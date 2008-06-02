@@ -1,0 +1,44 @@
+<ui version="4.0" >
+ <class>HelpForm</class>
+ <widget class="QWidget" name="HelpForm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>211</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Instructions</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" >
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" font-weight:600;">Use the sliders&lt;/span> in the &lt;span style=" font-style:italic;">Parameters&lt;/span> tool window to change the appearance.&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" font-weight:600;">Drag and drop an image&lt;/span> from file manager or web browser to change the image. You can change the left, center and right image individually.&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" font-weight:600;">Right-click&lt;/span> to save the result to a file (in PNG format).&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::RichText</enum>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
