@@ -24,41 +24,41 @@
 #include "ui_help.h"
 
 // Create a reflected version of the image, along with gradient translucency
-static QImage reflected(const QImage& img, int offsetPercent)
+static QPixmap reflected(const QPixmap& img, int offsetPercent)
 {
     QLinearGradient gradient(QPoint(0, 0), QPoint(0, img.height()));
     gradient.setColorAt(qMin(1.0, offsetPercent/100.0), Qt::black);
     gradient.setColorAt(0, Qt::white);
     
-    QImage mask = img;
+    QImage mask = img.toImage();
     QPainter painter(&mask);
     painter.fillRect(mask.rect(), gradient);
     painter.end();
 
-    QImage reflection = img.mirrored();
+    QImage reflection = img.toImage().mirrored();
     reflection.setAlphaChannel(mask);
 
-    return reflection;
+    return QPixmap::fromImage(reflection);
 }
 
 // Add a reflection to the image and return a new image
-static QImage reflectionAdded(const QImage& img, int opacityPercent, int offsetPercent)
+static QPixmap reflectionAdded(const QPixmap& img, int opacityPercent, int offsetPercent)
 {
-    QImage result(img.width(), img.height()*2, img.format());
+    QPixmap result(img.width(), img.height()*2);
 
     QPainter painter(&result);
-    painter.drawImage(0, 0, img);
+    painter.drawPixmap(0, 0, img);
     painter.setOpacity(qMin(1.0, opacityPercent/100.0));
-    painter.drawImage(0, img.height(), reflected(img, offsetPercent));
+    painter.drawPixmap(0, img.height(), reflected(img, offsetPercent));
     painter.end();
 
     return result;
 }
 
 // Create a stub image with big '?' in the middle 
-static QImage defaultImage()
+static QPixmap defaultImage()
 {
-    QImage m_defaultImage = QImage(400, 300, QImage::Format_ARGB32_Premultiplied);
+    QPixmap m_defaultImage = QPixmap(400, 300);
 
     QLinearGradient gradient(QPoint(0, 0), QPoint(0, m_defaultImage.height()));
     gradient.setColorAt(0, QColor(192, 192, 192));
@@ -81,7 +81,7 @@ class Screenie: public QWidget
 {
 public:
     Screenie();
-    void loadImage(int index, const QImage& image);
+    void loadImage(int index, const QPixmap& image);
     void dragEnterEvent(QDragEnterEvent*);
     void dropEvent(QDropEvent* event);
     void paintEvent(QPaintEvent*);
@@ -92,9 +92,9 @@ public:
     void recreateReflection();
 
 private:
-    QImage m_centerImage;
-    QImage m_leftImage;
-    QImage m_rightImage;
+    QPixmap m_centerImage;
+    QPixmap m_leftImage;
+    QPixmap m_rightImage;
 
     QGroupBox* m_leftImageBox;
     QGroupBox* m_centerImageBox;
@@ -185,7 +185,7 @@ void Screenie::setupUI()
     connect(m_backgroundBlueSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
 }
 
-QImage upperHalf(const QImage& img)
+QPixmap upperHalf(const QPixmap& img)
 {
     return img.copy(0, 0, img.width(), img.height()/2);
 }
@@ -203,9 +203,9 @@ void Screenie::recreateReflection()
     }
 }
 
-void Screenie::loadImage(int index, const QImage& image)
+void Screenie::loadImage(int index, const QPixmap& image)
 {
-    QImage img = image;
+    QPixmap img = image;
     if (img.isNull()) {
         qDebug() << "Can not load null image!";
         return;
@@ -255,13 +255,13 @@ void Screenie::dropEvent(QDropEvent* event)
 
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.count()) {
-        QImage img;
+        QPixmap img;
         QString fname = urls[0].toLocalFile();
 
         if (event->mimeData()->hasImage())
-            img = qvariant_cast<QImage>(event->mimeData()->imageData());
+            img = qvariant_cast<QPixmap>(event->mimeData()->imageData());
         else   
-            img = QImage(fname);
+            img = QPixmap(fname);
 
         if (img.isNull())
             setWindowTitle(QString("Can not load %1").arg(fname));
@@ -313,7 +313,7 @@ void Screenie::paintEvent(QPaintEvent*)
         int dx = m_leftOffsetSlider->value();
         int dy = m_leftDistanceSlider->value();
         painter.setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
-        painter.drawImage(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
+        painter.drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
         painter.restore();
     }
 
@@ -327,7 +327,7 @@ void Screenie::paintEvent(QPaintEvent*)
         int dx = m_rightOffsetSlider->value();
         int dy = m_rightDistanceSlider->value();
         painter.setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
-        painter.drawImage(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
+        painter.drawPixmap(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
         painter.restore();
     }
 
@@ -338,7 +338,7 @@ void Screenie::paintEvent(QPaintEvent*)
         transform.rotate(m_centerAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_centerImage.height()/4);
         painter.setTransform(transform * QTransform().translate(cx,cy), true);
-        painter.drawImage(corner, m_centerImage);
+        painter.drawPixmap(corner, m_centerImage);
         painter.restore();
     }
 
@@ -376,16 +376,16 @@ int main(int argc, char *argv[])
 
     switch(argc) {
         case 2:
-            widget.loadImage(1, QImage(argv[1]));
+            widget.loadImage(1, QPixmap(argv[1]));
             break;
         case 3:
-            widget.loadImage(0, QImage(argv[1]));
-            widget.loadImage(1, QImage(argv[2]));
+            widget.loadImage(0, QPixmap(argv[1]));
+            widget.loadImage(1, QPixmap(argv[2]));
             break;
         case 4:
-            widget.loadImage(0, QImage(argv[1]));
-            widget.loadImage(1, QImage(argv[2]));
-            widget.loadImage(2, QImage(argv[3]));
+            widget.loadImage(0, QPixmap(argv[1]));
+            widget.loadImage(1, QPixmap(argv[2]));
+            widget.loadImage(2, QPixmap(argv[3]));
             break;
     }
 
