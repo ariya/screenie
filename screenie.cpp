@@ -55,6 +55,28 @@ static QImage reflectionAdded(const QImage& img, int opacityPercent, int offsetP
     return result;
 }
 
+// Create a stub image with big '?' in the middle 
+static QImage defaultImage()
+{
+    QImage m_defaultImage = QImage(400, 300, QImage::Format_ARGB32_Premultiplied);
+
+    QLinearGradient gradient(QPoint(0, 0), QPoint(0, m_defaultImage.height()));
+    gradient.setColorAt(0, QColor(192, 192, 192));
+    gradient.setColorAt(1, QColor(128, 128, 128));
+    QPainter p(&m_defaultImage);
+    p.fillRect(m_defaultImage.rect(), gradient);
+    p.setPen(QPen(QColor(96, 96, 96), 3, Qt::SolidLine));
+    p.drawRect(m_defaultImage.rect());
+    QFont font;
+    font.setPixelSize(100);
+    p.setFont(font);
+    p.setPen(Qt::white);
+    p.drawText(m_defaultImage.rect(), Qt::AlignCenter, "?");
+    p.end();
+
+    return m_defaultImage;
+}
+
 class Screenie: public QWidget
 {
 public:
@@ -70,8 +92,6 @@ public:
     void recreateReflection();
 
 private:
-    QImage m_defaultImage;
-
     QImage m_centerImage;
     QImage m_leftImage;
     QImage m_rightImage;
@@ -94,36 +114,21 @@ private:
     bool m_useReflection;
     int m_reflectionOpacity;
     int m_reflectionOffset;
+
+    QSlider* m_backgroundRedSlider;
+    QSlider* m_backgroundGreenSlider;
+    QSlider* m_backgroundBlueSlider;
+    QColor m_backgroundColor;
 };
 
 Screenie::Screenie(): m_useReflection(true), m_reflectionOpacity(100), m_reflectionOffset(40)
 {
-    m_defaultImage = QImage(400, 300, QImage::Format_ARGB32_Premultiplied);
-    QLinearGradient gradient(QPoint(0, 0), QPoint(0, m_defaultImage.height()));
-    gradient.setColorAt(0, QColor(192, 192, 192));
-    gradient.setColorAt(1, QColor(128, 128, 128));
-    QPainter p(&m_defaultImage);
-    p.fillRect(m_defaultImage.rect(), gradient);
-    p.setPen(QPen(QColor(96, 96, 96), 3, Qt::SolidLine));
-    p.drawRect(m_defaultImage.rect());
-    QFont font;
-    font.setPixelSize(100);
-    p.setFont(font);
-    p.setPen(Qt::white);
-    p.drawText(m_defaultImage.rect(), Qt::AlignCenter, "?");
-    p.end();
-
-    m_leftImage = reflectionAdded(m_defaultImage, m_reflectionOpacity, m_reflectionOffset);
-    m_centerImage = reflectionAdded(m_defaultImage, m_reflectionOpacity, m_reflectionOffset);
-    m_rightImage = reflectionAdded(m_defaultImage, m_reflectionOpacity, m_reflectionOffset);
+    m_centerImage = reflectionAdded(defaultImage(), m_reflectionOpacity, m_reflectionOffset);
+    m_leftImage = m_rightImage = m_centerImage;
 
     setAcceptDrops(true);
 
     setAttribute(Qt::WA_StaticContents, true);
-
-    QPalette pal = palette();
-    pal.setColor(backgroundRole(), Qt::white);
-    setPalette(pal);
 
     setupUI();
     update();
@@ -158,6 +163,9 @@ void Screenie::setupUI()
     m_rightAngleSlider = qFindChild<QSlider*>(toolWidget, "rightAngleSlider");
     m_reflectionOpacitySlider = qFindChild<QSlider*>(toolWidget, "reflectionOpacitySlider");
     m_reflectionOffsetSlider = qFindChild<QSlider*>(toolWidget, "reflectionOffsetSlider");
+    m_backgroundRedSlider = qFindChild<QSlider*>(toolWidget, "backgroundRedSlider");
+    m_backgroundGreenSlider = qFindChild<QSlider*>(toolWidget, "backgroundGreenSlider");
+    m_backgroundBlueSlider = qFindChild<QSlider*>(toolWidget, "backgroundBlueSlider");
 
     connect(m_leftImageBox, SIGNAL(toggled(bool)), SLOT(update()));
     connect(m_centerImageBox, SIGNAL(toggled(bool)), SLOT(update()));
@@ -172,6 +180,9 @@ void Screenie::setupUI()
     connect(m_rightAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(m_reflectionOpacitySlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(m_reflectionOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(m_backgroundRedSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(m_backgroundGreenSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(m_backgroundBlueSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
 }
 
 QImage upperHalf(const QImage& img)
@@ -278,6 +289,15 @@ void Screenie::paintEvent(QPaintEvent*)
         recreateReflection();
     }
 
+    QColor color(m_backgroundRedSlider->value(), m_backgroundGreenSlider->value(),
+        m_backgroundBlueSlider->value());
+    if (m_backgroundColor != color) {
+        m_backgroundColor = color;
+        QPalette pal = palette();
+        pal.setColor(backgroundRole(), color);
+        setPalette(pal);
+    }
+
     m_leftOffsetSlider->setMaximum(cx);
     m_rightOffsetSlider->setMaximum(cx);
 
@@ -318,7 +338,7 @@ void Screenie::paintEvent(QPaintEvent*)
         transform.rotate(m_centerAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_centerImage.height()/4);
         painter.setTransform(transform * QTransform().translate(cx,cy), true);
-        painter.fillRect(QRect(corner, m_centerImage.size()), Qt::white);
+        painter.fillRect(QRect(corner, m_centerImage.size()), m_backgroundColor);
         painter.drawImage(corner, m_centerImage);
         painter.restore();
     }
