@@ -338,7 +338,6 @@ void Screenie::paintEvent(QPaintEvent*)
         transform.rotate(m_centerAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_centerImage.height()/4);
         painter.setTransform(transform * QTransform().translate(cx,cy), true);
-        painter.fillRect(QRect(corner, m_centerImage.size()), m_backgroundColor);
         painter.drawImage(corner, m_centerImage);
         painter.restore();
     }
