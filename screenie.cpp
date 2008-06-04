@@ -309,17 +309,6 @@ void Screenie::paintEvent(QPaintEvent*)
     pal.setBrush(backgroundRole(), bgbrush);
     setPalette(pal);
 
-    QPainter painter(this);
-    render(&painter);
-}
-
-void Screenie::render(QPainter* painter)
-{
-    painter->setRenderHint(QPainter::Antialiasing, true);
-    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-    int cx = width()/2;
-    int cy = height()*2/3;
-
     if ((m_reflectionOpacity != m_reflectionOpacitySlider->value()) ||
         (m_reflectionOffset != m_reflectionOffsetSlider->value()) || 
         (m_useReflection != m_reflectionBox->isChecked())) {
@@ -329,17 +318,19 @@ void Screenie::render(QPainter* painter)
         recreateReflection();
     }
 
-    QColor color(m_backgroundRedSlider->value(), m_backgroundGreenSlider->value(),
-        m_backgroundBlueSlider->value());
-    if (m_backgroundColor != color) {
-        m_backgroundColor = color;
-        QPalette pal = palette();
-        pal.setColor(backgroundRole(), color);
-        setPalette(pal);
-    }
+    QPainter painter(this);
+    render(&painter);
 
-    m_leftOffsetSlider->setMaximum(cx);
-    m_rightOffsetSlider->setMaximum(cx);
+    m_leftOffsetSlider->setMaximum(width()/2);
+    m_rightOffsetSlider->setMaximum(width()/2);
+}
+
+void Screenie::render(QPainter* painter)
+{
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+    int cx = width()/2;
+    int cy = height()*2/3;
 
     QTransform transform;
 
