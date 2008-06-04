@@ -101,6 +101,7 @@ private:
     QGroupBox* m_centerImageBox;
     QGroupBox* m_rightImageBox;
     QGroupBox* m_reflectionBox;
+    QGroupBox* m_backgroundBox;
 
     QSlider* m_leftOffsetSlider;
     QSlider* m_leftDistanceSlider;
@@ -119,10 +120,13 @@ private:
     QSlider* m_backgroundRedSlider;
     QSlider* m_backgroundGreenSlider;
     QSlider* m_backgroundBlueSlider;
+    bool m_useBackground;
     QColor m_backgroundColor;
+    QBrush m_checkerBoard;
 };
 
-Screenie::Screenie(): m_useReflection(true), m_reflectionOpacity(100), m_reflectionOffset(40)
+Screenie::Screenie(): m_useReflection(true), m_reflectionOpacity(100), m_reflectionOffset(40),
+m_useBackground(true)
 {
     m_centerImage = reflectionAdded(defaultImage(), m_reflectionOpacity, m_reflectionOffset);
     m_leftImage = m_rightImage = m_centerImage;
@@ -130,6 +134,8 @@ Screenie::Screenie(): m_useReflection(true), m_reflectionOpacity(100), m_reflect
     setAcceptDrops(true);
 
     setAttribute(Qt::WA_StaticContents, true);
+    setAttribute(Qt::WA_OpaquePaintEvent, true);
+    setAttribute(Qt::WA_NoSystemBackground, true);
 
     setupUI();
     update();
@@ -155,6 +161,8 @@ void Screenie::setupUI()
     m_centerImageBox = qFindChild<QGroupBox*>(toolWidget, "centerImageBox");
     m_rightImageBox = qFindChild<QGroupBox*>(toolWidget, "rightImageBox");
     m_reflectionBox = qFindChild<QGroupBox*>(toolWidget, "reflectionBox");
+    m_backgroundBox = qFindChild<QGroupBox*>(toolWidget, "backgroundBox");
+
     m_leftOffsetSlider = qFindChild<QSlider*>(toolWidget, "leftOffsetSlider");
     m_leftDistanceSlider = qFindChild<QSlider*>(toolWidget, "leftDistanceSlider");
     m_leftAngleSlider = qFindChild<QSlider*>(toolWidget, "leftAngleSlider");
@@ -172,6 +180,8 @@ void Screenie::setupUI()
     connect(m_centerImageBox, SIGNAL(toggled(bool)), SLOT(update()));
     connect(m_rightImageBox, SIGNAL(toggled(bool)), SLOT(update()));
     connect(m_reflectionBox, SIGNAL(toggled(bool)), SLOT(update()));
+    connect(m_backgroundBox, SIGNAL(toggled(bool)), SLOT(update()));
+
     connect(m_leftOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(m_leftDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(m_leftAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
@@ -276,6 +286,27 @@ void Screenie::dropEvent(QDropEvent* event)
 void Screenie::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
+
+    m_useBackground = m_backgroundBox->isChecked();
+    if (m_useBackground) {
+        int red = m_backgroundRedSlider->value();
+        int green = m_backgroundGreenSlider->value();
+        int blue = m_backgroundBlueSlider->value();
+        m_backgroundColor = QColor(red, green, blue);
+        painter.fillRect(rect(), m_backgroundColor);
+    } else {
+        if (m_checkerBoard.style() == Qt::NoBrush) {
+            QImage checker(16, 16, QImage::Format_ARGB32_Premultiplied);
+            QPainter painter(&checker);
+            painter.fillRect(checker.rect(), QColor(153, 153, 153));
+            painter.fillRect(0, 0, 8, 8, QColor(102, 102, 102));
+            painter.fillRect(8, 8, 8, 8, QColor(102, 102, 102));
+            painter.end();
+            m_checkerBoard.setTextureImage(checker);
+        }
+        painter.fillRect(rect(), m_checkerBoard);
+    }
+
     render(&painter);
 }
 
@@ -364,10 +395,11 @@ void Screenie::mouseReleaseEvent(QMouseEvent* event)
     if (fileName.isNull())
         return;
 
-
     QImage image(width(), height(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(0);
     QPainter painter(&image);
-    painter.fillRect(image.rect(), m_backgroundColor);
+    if (m_useBackground)
+        painter.fillRect(image.rect(), m_backgroundColor);
     render(&painter);
     painter.end();
     image.save(fileName);
