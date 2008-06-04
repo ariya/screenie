@@ -134,8 +134,6 @@ m_useBackground(true)
     setAcceptDrops(true);
 
     setAttribute(Qt::WA_StaticContents, true);
-    setAttribute(Qt::WA_OpaquePaintEvent, true);
-    setAttribute(Qt::WA_NoSystemBackground, true);
 
     setupUI();
     update();
@@ -285,7 +283,7 @@ void Screenie::dropEvent(QDropEvent* event)
 
 void Screenie::paintEvent(QPaintEvent*)
 {
-    QPainter painter(this);
+    QBrush bgbrush;
 
     m_useBackground = m_backgroundBox->isChecked();
     if (m_useBackground) {
@@ -293,7 +291,7 @@ void Screenie::paintEvent(QPaintEvent*)
         int green = m_backgroundGreenSlider->value();
         int blue = m_backgroundBlueSlider->value();
         m_backgroundColor = QColor(red, green, blue);
-        painter.fillRect(rect(), m_backgroundColor);
+        bgbrush = QBrush(m_backgroundColor);
     } else {
         if (m_checkerBoard.style() == Qt::NoBrush) {
             QImage checker(16, 16, QImage::Format_ARGB32_Premultiplied);
@@ -304,9 +302,14 @@ void Screenie::paintEvent(QPaintEvent*)
             painter.end();
             m_checkerBoard.setTextureImage(checker);
         }
-        painter.fillRect(rect(), m_checkerBoard);
+        bgbrush = m_checkerBoard;
     }
 
+    QPalette pal = palette();
+    pal.setBrush(backgroundRole(), bgbrush);
+    setPalette(pal);
+
+    QPainter painter(this);
     render(&painter);
 }
 
