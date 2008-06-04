@@ -90,6 +90,7 @@ public:
 
     void setupUI();
     void recreateReflection();
+    void render(QPainter*);
 
 private:
     QPixmap m_centerImage;
@@ -275,8 +276,13 @@ void Screenie::dropEvent(QDropEvent* event)
 void Screenie::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    render(&painter);
+}
+
+void Screenie::render(QPainter* painter)
+{
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
     int cx = width()/2;
     int cy = height()*2/3;
 
@@ -304,7 +310,7 @@ void Screenie::paintEvent(QPaintEvent*)
     QTransform transform;
 
     if (m_leftImageBox->isChecked()) {
-        painter.save();
+        painter->save();
         qreal leftScale = 1 - (qreal)m_leftDistanceSlider->value()/200.0;
         transform = QTransform().scale(leftScale, leftScale);
         transform.translate(0, -m_leftImage.height()/4);
@@ -312,13 +318,13 @@ void Screenie::paintEvent(QPaintEvent*)
         transform.translate(0, m_leftImage.height()/4);
         int dx = m_leftOffsetSlider->value();
         int dy = m_leftDistanceSlider->value();
-        painter.setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
-        painter.drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
-        painter.restore();
+        painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
+        painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
+        painter->restore();
     }
 
     if (m_rightImageBox->isChecked()) {
-        painter.save();
+        painter->save();
         qreal rightScale = 1 - (qreal)m_rightDistanceSlider->value()/200.0;
         transform = QTransform().scale(rightScale, rightScale);
         transform.translate(0, -m_rightImage.height()/4);
@@ -326,20 +332,20 @@ void Screenie::paintEvent(QPaintEvent*)
         transform.translate(0, m_rightImage.height()/4);
         int dx = m_rightOffsetSlider->value();
         int dy = m_rightDistanceSlider->value();
-        painter.setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
-        painter.drawPixmap(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
-        painter.restore();
+        painter->setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
+        painter->drawPixmap(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
+        painter->restore();
     }
 
     if (m_centerImageBox->isChecked()) {
         QPoint corner(-m_centerImage.width()/2, -m_centerImage.height()/2);
-        painter.save();
+        painter->save();
         transform = QTransform().translate(0, -m_centerImage.height()/4);
         transform.rotate(m_centerAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_centerImage.height()/4);
-        painter.setTransform(transform * QTransform().translate(cx,cy), true);
-        painter.drawPixmap(corner, m_centerImage);
-        painter.restore();
+        painter->setTransform(transform * QTransform().translate(cx,cy), true);
+        painter->drawPixmap(corner, m_centerImage);
+        painter->restore();
     }
 
 }
