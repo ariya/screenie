@@ -364,13 +364,13 @@ void Screenie::mouseReleaseEvent(QMouseEvent* event)
     if (fileName.isNull())
         return;
 
-    QPixmap pixmap = QPixmap::grabWidget(this);
-    if (pixmap.isNull()) {
-        qDebug() << "QPixmap::grabWidget failed!";
-        return;
-    }
 
-    pixmap.save(fileName);
+    QImage image(width(), height(), QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&image);
+    painter.fillRect(image.rect(), m_backgroundColor);
+    render(&painter);
+    painter.end();
+    image.save(fileName);
 }
 
 int main(int argc, char *argv[])
