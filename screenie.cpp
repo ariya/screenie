@@ -45,6 +45,7 @@ static QPixmap reflected(const QPixmap& img, int offsetPercent)
 static QPixmap reflectionAdded(const QPixmap& img, int opacityPercent, int offsetPercent)
 {
     QPixmap result(img.width(), img.height()*2);
+    result.fill(Qt::transparent);
 
     QPainter painter(&result);
     painter.drawPixmap(0, 0, img);
