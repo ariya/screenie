@@ -82,6 +82,7 @@ class Screenie: public QWidget
 {
 public:
     Screenie();
+    ~Screenie();
     void loadImage(int index, const QPixmap& image);
     void dragEnterEvent(QDragEnterEvent*);
     void dropEvent(QDropEvent* event);
@@ -98,29 +99,11 @@ private:
     QPixmap m_leftImage;
     QPixmap m_rightImage;
 
-    QGroupBox* m_leftImageBox;
-    QGroupBox* m_centerImageBox;
-    QGroupBox* m_rightImageBox;
-    QGroupBox* m_reflectionBox;
-    QGroupBox* m_backgroundBox;
+    Ui::ParametersForm* parameters;
 
-    QSlider* m_leftOffsetSlider;
-    QSlider* m_leftDistanceSlider;
-    QSlider* m_leftAngleSlider;
-    QSlider* m_centerAngleSlider;
-    QSlider* m_rightOffsetSlider;
-    QSlider* m_rightDistanceSlider;
-    QSlider* m_rightAngleSlider;
-
-    QSlider* m_reflectionOpacitySlider;
-    QSlider* m_reflectionOffsetSlider;
     bool m_useReflection;
     int m_reflectionOpacity;
     int m_reflectionOffset;
-
-    QSlider* m_backgroundRedSlider;
-    QSlider* m_backgroundGreenSlider;
-    QSlider* m_backgroundBlueSlider;
     bool m_useBackground;
     QColor m_backgroundColor;
     QBrush m_checkerBoard;
@@ -140,12 +123,17 @@ m_useBackground(true)
     update();
 }
 
+Screenie::~Screenie()
+{
+    delete parameters;
+}
+
 void Screenie::setupUI()
 {
+    parameters = new Ui::ParametersForm;
     QWidget* toolWidget = new QWidget(this);
     toolWidget->setWindowFlags(Qt::Tool | Qt::WindowTitleHint);
-    Ui::ParametersForm parameters;
-    parameters.setupUi(toolWidget);
+    parameters->setupUi(toolWidget);
     toolWidget->show();
     toolWidget->adjustSize();
 
@@ -156,43 +144,24 @@ void Screenie::setupUI()
     helpWidget->show();
     helpWidget->adjustSize();
 
-    m_leftImageBox = qFindChild<QGroupBox*>(toolWidget, "leftImageBox");
-    m_centerImageBox = qFindChild<QGroupBox*>(toolWidget, "centerImageBox");
-    m_rightImageBox = qFindChild<QGroupBox*>(toolWidget, "rightImageBox");
-    m_reflectionBox = qFindChild<QGroupBox*>(toolWidget, "reflectionBox");
-    m_backgroundBox = qFindChild<QGroupBox*>(toolWidget, "backgroundBox");
+    connect(parameters->leftImageBox, SIGNAL(toggled(bool)), SLOT(update()));
+    connect(parameters->centerImageBox, SIGNAL(toggled(bool)), SLOT(update()));
+    connect(parameters->rightImageBox, SIGNAL(toggled(bool)), SLOT(update()));
+    connect(parameters->reflectionBox, SIGNAL(toggled(bool)), SLOT(update()));
+    connect(parameters->backgroundBox, SIGNAL(toggled(bool)), SLOT(update()));
 
-    m_leftOffsetSlider = qFindChild<QSlider*>(toolWidget, "leftOffsetSlider");
-    m_leftDistanceSlider = qFindChild<QSlider*>(toolWidget, "leftDistanceSlider");
-    m_leftAngleSlider = qFindChild<QSlider*>(toolWidget, "leftAngleSlider");
-    m_centerAngleSlider = qFindChild<QSlider*>(toolWidget, "centerAngleSlider");
-    m_rightOffsetSlider = qFindChild<QSlider*>(toolWidget, "rightOffsetSlider");
-    m_rightDistanceSlider = qFindChild<QSlider*>(toolWidget, "rightDistanceSlider");
-    m_rightAngleSlider = qFindChild<QSlider*>(toolWidget, "rightAngleSlider");
-    m_reflectionOpacitySlider = qFindChild<QSlider*>(toolWidget, "reflectionOpacitySlider");
-    m_reflectionOffsetSlider = qFindChild<QSlider*>(toolWidget, "reflectionOffsetSlider");
-    m_backgroundRedSlider = qFindChild<QSlider*>(toolWidget, "backgroundRedSlider");
-    m_backgroundGreenSlider = qFindChild<QSlider*>(toolWidget, "backgroundGreenSlider");
-    m_backgroundBlueSlider = qFindChild<QSlider*>(toolWidget, "backgroundBlueSlider");
-
-    connect(m_leftImageBox, SIGNAL(toggled(bool)), SLOT(update()));
-    connect(m_centerImageBox, SIGNAL(toggled(bool)), SLOT(update()));
-    connect(m_rightImageBox, SIGNAL(toggled(bool)), SLOT(update()));
-    connect(m_reflectionBox, SIGNAL(toggled(bool)), SLOT(update()));
-    connect(m_backgroundBox, SIGNAL(toggled(bool)), SLOT(update()));
-
-    connect(m_leftOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_leftDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_leftAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_centerAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_rightOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_rightDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_rightAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_reflectionOpacitySlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_reflectionOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_backgroundRedSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_backgroundGreenSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
-    connect(m_backgroundBlueSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->leftOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->leftDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->leftAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->centerAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->rightOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->rightDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->rightAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->reflectionOpacitySlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->reflectionOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->backgroundRedSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->backgroundGreenSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->backgroundBlueSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
 }
 
 QPixmap upperHalf(const QPixmap& img)
@@ -286,11 +255,11 @@ void Screenie::paintEvent(QPaintEvent*)
 {
     QBrush bgbrush;
 
-    m_useBackground = m_backgroundBox->isChecked();
+    m_useBackground = parameters->backgroundBox->isChecked();
     if (m_useBackground) {
-        int red = m_backgroundRedSlider->value();
-        int green = m_backgroundGreenSlider->value();
-        int blue = m_backgroundBlueSlider->value();
+        int red = parameters->backgroundRedSlider->value();
+        int green = parameters->backgroundGreenSlider->value();
+        int blue = parameters->backgroundBlueSlider->value();
         m_backgroundColor = QColor(red, green, blue);
         bgbrush = QBrush(m_backgroundColor);
     } else {
@@ -310,20 +279,20 @@ void Screenie::paintEvent(QPaintEvent*)
     pal.setBrush(backgroundRole(), bgbrush);
     setPalette(pal);
 
-    if ((m_reflectionOpacity != m_reflectionOpacitySlider->value()) ||
-        (m_reflectionOffset != m_reflectionOffsetSlider->value()) || 
-        (m_useReflection != m_reflectionBox->isChecked())) {
-        m_reflectionOpacity = m_reflectionOpacitySlider->value();
-        m_reflectionOffset = m_reflectionOffsetSlider->value();
-        m_useReflection = m_reflectionBox->isChecked();
+    if ((m_reflectionOpacity != parameters->reflectionOpacitySlider->value()) ||
+        (m_reflectionOffset != parameters->reflectionOffsetSlider->value()) || 
+        (m_useReflection != parameters->reflectionBox->isChecked())) {
+        m_reflectionOpacity = parameters->reflectionOpacitySlider->value();
+        m_reflectionOffset = parameters->reflectionOffsetSlider->value();
+        m_useReflection = parameters->reflectionBox->isChecked();
         recreateReflection();
     }
 
     QPainter painter(this);
     render(&painter);
 
-    m_leftOffsetSlider->setMaximum(width()/2);
-    m_rightOffsetSlider->setMaximum(width()/2);
+    parameters->leftOffsetSlider->setMaximum(width()/2);
+    parameters->rightOffsetSlider->setMaximum(width()/2);
 }
 
 void Screenie::render(QPainter* painter)
@@ -335,39 +304,39 @@ void Screenie::render(QPainter* painter)
 
     QTransform transform;
 
-    if (m_leftImageBox->isChecked()) {
+    if (parameters->leftImageBox->isChecked()) {
         painter->save();
-        qreal leftScale = 1 - (qreal)m_leftDistanceSlider->value()/200.0;
+        qreal leftScale = 1 - (qreal)parameters->leftDistanceSlider->value()/200.0;
         transform = QTransform().scale(leftScale, leftScale);
         transform.translate(0, -m_leftImage.height()/4);
-        transform.rotate(m_leftAngleSlider->value(), Qt::YAxis);
+        transform.rotate(parameters->leftAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_leftImage.height()/4);
-        int dx = m_leftOffsetSlider->value();
-        int dy = m_leftDistanceSlider->value();
+        int dx = parameters->leftOffsetSlider->value();
+        int dy = parameters->leftDistanceSlider->value();
         painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
         painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
         painter->restore();
     }
 
-    if (m_rightImageBox->isChecked()) {
+    if (parameters->rightImageBox->isChecked()) {
         painter->save();
-        qreal rightScale = 1 - (qreal)m_rightDistanceSlider->value()/200.0;
+        qreal rightScale = 1 - (qreal)parameters->rightDistanceSlider->value()/200.0;
         transform = QTransform().scale(rightScale, rightScale);
         transform.translate(0, -m_rightImage.height()/4);
-        transform.rotate(m_rightAngleSlider->value(), Qt::YAxis);
+        transform.rotate(parameters->rightAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_rightImage.height()/4);
-        int dx = m_rightOffsetSlider->value();
-        int dy = m_rightDistanceSlider->value();
+        int dx = parameters->rightOffsetSlider->value();
+        int dy = parameters->rightDistanceSlider->value();
         painter->setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
         painter->drawPixmap(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
         painter->restore();
     }
 
-    if (m_centerImageBox->isChecked()) {
+    if (parameters->centerImageBox->isChecked()) {
         QPoint corner(-m_centerImage.width()/2, -m_centerImage.height()/2);
         painter->save();
         transform = QTransform().translate(0, -m_centerImage.height()/4);
-        transform.rotate(m_centerAngleSlider->value(), Qt::YAxis);
+        transform.rotate(parameters->centerAngleSlider->value(), Qt::YAxis);
         transform.translate(0, m_centerImage.height()/4);
         painter->setTransform(transform * QTransform().translate(cx,cy), true);
         painter->drawPixmap(corner, m_centerImage);
