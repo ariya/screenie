@@ -358,7 +358,7 @@
        </widget>
       </item>
       <item row="0" column="2" >
-       <widget class="QSpinBox" name="spinBox" >
+       <widget class="QSpinBox" name="redSpinBox" >
         <property name="maximum" >
          <number>255</number>
         </property>
@@ -388,7 +388,7 @@
        </widget>
       </item>
       <item row="1" column="2" >
-       <widget class="QSpinBox" name="spinBox_2" >
+       <widget class="QSpinBox" name="greenSpinBox" >
         <property name="maximum" >
          <number>255</number>
         </property>
@@ -418,7 +418,7 @@
        </widget>
       </item>
       <item row="2" column="2" >
-       <widget class="QSpinBox" name="spinBox_3" >
+       <widget class="QSpinBox" name="blueSpinBox" >
         <property name="maximum" >
          <number>255</number>
         </property>
@@ -437,7 +437,7 @@
   <connection>
    <sender>backgroundRedSlider</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>spinBox</receiver>
+   <receiver>redSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -451,7 +451,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox</sender>
+   <sender>redSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>backgroundRedSlider</receiver>
    <slot>setValue(int)</slot>
@@ -469,7 +469,7 @@
   <connection>
    <sender>backgroundGreenSlider</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>spinBox_2</receiver>
+   <receiver>greenSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -483,7 +483,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_2</sender>
+   <sender>greenSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>backgroundGreenSlider</receiver>
    <slot>setValue(int)</slot>
@@ -501,7 +501,7 @@
   <connection>
    <sender>backgroundBlueSlider</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>spinBox_3</receiver>
+   <receiver>blueSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -515,7 +515,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_3</sender>
+   <sender>blueSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>backgroundBlueSlider</receiver>
    <slot>setValue(int)</slot>

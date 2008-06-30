@@ -162,6 +162,9 @@ void Screenie::setupUI()
     connect(parameters->backgroundRedSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->backgroundGreenSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->backgroundBlueSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->redSpinBox, SIGNAL(valueChanged(int)), SLOT(update()));
+    connect(parameters->greenSpinBox, SIGNAL(valueChanged(int)), SLOT(update()));
+    connect(parameters->blueSpinBox, SIGNAL(valueChanged(int)), SLOT(update()));
 }
 
 QPixmap upperHalf(const QPixmap& img)
