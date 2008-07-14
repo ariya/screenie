@@ -358,7 +358,8 @@ void Screenie::mouseReleaseEvent(QMouseEvent* event)
     if (event->button() != Qt::RightButton)
         return;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QString(), "*.png");
+    QString filter = "Portable Network Graphics (*.png)";
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
     if (fileName.isNull())
         return;
 
