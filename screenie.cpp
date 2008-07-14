@@ -120,6 +120,7 @@ m_useBackground(true)
     setAttribute(Qt::WA_StaticContents, true);
 
     setupUI();
+    resize(900, 500);
     update();
 }
 
