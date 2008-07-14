@@ -369,7 +369,7 @@ void Screenie::mouseReleaseEvent(QMouseEvent* event)
         painter.fillRect(image.rect(), m_backgroundColor);
     render(&painter);
     painter.end();
-    image.save(fileName);
+    image.save(fileName, "png");
 }
 
 int main(int argc, char *argv[])
