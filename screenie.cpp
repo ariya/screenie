@@ -98,6 +98,10 @@ private:
     QPixmap m_centerImage;
     QPixmap m_leftImage;
     QPixmap m_rightImage;
+	
+	void paintLeftImage(QPainter*, const int, const int);
+	void paintCenterImage(QPainter*, const int, const int);
+	void paintRightImage(QPainter*, const int, const int);
 
     Ui::ParametersForm* parameters;
 
@@ -154,6 +158,8 @@ void Screenie::setupUI()
     connect(parameters->leftOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->leftDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->leftAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->centerOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
+    connect(parameters->centerDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->centerAngleSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->rightOffsetSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
     connect(parameters->rightDistanceSlider, SIGNAL(sliderMoved(int)), SLOT(update()));
@@ -306,23 +312,90 @@ void Screenie::render(QPainter* painter)
     int cx = width()/2;
     int cy = height()*2/3;
 
-    QTransform transform;
+    //QTransform transform;
 
-    if (parameters->leftImageBox->isChecked()) {
+	int leftDistance = parameters->leftDistanceSlider->value();
+	int centerDistance = parameters->centerDistanceSlider->value();
+	int rightDistance = parameters->rightDistanceSlider->value();
+	
+	if (leftDistance > centerDistance && leftDistance > rightDistance) {
+		// left is the background image
+		paintLeftImage(painter, cx, cy);
+		if (centerDistance > rightDistance) {
+			paintCenterImage(painter, cx, cy);
+			paintRightImage(painter, cx, cy);
+		} else {
+			paintRightImage(painter, cx, cy);
+			paintCenterImage(painter, cx, cy);
+		}
+	} else if(centerDistance > leftDistance && centerDistance > rightDistance) {
+		paintCenterImage(painter, cx, cy);
+		if (leftDistance > rightDistance) {
+			paintLeftImage(painter, cx, cy);
+			paintRightImage(painter, cx, cy);
+		} else {
+			paintRightImage(painter, cx, cy);
+			paintLeftImage(painter, cx, cy);
+		}
+	} else {
+		paintRightImage(painter, cx, cy);
+		if (leftDistance > centerDistance) {
+			paintLeftImage(painter, cx, cy);
+			paintCenterImage(painter, cx, cy);
+		} else {
+			paintCenterImage(painter, cx, cy);
+			paintLeftImage(painter, cx, cy);
+		}
+	} 
+	// The most background picture.
+	// The middle one
+	// The most foreground one
+
+
+
+}
+
+void Screenie::paintLeftImage(QPainter *painter, const int cx, const int cy)
+{
+	if (parameters->leftImageBox->isChecked()) {
+		QTransform transform;
+		painter->save();
+		qreal leftScale = 1 - (qreal)parameters->leftDistanceSlider->value()/200.0;
+		transform = QTransform().scale(leftScale, leftScale);
+		transform.translate(0, -m_leftImage.height()/4);
+		transform.rotate(parameters->leftAngleSlider->value(), Qt::YAxis);
+		transform.translate(0, m_leftImage.height()/4);
+		int dx = parameters->leftOffsetSlider->value();
+		int dy = parameters->leftDistanceSlider->value();
+		//painter->setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
+		painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
+		painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
+		painter->restore();
+	}
+}
+			  
+void Screenie::paintCenterImage(QPainter *painter, const int cx, const int cy)
+{
+    if (parameters->centerImageBox->isChecked()) {
+		QTransform transform;
         painter->save();
-        qreal leftScale = 1 - (qreal)parameters->leftDistanceSlider->value()/200.0;
-        transform = QTransform().scale(leftScale, leftScale);
-        transform.translate(0, -m_leftImage.height()/4);
-        transform.rotate(parameters->leftAngleSlider->value(), Qt::YAxis);
-        transform.translate(0, m_leftImage.height()/4);
-        int dx = parameters->leftOffsetSlider->value();
-        int dy = parameters->leftDistanceSlider->value();
-        painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
-        painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
+        qreal centerScale = 1 - (qreal)parameters->centerDistanceSlider->value()/200.0;
+        transform = QTransform().scale(centerScale, centerScale);
+        transform.translate(0, -m_centerImage.height()/4);
+        transform.rotate(parameters->centerAngleSlider->value(), Qt::YAxis);
+        transform.translate(0, m_centerImage.height()/4);
+        int dx = parameters->centerOffsetSlider->value();
+        int dy = parameters->centerDistanceSlider->value();
+        painter->setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
+        painter->drawPixmap(-m_centerImage.width()/2, -m_centerImage.height()/2, m_centerImage);
         painter->restore();
     }
-
+}
+			  
+void Screenie::paintRightImage(QPainter *painter, const int cx, const int cy)
+{
     if (parameters->rightImageBox->isChecked()) {
+		QTransform transform;
         painter->save();
         qreal rightScale = 1 - (qreal)parameters->rightDistanceSlider->value()/200.0;
         transform = QTransform().scale(rightScale, rightScale);
@@ -335,20 +408,8 @@ void Screenie::render(QPainter* painter)
         painter->drawPixmap(-m_rightImage.width()/2, -m_rightImage.height()/2, m_rightImage);
         painter->restore();
     }
-
-    if (parameters->centerImageBox->isChecked()) {
-        QPoint corner(-m_centerImage.width()/2, -m_centerImage.height()/2);
-        painter->save();
-        transform = QTransform().translate(0, -m_centerImage.height()/4);
-        transform.rotate(parameters->centerAngleSlider->value(), Qt::YAxis);
-        transform.translate(0, m_centerImage.height()/4);
-        painter->setTransform(transform * QTransform().translate(cx,cy), true);
-        painter->drawPixmap(corner, m_centerImage);
-        painter->restore();
-    }
-
 }
-
+			  
 void Screenie::resizeEvent(QResizeEvent*)
 {
     QTimer::singleShot(500, this, SLOT(update()));
