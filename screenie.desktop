@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Screenie
+Comment=A fancy screenshot composer
+Exec=/usr/bin/screenie
+Icon=screenie
+Type=Application
+Categories=Graphics;3DGraphics;
