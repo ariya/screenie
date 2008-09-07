@@ -29,7 +29,7 @@ static QPixmap reflected(const QPixmap& img, int offsetPercent)
     QLinearGradient gradient(QPoint(0, 0), QPoint(0, img.height()));
     gradient.setColorAt(qMin(1.0, offsetPercent/100.0), Qt::black);
     gradient.setColorAt(0, Qt::white);
-    
+
     QImage mask = img.toImage();
     QPainter painter(&mask);
     painter.fillRect(mask.rect(), gradient);
@@ -56,7 +56,7 @@ static QPixmap reflectionAdded(const QPixmap& img, int opacityPercent, int offse
     return result;
 }
 
-// Create a stub image with big '?' in the middle 
+// Create a stub image with big '?' in the middle
 static QPixmap defaultImage()
 {
     QPixmap m_defaultImage = QPixmap(400, 300);
@@ -98,10 +98,10 @@ private:
     QPixmap m_centerImage;
     QPixmap m_leftImage;
     QPixmap m_rightImage;
-	
-	void paintLeftImage(QPainter*, const int, const int);
-	void paintCenterImage(QPainter*, const int, const int);
-	void paintRightImage(QPainter*, const int, const int);
+
+    void paintLeftImage(QPainter*, const int, const int);
+    void paintCenterImage(QPainter*, const int, const int);
+    void paintRightImage(QPainter*, const int, const int);
 
     Ui::ParametersForm* parameters;
 
@@ -198,8 +198,8 @@ void Screenie::loadImage(int index, const QPixmap& image)
     if (img.isNull()) {
         qDebug() << "Can not load null image!";
         return;
-    } 
-    
+    }
+
     if ((img.width() > 640) || (img.height() > 480)) {
         qDebug() << "Image is too large. Rescaling....";
         img = img.scaled(640, 480, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -249,7 +249,7 @@ void Screenie::dropEvent(QDropEvent* event)
 
         if (event->mimeData()->hasImage())
             img = qvariant_cast<QPixmap>(event->mimeData()->imageData());
-        else   
+        else
             img = QPixmap(fname);
 
         if (img.isNull())
@@ -290,7 +290,7 @@ void Screenie::paintEvent(QPaintEvent*)
     setPalette(pal);
 
     if ((m_reflectionOpacity != parameters->reflectionOpacitySlider->value()) ||
-        (m_reflectionOffset != parameters->reflectionOffsetSlider->value()) || 
+        (m_reflectionOffset != parameters->reflectionOffsetSlider->value()) ||
         (m_useReflection != parameters->reflectionBox->isChecked())) {
         m_reflectionOpacity = parameters->reflectionOpacitySlider->value();
         m_reflectionOffset = parameters->reflectionOffsetSlider->value();
@@ -312,72 +312,62 @@ void Screenie::render(QPainter* painter)
     int cx = width()/2;
     int cy = height()*2/3;
 
-    //QTransform transform;
+    int leftDistance = parameters->leftDistanceSlider->value();
+    int centerDistance = parameters->centerDistanceSlider->value();
+    int rightDistance = parameters->rightDistanceSlider->value();
 
-	int leftDistance = parameters->leftDistanceSlider->value();
-	int centerDistance = parameters->centerDistanceSlider->value();
-	int rightDistance = parameters->rightDistanceSlider->value();
-	
-	if (leftDistance > centerDistance && leftDistance > rightDistance) {
-		// left is the background image
-		paintLeftImage(painter, cx, cy);
-		if (centerDistance > rightDistance) {
-			paintCenterImage(painter, cx, cy);
-			paintRightImage(painter, cx, cy);
-		} else {
-			paintRightImage(painter, cx, cy);
-			paintCenterImage(painter, cx, cy);
-		}
-	} else if(centerDistance > leftDistance && centerDistance > rightDistance) {
-		paintCenterImage(painter, cx, cy);
-		if (leftDistance > rightDistance) {
-			paintLeftImage(painter, cx, cy);
-			paintRightImage(painter, cx, cy);
-		} else {
-			paintRightImage(painter, cx, cy);
-			paintLeftImage(painter, cx, cy);
-		}
-	} else {
-		paintRightImage(painter, cx, cy);
-		if (leftDistance > centerDistance) {
-			paintLeftImage(painter, cx, cy);
-			paintCenterImage(painter, cx, cy);
-		} else {
-			paintCenterImage(painter, cx, cy);
-			paintLeftImage(painter, cx, cy);
-		}
-	} 
-	// The most background picture.
-	// The middle one
-	// The most foreground one
-
-
-
+    if (leftDistance > centerDistance && leftDistance > rightDistance) {
+        paintLeftImage(painter, cx, cy);
+        if (centerDistance > rightDistance) {
+            paintCenterImage(painter, cx, cy);
+            paintRightImage(painter, cx, cy);
+        } else {
+            paintRightImage(painter, cx, cy);
+            paintCenterImage(painter, cx, cy);
+        }
+    } else if(centerDistance > leftDistance && centerDistance > rightDistance) {
+        paintCenterImage(painter, cx, cy);
+        if (leftDistance > rightDistance) {
+            paintLeftImage(painter, cx, cy);
+            paintRightImage(painter, cx, cy);
+        } else {
+            paintRightImage(painter, cx, cy);
+            paintLeftImage(painter, cx, cy);
+        }
+    } else {
+        paintRightImage(painter, cx, cy);
+        if (leftDistance > centerDistance) {
+            paintLeftImage(painter, cx, cy);
+            paintCenterImage(painter, cx, cy);
+        } else {
+            paintCenterImage(painter, cx, cy);
+            paintLeftImage(painter, cx, cy);
+        }
+    }
 }
 
 void Screenie::paintLeftImage(QPainter *painter, const int cx, const int cy)
 {
-	if (parameters->leftImageBox->isChecked()) {
-		QTransform transform;
-		painter->save();
-		qreal leftScale = 1 - (qreal)parameters->leftDistanceSlider->value()/200.0;
-		transform = QTransform().scale(leftScale, leftScale);
-		transform.translate(0, -m_leftImage.height()/4);
-		transform.rotate(parameters->leftAngleSlider->value(), Qt::YAxis);
-		transform.translate(0, m_leftImage.height()/4);
-		int dx = parameters->leftOffsetSlider->value();
-		int dy = parameters->leftDistanceSlider->value();
-		//painter->setTransform(transform * QTransform().translate(cx+dx,cy-dy), true);
-		painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
-		painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
-		painter->restore();
-	}
+    if (parameters->leftImageBox->isChecked()) {
+        QTransform transform;
+        painter->save();
+        qreal leftScale = 1 - (qreal)parameters->leftDistanceSlider->value()/200.0;
+        transform = QTransform().scale(leftScale, leftScale);
+        transform.translate(0, -m_leftImage.height()/4);
+        transform.rotate(parameters->leftAngleSlider->value(), Qt::YAxis);
+        transform.translate(0, m_leftImage.height()/4);
+        int dx = parameters->leftOffsetSlider->value();
+        int dy = parameters->leftDistanceSlider->value();
+        painter->setTransform(transform * QTransform().translate(cx-dx,cy-dy), true);
+        painter->drawPixmap(-m_leftImage.width()/2, -m_leftImage.height()/2, m_leftImage);
+        painter->restore();
+    }
 }
-			  
+
 void Screenie::paintCenterImage(QPainter *painter, const int cx, const int cy)
 {
     if (parameters->centerImageBox->isChecked()) {
-		QTransform transform;
+        QTransform transform;
         painter->save();
         qreal centerScale = 1 - (qreal)parameters->centerDistanceSlider->value()/200.0;
         transform = QTransform().scale(centerScale, centerScale);
@@ -391,11 +381,11 @@ void Screenie::paintCenterImage(QPainter *painter, const int cx, const int cy)
         painter->restore();
     }
 }
-			  
+
 void Screenie::paintRightImage(QPainter *painter, const int cx, const int cy)
 {
     if (parameters->rightImageBox->isChecked()) {
-		QTransform transform;
+        QTransform transform;
         painter->save();
         qreal rightScale = 1 - (qreal)parameters->rightDistanceSlider->value()/200.0;
         transform = QTransform().scale(rightScale, rightScale);
@@ -409,7 +399,7 @@ void Screenie::paintRightImage(QPainter *painter, const int cx, const int cy)
         painter->restore();
     }
 }
-			  
+
 void Screenie::resizeEvent(QResizeEvent*)
 {
     QTimer::singleShot(500, this, SLOT(update()));
