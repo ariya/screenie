@@ -139,6 +139,7 @@ void Screenie::setupUI()
     QWidget* toolWidget = new QWidget(this);
     toolWidget->setWindowFlags(Qt::Tool | Qt::WindowTitleHint);
     parameters->setupUi(toolWidget);
+    toolWidget->setWindowIcon(QIcon(":/screenie.png"));
     toolWidget->show();
     toolWidget->adjustSize();
 
@@ -146,6 +147,7 @@ void Screenie::setupUI()
     helpWidget->setWindowFlags(Qt::Tool | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     Ui::HelpForm helpForm;
     helpForm.setupUi(helpWidget);
+    helpWidget->setWindowIcon(QIcon(":/screenie.png"));
     helpWidget->show();
     helpWidget->adjustSize();
 
