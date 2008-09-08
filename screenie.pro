@@ -10,3 +10,7 @@ macx {
    ICON = screenie.icns
 }
 
+win32 {
+   RC_FILE = screenie.rc
+}
+
