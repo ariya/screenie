@@ -1,9 +1,11 @@
 Makefile
-*.xcode
 *.o
 *.exe
-*.app
 screenie
 
 ui_*.h
 
+# Mac
+*.xcodeproj
+.DS_Store
+*.app
