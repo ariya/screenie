@@ -430,6 +430,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     Screenie widget;
+    widget.setWindowIcon(QIcon(":/screenie.png"));
     widget.show();
 
     switch(argc) {

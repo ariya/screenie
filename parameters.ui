@@ -513,7 +513,9 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="screenie.qrc" />
+ </resources>
  <connections>
   <connection>
    <sender>backgroundRedSlider</sender>

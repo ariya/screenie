@@ -3,7 +3,9 @@ Makefile
 *.exe
 screenie
 
+# Qt build
 ui_*.h
+qrc_*.cpp
 
 # Mac
 *.xcodeproj
