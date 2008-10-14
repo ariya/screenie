@@ -45,7 +45,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
-         <string>Offset</string>
+         <string comment="Image offset" >Offset</string>
         </property>
        </widget>
       </item>
@@ -149,7 +149,7 @@
     <item row="0" column="0" >
      <widget class="QLabel" name="label_14" >
       <property name="text" >
-       <string>Offset</string>
+       <string comment="Image offset" >Offset</string>
       </property>
      </widget>
     </item>
@@ -250,7 +250,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>Offset</string>
+         <string comment="Image offset" >Offset</string>
         </property>
        </widget>
       </item>
@@ -380,7 +380,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_9" >
         <property name="text" >
-         <string>Offset</string>
+         <string comment="Opacity offset" >Offset</string>
         </property>
        </widget>
       </item>
@@ -514,7 +514,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="screenie.qrc" />
+  <include location="resources/screenie.qrc" />
  </resources>
  <connections>
   <connection>
