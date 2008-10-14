@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>499</width>
-    <height>348</height>
+    <width>477</width>
+    <height>232</height>
    </rect>
   </property>
   <property name="minimumSize" >
@@ -18,30 +18,23 @@
   <property name="windowTitle" >
    <string>Parameters</string>
   </property>
-  <widget class="QGroupBox" name="leftImageBox" >
-   <property name="geometry" >
-    <rect>
-     <x>12</x>
-     <y>4</y>
-     <width>139</width>
-     <height>133</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Left Image</string>
-   </property>
-   <property name="flat" >
-    <bool>true</bool>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2" >
-    <item>
+  <property name="windowIcon" >
+   <iconset resource="resources/screenie.qrc" >
+    <normaloff>:/screenie.png</normaloff>:/screenie.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" colspan="2" >
+    <widget class="QGroupBox" name="leftImageBox" >
+     <property name="title" >
+      <string>Left Image</string>
+     </property>
+     <property name="flat" >
+      <bool>true</bool>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
      <layout class="QFormLayout" name="formLayout_2" >
-      <property name="fieldGrowthPolicy" >
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
@@ -124,128 +117,112 @@
        </widget>
       </item>
      </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="centerImageBox" >
-   <property name="geometry" >
-    <rect>
-     <x>167</x>
-     <y>4</y>
-     <width>164</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Center Image</string>
-   </property>
-   <property name="flat" >
-    <bool>true</bool>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <layout class="QFormLayout" name="formLayout" >
-    <item row="0" column="0" >
-     <widget class="QLabel" name="label_14" >
-      <property name="text" >
-       <string comment="Image offset" >Offset</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" >
-     <widget class="QSlider" name="centerOffsetSlider" >
-      <property name="minimum" >
-       <number>-150</number>
-      </property>
-      <property name="maximum" >
-       <number>150</number>
-      </property>
-      <property name="value" >
-       <number>0</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" >
-     <widget class="QLabel" name="label_13" >
-      <property name="text" >
-       <string>Distance</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" >
-     <widget class="QSlider" name="centerDistanceSlider" >
-      <property name="minimum" >
-       <number>0</number>
-      </property>
-      <property name="maximum" >
-       <number>99</number>
-      </property>
-      <property name="value" >
-       <number>0</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" >
-     <widget class="QLabel" name="label" >
-      <property name="text" >
-       <string>Angle</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1" >
-     <widget class="QSlider" name="centerAngleSlider" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimum" >
-       <number>-180</number>
-      </property>
-      <property name="maximum" >
-       <number>180</number>
-      </property>
-      <property name="value" >
-       <number>15</number>
-      </property>
-      <property name="sliderPosition" >
-       <number>15</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="rightImageBox" >
-   <property name="geometry" >
-    <rect>
-     <x>348</x>
-     <y>4</y>
-     <width>139</width>
-     <height>133</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Right Image</string>
-   </property>
-   <property name="flat" >
-    <bool>true</bool>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_3" >
-    <item>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2" >
+    <widget class="QGroupBox" name="centerImageBox" >
+     <property name="title" >
+      <string>Center Image</string>
+     </property>
+     <property name="flat" >
+      <bool>true</bool>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string comment="Image offset" >Offset</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSlider" name="centerOffsetSlider" >
+        <property name="minimum" >
+         <number>-150</number>
+        </property>
+        <property name="maximum" >
+         <number>150</number>
+        </property>
+        <property name="value" >
+         <number>0</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_13" >
+        <property name="text" >
+         <string>Distance</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSlider" name="centerDistanceSlider" >
+        <property name="minimum" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <number>99</number>
+        </property>
+        <property name="value" >
+         <number>0</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Angle</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QSlider" name="centerAngleSlider" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimum" >
+         <number>-180</number>
+        </property>
+        <property name="maximum" >
+         <number>180</number>
+        </property>
+        <property name="value" >
+         <number>15</number>
+        </property>
+        <property name="sliderPosition" >
+         <number>15</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="4" colspan="2" >
+    <widget class="QGroupBox" name="rightImageBox" >
+     <property name="title" >
+      <string>Right Image</string>
+     </property>
+     <property name="flat" >
+      <bool>true</bool>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
      <layout class="QFormLayout" name="formLayout_3" >
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
@@ -314,51 +291,25 @@
        </widget>
       </item>
      </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" native="1" name="widget" >
-   <property name="geometry" >
-    <rect>
-     <x>12</x>
-     <y>152</y>
-     <width>25</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="sizePolicy" >
-    <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize" >
-    <size>
-     <width>25</width>
-     <height>15</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="reflectionBox" >
-   <property name="geometry" >
-    <rect>
-     <x>12</x>
-     <y>175</y>
-     <width>139</width>
-     <height>146</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Reflection</string>
-   </property>
-   <property name="flat" >
-    <bool>true</bool>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4" >
-    <item>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2" >
+    <widget class="QGroupBox" name="reflectionBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Reflection</string>
+     </property>
+     <property name="flat" >
+      <bool>true</bool>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
      <layout class="QFormLayout" name="formLayout_4" >
       <item row="0" column="0" >
        <widget class="QLabel" name="label_8" >
@@ -398,120 +349,120 @@
        </widget>
       </item>
      </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="backgroundBox" >
-   <property name="geometry" >
-    <rect>
-     <x>167</x>
-     <y>175</y>
-     <width>165</width>
-     <height>146</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Background</string>
-   </property>
-   <property name="flat" >
-    <bool>true</bool>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2" >
-    <item row="0" column="0" >
-     <widget class="QLabel" name="label_10" >
-      <property name="text" >
-       <string>R</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" >
-     <widget class="QSlider" name="backgroundRedSlider" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2" >
-     <widget class="QSpinBox" name="redSpinBox" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" >
-     <widget class="QLabel" name="label_11" >
-      <property name="text" >
-       <string>G</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" >
-     <widget class="QSlider" name="backgroundGreenSlider" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2" >
-     <widget class="QSpinBox" name="greenSpinBox" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" >
-     <widget class="QLabel" name="label_12" >
-      <property name="text" >
-       <string>B</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1" >
-     <widget class="QSlider" name="backgroundBlueSlider" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2" >
-     <widget class="QSpinBox" name="blueSpinBox" >
-      <property name="maximum" >
-       <number>255</number>
-      </property>
-      <property name="value" >
-       <number>255</number>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+    </widget>
+   </item>
+   <item row="1" column="3" colspan="2" >
+    <widget class="QGroupBox" name="backgroundBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Background</string>
+     </property>
+     <property name="flat" >
+      <bool>true</bool>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_10" >
+        <property name="text" >
+         <string>R</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSlider" name="backgroundRedSlider" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QSpinBox" name="redSpinBox" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_11" >
+        <property name="text" >
+         <string>G</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSlider" name="backgroundGreenSlider" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QSpinBox" name="greenSpinBox" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_12" >
+        <property name="text" >
+         <string>B</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QSlider" name="backgroundBlueSlider" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QSpinBox" name="blueSpinBox" >
+        <property name="maximum" >
+         <number>255</number>
+        </property>
+        <property name="value" >
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources>
   <include location="resources/screenie.qrc" />

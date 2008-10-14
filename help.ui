@@ -12,6 +12,10 @@
   <property name="windowTitle" >
    <string>Instructions</string>
   </property>
+  <property name="windowIcon" >
+   <iconset resource="resources/screenie.qrc" >
+    <normaloff>:/screenie.png</normaloff>:/screenie.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
     <widget class="QLabel" name="label" >
@@ -39,6 +43,8 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/screenie.qrc" />
+ </resources>
  <connections/>
 </ui>
