@@ -110,7 +110,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Screenie</name>
     <message>
-        <location filename="../screenie.cpp" line="417"/>
+        <location filename="../screenie.cpp" line="416"/>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
