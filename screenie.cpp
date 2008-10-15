@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
     /* Load translation try from /usr/share/screenie, then ./l10n/screenie then ./ */
     QString locale = QLocale::system().name();
     QTranslator translator;
-    if (translator.load(QString("screenie") + locale, "/usr/share/screenie/") == false) {
+    if (translator.load(QString("screenie_") + locale, "/usr/share/screenie/") == false) {
       if (translator.load(QString("l10n/screenie_") + locale) == false) {
         translator.load(QString("screenie_") + locale);
       }
