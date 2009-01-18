@@ -18,5 +18,6 @@ win32 {
 }
 
 TRANSLATIONS = l10n/screenie_fr.ts \
+               l10n/screenie_pl.ts \
                l10n/screenie_ru.ts
 
