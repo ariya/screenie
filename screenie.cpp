@@ -439,6 +439,11 @@ int main(int argc, char *argv[])
     }
     app.installTranslator(&translator);
 
+    /* Load the system translator to get the Save dialog translated */
+    QTranslator qtTranslator;
+    qtTranslator.load(QString("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+
     Screenie widget;
     widget.setWindowIcon(QIcon(":/screenie.png"));
     widget.show();
