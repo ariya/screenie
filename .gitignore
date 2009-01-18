@@ -1,6 +1,7 @@
 Makefile
 *.o
 *.exe
+*.qm
 screenie
 
 # Qt build
