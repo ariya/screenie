@@ -32,6 +32,7 @@ static QPixmap reflected(const QPixmap& img, int offsetPercent)
 
     QImage mask = img.toImage();
     QPainter painter(&mask);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
     painter.fillRect(mask.rect(), gradient);
     painter.end();
 
