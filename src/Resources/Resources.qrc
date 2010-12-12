@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="/" >
-    <file>screenie.png</file>
+    <file>img/ApplicationIcon.png</file>
   </qresource>
 </RCC>

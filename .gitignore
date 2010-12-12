@@ -8,6 +8,9 @@ screenie
 ui_*.h
 qrc_*.cpp
 
+# Qt Creator
+*.pro.user
+
 # Mac
 *.xcodeproj
 .DS_Store
