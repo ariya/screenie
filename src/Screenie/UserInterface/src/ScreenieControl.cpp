@@ -24,6 +24,8 @@
 #include <QtCore/QPointF>
 #include <QtCore/QStringList>
 #include <QtCore/QtAlgorithms>
+#include <QtCore/QMimeData>
+#include <QtCore/QUrl>
 #include <QtGui/QColor>
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsItem>
@@ -32,7 +34,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QMainWindow>
 #include <QtGui/QSlider>
-
 
 #include "../../../Model/src/ScreenieScene.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
@@ -87,6 +88,39 @@ DefaultScreenieModel &ScreenieControl::getDefaultScreenieModel()
     return m_defaultScreenieModel;
 }
 
+void ScreenieControl::updateData(const QMimeData *mimeData, ScreenieModelInterface &screenieModel)
+{
+    // prefer image data over file paths (URLs)
+    if (mimeData->hasImage()) {
+        QPixmap pixmap;
+        pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
+        if (!pixmap.isNull()) {
+            if (screenieModel.inherits(ScreeniePixmapModel::staticMetaObject.className())) {
+                ScreeniePixmapModel &pixmapModel = dynamic_cast<ScreeniePixmapModel &>(screenieModel);
+                pixmapModel.setPixmap(pixmap);
+            } else {
+                // convert to ScreeniePixmapModel
+                ScreeniePixmapModel *screeniePixmapModel = new ScreeniePixmapModel(pixmap);
+                screeniePixmapModel->convert(screenieModel);
+                m_screenieScene.removeModel(&screenieModel);
+                m_screenieScene.addModel(screeniePixmapModel);
+            }
+        }
+    } else {
+        QString filePath = mimeData->urls().first().toLocalFile();
+        if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
+            ScreenieFilePathModel &filePathModel = dynamic_cast<ScreenieFilePathModel &>(screenieModel);
+            filePathModel.setFilePath(filePath);
+        } else {
+            // convert to ScreenieFilePathModel
+            ScreenieFilePathModel *screenieFilePathModel = new ScreenieFilePathModel(filePath);
+            screenieFilePathModel->convert(screenieModel);
+            m_screenieScene.removeModel(&screenieModel);
+            m_screenieScene.addModel(screenieFilePathModel);
+        }
+    }
+}
+
 // public slots
 
 void ScreenieControl::addImage(QString filePath, QPointF position)
@@ -101,7 +135,6 @@ void ScreenieControl::addImages(QStringList filePaths, QPointF position)
         ScreenieModelInterface *screenieModel = new ScreenieFilePathModel(filePath);
         applyDefaultValues(*screenieModel);
         screenieModel->setPosition(position);
-        qDebug("ScreenieControl: Rotation: %d, dist.: %d", screenieModel->getRotation(), screenieModel->getDistance());
         m_screenieScene.addModel(screenieModel);
     }
 }
@@ -119,7 +152,6 @@ void ScreenieControl::addImages(QList<QPixmap> pixmaps, QPointF position)
         ScreeniePixmapModel *screenieModel = new ScreeniePixmapModel(pixmap);
         applyDefaultValues(*screenieModel);
         screenieModel->setPosition(position);       
-        qDebug("ScreenieControl: Rotation: %d, dist.: %d", screenieModel->getRotation(), screenieModel->getDistance());
         m_screenieScene.addModel(screenieModel);
     }
 }
@@ -347,6 +379,7 @@ void ScreenieControl::handleModelRemoved(const ScreenieModelInterface &screenieM
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(graphicsItem);
             if (&screenieModel == &screeniePixmapItem->getScreenieModel()) {
                 m_screenieGraphicsScene.removeItem(screeniePixmapItem);
+                delete screeniePixmapItem;
                 break;
             }
         }

@@ -95,7 +95,6 @@ int DefaultScreenieModel::getReflectionOffset() const
 void DefaultScreenieModel::setReflectionOffset(int reflectionOffset)
 {
     d->reflectionOffset = reflectionOffset;
-    qDebug("DefaultScreenieModel: set off: %d", d->reflectionOffset);
 }
 
 int DefaultScreenieModel::getReflectionOpacity() const {

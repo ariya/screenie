@@ -45,7 +45,9 @@ ScreenieFilePathModel::ScreenieFilePathModel(const QString &filePath)
 ScreenieFilePathModel::~ScreenieFilePathModel()
 {
     delete d;
-    qDebug("ScreenieFilePathModel d'tor called.");
+#ifdef DEBUG
+    qDebug("ScreenieFilePathModel:~ScreenieFilePathModel: called.");
+#endif
 }
 
 QPixmap ScreenieFilePathModel::readPixmap()
@@ -73,15 +75,9 @@ bool ScreenieFilePathModel::isValid() const
     return d->valid;
 }
 
-bool ScreenieFilePathModel::operator=(const ScreenieModelInterface &other)
+void ScreenieFilePathModel::convert(ScreenieModelInterface &source)
 {
-    bool result;
-    if (other.inherits(ScreenieFilePathModel::metaObject()->className())) {
-        result = d->filePath == dynamic_cast<const ScreenieFilePathModel &>(other).d->filePath;
-    } else {
-        result = false;
-    }
-    return result;
+    AbstractScreenieModel::convert(source);
 }
 
 void ScreenieFilePathModel::setFilePath(const QString &filePath)

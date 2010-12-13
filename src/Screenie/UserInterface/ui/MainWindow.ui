@@ -236,7 +236,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -285,7 +285,7 @@
   <action name="addImageAction">
    <property name="icon">
     <iconset resource="../../../Resources/Resources.qrc">
-     <normaloff>:/img/ApplicationIcon.png</normaloff>:/img/ApplicationIcon.png</iconset>
+     <normaloff>:/img/AddImageIcon.png</normaloff>:/img/AddImageIcon.png</iconset>
    </property>
    <property name="text">
     <string>Add Image</string>

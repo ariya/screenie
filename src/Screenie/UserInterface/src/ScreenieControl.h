@@ -32,6 +32,7 @@
 #include <QtGui/QPixmap>
 
 class QStringList;
+class QMimeData;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -64,6 +65,8 @@ public:
     QList<ScreenieModelInterface *> getSelectedScreenieModels() const;
 
     DefaultScreenieModel &getDefaultScreenieModel();
+
+    void updateData(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
 
 public slots:
     void addImage(QString filePath, QPointF position);

@@ -1,3 +1,6 @@
+DEPENDPATH += $$PWD/GeneratedFiles \
+              $$PWD/src
+
 HEADERS += $$PWD/src/PaintTools.h \
            $$PWD/src/Settings.h
 

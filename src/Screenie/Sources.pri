@@ -1,8 +1,10 @@
-DEPENDPATH += Utils/src \
-              Resources/src \
-              Model/src \
-              Kernel/src \
-              src
+DEPENDPATH += $$PWD/Utils/src \
+              $$PWD/Resources/src \
+              $$PWD/Model/src \
+              $$PWD/Kernel/src \
+              $$PWD/UserInterface/src \
+              $$PWD/GeneratedFiles \
+              $$PWD/src
 
 HEADERS += $$PWD/src/Main.h \
            $$PWD/UserInterface/src/MainWindow.h \

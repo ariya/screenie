@@ -1,3 +1,7 @@
+DEPENDPATH += $$PWD/Utils/src \
+              $$PWD/GeneratedFiles \
+              $$PWD/src
+
 HEADERS += 
 
 SOURCES += 

@@ -45,7 +45,9 @@ ScreeniePixmapModel::ScreeniePixmapModel(QPixmap pixmap)
 ScreeniePixmapModel::~ScreeniePixmapModel()
 {
     delete d;
-    qDebug("ScreeniePixmapModel d'tor called.");
+#ifdef DEBUG
+    qDebug("ScreeniePixmapModel:~ScreeniePixmapModel: called.");
+#endif
 }
 
 QPixmap ScreeniePixmapModel::readPixmap()
@@ -63,15 +65,9 @@ bool ScreeniePixmapModel::isValid() const
     return d->valid;
 }
 
-bool ScreeniePixmapModel::operator=(const ScreenieModelInterface &other)
+void ScreeniePixmapModel::convert(ScreenieModelInterface &source)
 {
-    bool result;
-    if (other.inherits(ScreeniePixmapModel::metaObject()->className())) {
-        result = d->pixmap.cacheKey() == dynamic_cast<const ScreeniePixmapModel &>(other).d->pixmap.cacheKey();
-    } else {
-        result = false;
-    }
-    return result;
+    AbstractScreenieModel::convert(source);
 }
 
 void ScreeniePixmapModel::setPixmap(QPixmap pixmap)

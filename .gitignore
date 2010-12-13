@@ -2,11 +2,16 @@ Makefile
 *.o
 *.exe
 *.qm
-screenie
+*.dll
+*.so
+*.dylib
 
 # Qt build
 ui_*.h
 qrc_*.cpp
+moc_*.cpp
+GeneratedFiles
+bin
 
 # Qt Creator
 *.pro.user

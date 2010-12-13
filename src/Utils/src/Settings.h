@@ -22,7 +22,8 @@
 #define SETTINGS_H
 
 #include <QtCore/QObject>
-#include <QtCore/QSize>
+
+class QSize;
 
 class SettingsPrivate;
 
@@ -34,7 +35,11 @@ public:
     static Settings &getInstance();
     static void destroyInstance();
 
-    QSize getMaximumImageSize() const;
+    const QSize &getMaximumImageSize() const;
+    void setMaximumImageSize(const QSize &maximumImageSize);
+
+    const QString &getLastImageDirectoryPath() const;
+    void setLastImageDirectoryPath(const QString &lastImageDirectoryPath);
 
 signals:
     void changed();

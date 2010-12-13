@@ -19,6 +19,8 @@
  */
 
 #include <QtCore/QPoint>
+#include <QtCore/QMimeData>
+#include <QtCore/QUrl>
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
@@ -39,21 +41,21 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
       m_screenieControl(screenieControl),
       m_reflection(reflection)
 {
-    qDebug("ScreeniePixmapItem: Rotation: %d, dist.: %d, refl: %d, off: %d, opacity: %d",
-            screenieModel.getRotation(), screenieModel.getDistance(), screenieModel.isReflectionEnabled(), screenieModel.getReflectionOffset(), screenieModel.getReflectionOpacity());
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setTransformationMode(Qt::SmoothTransformation);
-    QPixmap pixmap = screenieModel.readPixmap();
-    setPixmap(pixmap);
-    updateReflection();
-    updateItem();
+    QPixmap pixmap = m_screenieModel.readPixmap();
+    updatePixmap(pixmap);
+    setAcceptDrops(true);
     frenchConnection();
 }
 
 ScreeniePixmapItem::~ScreeniePixmapItem()
 {
+#ifdef DEBUG
+    qDebug("ScreeniePixmapItem::~ScreeniePixmapItem: called.");
+#endif
 }
 
 ScreenieModelInterface &ScreeniePixmapItem::getScreenieModel() const
@@ -89,9 +91,6 @@ void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsPixmapItem::mouseMoveEvent(event);
         m_screenieModel.setPosition(scenePos());
         event->accept();
-#ifdef DEBUG
-        qDebug("ScreeniePixmapItem::mouseMoveEvent: x/y: %f/%f", scenePos().x(), scenePos().y());
-#endif
         break;
      default:
         QGraphicsPixmapItem::mouseMoveEvent(event);
@@ -106,6 +105,17 @@ void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
     event->accept();
 }
 
+void ScreeniePixmapItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    event->setAccepted(event->mimeData()->hasUrls() || event->mimeData()->hasImage());
+}
+
+void ScreeniePixmapItem::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    m_screenieControl.updateData(event->mimeData(), m_screenieModel);
+    event->accept();
+}
+
 // private
 
 void ScreeniePixmapItem::frenchConnection()
@@ -116,6 +126,10 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updateItem()));
     connect(&m_screenieModel, SIGNAL(reflectionChanged()),
             this, SLOT(updateReflection()));
+    connect(&m_screenieModel, SIGNAL(pixmapChanged(const QPixmap &)),
+            this, SLOT(updatePixmap(const QPixmap &)));
+    connect(&m_screenieModel, SIGNAL(filePathChanged(const QString &)),
+            this, SLOT(updatePixmap()));
 }
 
 void ScreeniePixmapItem::rotate(int angle)
@@ -154,6 +168,19 @@ void ScreeniePixmapItem::updateReflection()
         }
     }
     setPixmap(pixmap);
+}
+
+void ScreeniePixmapItem::updatePixmap(const QPixmap &pixmap)
+{
+    setPixmap(pixmap);
+    updateReflection();
+    updateItem();
+}
+
+void ScreeniePixmapItem::updatePixmap()
+{
+    QPixmap pixmap = m_screenieModel.readPixmap();
+    updatePixmap(pixmap);
 }
 
 void ScreeniePixmapItem::updateItem()

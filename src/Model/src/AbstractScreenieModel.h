@@ -56,7 +56,7 @@ public:
     virtual int getReflectionOpacity() const;
     virtual void setReflectionOpacity(int reflectionOpacity);
 
-    virtual bool operator=(const ScreenieModelInterface &other) = 0;
+    virtual void convert(ScreenieModelInterface &source);
 
 protected:
     QPixmap fitToMaximumSize(QPixmap pixmap);

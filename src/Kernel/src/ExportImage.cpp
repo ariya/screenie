@@ -38,15 +38,16 @@ ExportImage::ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &gra
 
 void ExportImage::exportImage(const QString &filePath)
 {
-    QRectF targetRect(QPointF(0.0f, 0.0f), QSizeF(640.0, 480.0));
+    /*!\todo Specify some margin etc. */
+    QRectF targetRect =  m_graphicsScene.itemsBoundingRect();
     QImage image(qRound(targetRect.width()), qRound(targetRect.height()), QImage::Format_ARGB32_Premultiplied);
     image.fill(0);
     QPainter painter(&image);
     painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing, true);
     if (m_screenieScene.isBackgroundEnabled()) {
-        painter.fillRect(targetRect, m_screenieScene.getBackgroundColor());
+        painter.fillRect(0, 0, image.width(), image.height(), m_screenieScene.getBackgroundColor());
     }
     m_graphicsScene.clearSelection();
-    m_graphicsScene.render(&painter, targetRect);
+    m_graphicsScene.render(&painter, QRectF(), targetRect);
     image.save(filePath, "PNG");
 }

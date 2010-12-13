@@ -36,6 +36,12 @@ class ScreenieGraphicsScene : public QGraphicsScene
     Q_OBJECT
 public:
     explicit ScreenieGraphicsScene(QObject *parent = 0);
+    virtual ~ScreenieGraphicsScene();
+
+signals:
+    void pixmapsAdded(QList<QPixmap> pixmaps, QPointF position);
+    void filePathsAdded(QStringList filePaths, QPointF position);
+    void removeItems();
 
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
@@ -43,10 +49,8 @@ protected:
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
 
-signals:
-    void pixmapsAdded(QList<QPixmap> pixmaps, QPointF position);
-    void filePathsAdded(QStringList filePaths, QPointF position);
-    void removeItems();
+private:
+    bool m_itemDragDrop;
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H

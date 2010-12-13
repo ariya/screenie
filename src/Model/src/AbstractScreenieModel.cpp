@@ -55,7 +55,9 @@ AbstractScreenieModel::AbstractScreenieModel()
 AbstractScreenieModel::~AbstractScreenieModel()
 {
     delete d;
-    qDebug("AbstractScreenieModel d'tor called.");
+#ifdef DEBUG
+    qDebug("AbstractScreenieModel:~AbstractScreenieModel: called.");
+#endif
 }
 
 QPointF AbstractScreenieModel::getPosition() const {
@@ -158,6 +160,16 @@ void AbstractScreenieModel::setReflectionOpacity(int reflectionOpacity)
         d->reflectionOpacity = reflectionOpacity;
         emit reflectionChanged();
     }
+}
+
+void AbstractScreenieModel::convert(ScreenieModelInterface &source)
+{
+    d->position = source.getPosition();
+    d->distance = source.getDistance();
+    d->rotation = source.getRotation();
+    d->reflectionEnabled = source.isReflectionEnabled();
+    d->reflectionOffset = source.getReflectionOffset();
+    d->reflectionOpacity = source.getReflectionOpacity();
 }
 
 // protected

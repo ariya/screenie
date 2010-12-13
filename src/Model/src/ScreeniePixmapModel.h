@@ -45,13 +45,10 @@ public:
     virtual QSize getSize() const;
     virtual bool isValid() const;
 
-    virtual bool operator=(const ScreenieModelInterface &other);
+    virtual void convert(ScreenieModelInterface &source);
 
     QPixmap getPixmap() const;
     void setPixmap(QPixmap pixmap);
-
-signals:
-    void pixmapChanged(QPixmap pixmap);
 
 private:
     ScreeniePixmapModelPrivate *d;

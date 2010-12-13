@@ -25,6 +25,7 @@
 
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
+class QGraphicsSceneDragDropEvent;
 
 class ScreenieModelInterface;
 class ScreenieControl;
@@ -53,6 +54,8 @@ protected:
     virtual int type() const;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+    virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 
 private:
     ScreenieModelInterface &m_screenieModel;
@@ -65,6 +68,8 @@ private:
 
 private slots:
     void updateReflection();
+    void updatePixmap(const QPixmap &pixmap);
+    void updatePixmap();
     void updateItem();
 };
 

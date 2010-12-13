@@ -25,6 +25,8 @@
 #include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 
+class QString;
+
 class ScreenieModelInterface : public QObject
 {
     Q_OBJECT
@@ -92,12 +94,14 @@ public:
     virtual int getReflectionOpacity() const = 0;
     virtual void setReflectionOpacity(int reflectionOpacity) = 0;
 
-    virtual bool operator=(const ScreenieModelInterface &other) = 0;
+    virtual void convert(ScreenieModelInterface &source) = 0;
 
 signals:
     void reflectionChanged();
     void distanceChanged();
     void changed();
+    void pixmapChanged(const QPixmap &pixmap);
+    void filePathChanged(const QString &filePath);
 };
 
 #endif // SCREENIEMODELINTERFACE_H

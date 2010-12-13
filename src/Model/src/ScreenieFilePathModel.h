@@ -50,10 +50,7 @@ public:
     virtual QString getFilePath() const;
     virtual void setFilePath(const QString &filePath);
 
-    virtual bool operator=(const ScreenieModelInterface &other);
-
-signals:
-    void filePathChanged(QString filePath);
+    virtual void convert(ScreenieModelInterface &source);
 
 private:
     ScreenieFilePathModelPrivate *d;

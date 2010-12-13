@@ -20,6 +20,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QPointF>
+#include <QtCore/QDir>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
@@ -32,8 +33,9 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
+#include "../../../Utils/src/Settings.h"
 #include "../../../Model/src/ScreenieScene.h"
-#include "../.././Model/src/ScreenieModelInterface.h"
+#include "../../../Model/src/ScreenieModelInterface.h"
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../../../Kernel/src/ExportImage.h"
 #include "../../../Kernel/src/ExportPDF.h"
@@ -169,9 +171,12 @@ void MainWindow::initializeUi()
 
 void MainWindow::on_addImageAction_triggered()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open Image"));
+    QString lastImageDirectoryPath = Settings::getInstance().getLastImageDirectoryPath();
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Add Image"), lastImageDirectoryPath);
     if (!filePath.isNull()) {
         m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
+        lastImageDirectoryPath = QDir(filePath).absolutePath();
+        Settings::getInstance().setLastImageDirectoryPath(lastImageDirectoryPath);
     }
 }
 

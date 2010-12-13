@@ -19,6 +19,7 @@
  */
 
 #include <QtCore/QSize>
+#include <QtCore/QString>
 
 #include "Settings.h"
 
@@ -28,6 +29,7 @@ public:
     static Settings *instance;
 
     QSize maximumImageSize;
+    QString lastImageDirectoryPath;
 
     SettingsPrivate() : maximumImageSize(QSize(640, 640)) {}
 };
@@ -51,8 +53,29 @@ void Settings::destroyInstance() {
     }
 }
 
-QSize Settings::getMaximumImageSize() const {
+const QSize &Settings::getMaximumImageSize() const {
     return d->maximumImageSize;
+}
+
+void Settings::setMaximumImageSize(const QSize &maximumImageSize)
+{
+    if (d->maximumImageSize != maximumImageSize) {
+        d->maximumImageSize = maximumImageSize;
+        emit changed();
+    }
+}
+
+const QString &Settings::getLastImageDirectoryPath() const
+{
+    return d->lastImageDirectoryPath;
+}
+
+void Settings::setLastImageDirectoryPath(const QString &lastImageDirectoryPath)
+{
+    if (d->lastImageDirectoryPath != lastImageDirectoryPath) {
+        d->lastImageDirectoryPath = lastImageDirectoryPath;
+        emit changed();
+    }
 }
 
 // protected
