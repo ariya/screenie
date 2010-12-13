@@ -28,6 +28,7 @@
 class QString;
 
 #include "AbstractScreenieModel.h"
+#include "ModelLib.h"
 
 class ScreenieFilePathModelPrivate;
 
@@ -40,17 +41,17 @@ public:
      *
      * \sa #readPixmap()
      */
-    explicit ScreenieFilePathModel(const QString &filePath = QString());
-    virtual ~ScreenieFilePathModel();
+    MODEL_API explicit ScreenieFilePathModel(const QString &filePath = QString());
+    MODEL_API virtual ~ScreenieFilePathModel();
 
-    virtual QPixmap readPixmap();
-    virtual QSize getSize() const;
-    virtual bool isValid() const;
+    MODEL_API virtual QPixmap readPixmap();
+    MODEL_API virtual QSize getSize() const;
+    MODEL_API virtual bool isValid() const;
 
-    virtual QString getFilePath() const;
-    virtual void setFilePath(const QString &filePath);
+    MODEL_API virtual QString getFilePath() const;
+    MODEL_API virtual void setFilePath(const QString &filePath);
 
-    virtual void convert(ScreenieModelInterface &source);
+    MODEL_API virtual void convert(ScreenieModelInterface &source);
 
 private:
     ScreenieFilePathModelPrivate *d;

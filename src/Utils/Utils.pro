@@ -4,7 +4,7 @@ include(../External.pri)
 include(Sources.pri)
 
 TEMPLATE = lib
-#DESTDIR = $$PWD/../../bin/
+DEFINES += UTILS_EXPORT
 
 
 

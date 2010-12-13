@@ -24,14 +24,16 @@
 class QGraphicsScene;
 class QString;
 
+#include "KernelLib.h"
+
 class ScreenieScene;
 
 class ExportImage
 {
 public:
-    ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
+    KERNEL_API ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
 
-    void exportImage(const QString &filePath);
+    KERNEL_API void exportImage(const QString &filePath);
 
 private:
     const ScreenieScene &m_screenieScene;

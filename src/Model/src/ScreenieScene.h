@@ -26,6 +26,8 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QColor>
 
+#include "ModelLib.h"
+
 class ScreenieModelInterface;
 class ScreenieScenePrivate;
 
@@ -49,36 +51,36 @@ public:
      * \sa #modelAdded(ScreenieModel &)
      * \sa #changed()
      */
-    void addModel(ScreenieModelInterface *screenieModel);
+    MODEL_API void addModel(ScreenieModelInterface *screenieModel);
 
     /*!
      * \sa #modelRemoved(const ScreenieModelInterface &)
      * \sa #changed()
      */
-    void removeModel(ScreenieModelInterface *screenieModel);
+    MODEL_API void removeModel(ScreenieModelInterface *screenieModel);
 
     /*!
      * \sa #modelRemoved(const ScreenieModelInterface &)
      * \sa #changed()
      */
-    void removeModel(int index);
-    int count() const;
+    MODEL_API void removeModel(int index);
+    MODEL_API int count() const;
 
-    bool isBackgroundEnabled() const;
-
-    /*!
-     * \sa #backgroundChanged()
-     * \sa #changed()
-     */
-    void setBackgroundEnabled(bool enable);
-
-    QColor getBackgroundColor() const;
+    MODEL_API bool isBackgroundEnabled() const;
 
     /*!
      * \sa #backgroundChanged()
      * \sa #changed()
      */
-    void setBackgroundColor(QColor colour);
+    MODEL_API void setBackgroundEnabled(bool enable);
+
+    MODEL_API QColor getBackgroundColor() const;
+
+    /*!
+     * \sa #backgroundChanged()
+     * \sa #changed()
+     */
+    MODEL_API void setBackgroundColor(QColor colour);
 
 signals:
     /*!

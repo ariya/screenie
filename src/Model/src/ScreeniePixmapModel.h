@@ -26,6 +26,7 @@
 #include <QtGui/QPixmap>
 
 #include "AbstractScreenieModel.h"
+#include "ModelLib.h"
 
 class ScreeniePixmapModelPrivate;
 
@@ -38,17 +39,17 @@ public:
      *
      * \sa #readPixmap()
      */
-    explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
-    virtual ~ScreeniePixmapModel();
+    MODEL_API explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
+    MODEL_API virtual ~ScreeniePixmapModel();
 
-    virtual QPixmap readPixmap();
-    virtual QSize getSize() const;
-    virtual bool isValid() const;
+    MODEL_API virtual QPixmap readPixmap();
+    MODEL_API virtual QSize getSize() const;
+    MODEL_API virtual bool isValid() const;
 
-    virtual void convert(ScreenieModelInterface &source);
+    MODEL_API virtual void convert(ScreenieModelInterface &source);
 
-    QPixmap getPixmap() const;
-    void setPixmap(QPixmap pixmap);
+    MODEL_API QPixmap getPixmap() const;
+    MODEL_API void setPixmap(QPixmap pixmap);
 
 private:
     ScreeniePixmapModelPrivate *d;

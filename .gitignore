@@ -4,7 +4,6 @@ Makefile
 *.qm
 *.dll
 *.so
-*.dylib
 
 # Qt build
 ui_*.h
@@ -20,3 +19,4 @@ bin
 *.xcodeproj
 .DS_Store
 *.app
+*.dylib

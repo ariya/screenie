@@ -18,42 +18,15 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef KERNELLIB_H
+#define KERNELLIB_H
 
-#include <QtCore/QObject>
+#include <QtCore/QtGlobal>
 
-#include "UtilsLib.h"
+#ifdef KERNEL_EXPORT
+# define KERNEL_API Q_DECL_EXPORT
+#else
+# define KERNEL_API Q_DECL_IMPORT
+#endif
 
-class QSize;
-
-class SettingsPrivate;
-
-class Settings : public QObject
-{
-    Q_OBJECT
-
-public:
-    UTILS_API static Settings &getInstance();
-    UTILS_API static void destroyInstance();
-
-    UTILS_API const QSize &getMaximumImageSize() const;
-    UTILS_API void setMaximumImageSize(const QSize &maximumImageSize);
-
-    UTILS_API const QString &getLastImageDirectoryPath() const;
-    UTILS_API void setLastImageDirectoryPath(const QString &lastImageDirectoryPath);
-
-signals:
-    void changed();
-
-protected:
-    virtual ~Settings();
-
-private:
-    SettingsPrivate *d;
-
-    Settings();
-
-};
-
-#endif // SETTINGS_H
+#endif // KERNELLIB_H

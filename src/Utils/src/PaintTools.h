@@ -23,6 +23,8 @@
 
 #include <QtGui/QPixmap>
 
+#include "UtilsLib.h"
+
 /*!
  * Helper paint functions.
  */
@@ -32,14 +34,14 @@ public:
     /*!
      * Creates a stub image with a big '?' in the center.
      */
-    static QPixmap createDefaultImage();
+    UTILS_API static QPixmap createDefaultImage();
 
     /*!
      * Returns the upper half of the \p pixmap.
      *
      * \return A QPixmap with a copy of the upper half area of the \p pixmap
      */
-    static QPixmap upperHalf(const QPixmap &pixmap);
+    UTILS_API static QPixmap upperHalf(const QPixmap &pixmap);
 };
 
 #endif // PAINTTOOLS_H

@@ -21,6 +21,8 @@
 #ifndef DEFAULTSCREENIEMODEL_H
 #define DEFAULTSCREENIEMODEL_H
 
+#include "ModelLib.h"
+
 class DefaultScreenieModelPrivate;
 
 /*!
@@ -38,28 +40,28 @@ public:
     static const int ReflectionOffset;
     static const int ReflectionOpacity;
 
-    DefaultScreenieModel();
-    ~DefaultScreenieModel();
+    MODEL_API DefaultScreenieModel();
+    MODEL_API ~DefaultScreenieModel();
 
-    int getDistance() const;
-    void setDistance(int distance);
+    MODEL_API int getDistance() const;
+    MODEL_API void setDistance(int distance);
 
-    int getRotation() const;
-    void setRotation(int rotation);
+    MODEL_API int getRotation() const;
+    MODEL_API void setRotation(int rotation);
 
-    bool isReflectionEnabled() const;
-    void setReflectionEnabled(bool enable);
+    MODEL_API bool isReflectionEnabled() const;
+    MODEL_API void setReflectionEnabled(bool enable);
 
-    int getReflectionOffset() const;
-    void setReflectionOffset(int reflectionOffset);
+    MODEL_API int getReflectionOffset() const;
+    MODEL_API void setReflectionOffset(int reflectionOffset);
 
-    int getReflectionOpacity() const;
-    void setReflectionOpacity(int reflectionOpacity);
+    MODEL_API int getReflectionOpacity() const;
+    MODEL_API void setReflectionOpacity(int reflectionOpacity);
 
     /*!
      * Resets all values to the default values.
      */
-    void reset();
+    MODEL_API void reset();
 
 private:
     DefaultScreenieModelPrivate *d;

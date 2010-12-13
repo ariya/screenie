@@ -25,14 +25,16 @@ class ReflectionPrivate;
 
 #include <QtGui/QPixmap>
 
+#include "KernelLib.h"
+
 /*!
  * Glass reflection effect.
  */
 class Reflection
 {
 public:
-    Reflection();
-    virtual ~Reflection();
+    KERNEL_API Reflection();
+    KERNEL_API virtual ~Reflection();
 
     /*!
      * Creates a reflected version of the \p pixmap, along with gradient translucency
@@ -46,7 +48,7 @@ public:
      * \param offset
      *        the offset of the gradient in percent [1, 100] of the \c pixmap's height
      */
-    QPixmap addReflection(const QPixmap &pixmap, int opacity, int offset);
+    KERNEL_API QPixmap addReflection(const QPixmap &pixmap, int opacity, int offset);
 
 private:
     ReflectionPrivate *d;

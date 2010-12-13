@@ -7,7 +7,8 @@ HEADERS += $$PWD/src/AbstractScreenieModel.h \
            $$PWD/src/ScreenieFilePathModel.h \
            $$PWD/src/ScreenieModelInterface.h \
            $$PWD/src/ScreeniePixmapModel.h \
-           $$PWD/src/ScreenieScene.h
+           $$PWD/src/ScreenieScene.h \
+           $$PWD/src/ModelLib.h
 
 SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/DefaultScreenieModel.cpp \
