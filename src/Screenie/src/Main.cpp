@@ -31,6 +31,12 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(Resources);
 
+    // workaround for http://bugreports.qt.nokia.com/browse/QTBUG-15663: use
+    // the "raster" paint engine on affected OSes. Note that the command line
+    // argument -graphicssystem still takes precedence (which is good)
+#if defined Q_OS_MAC || defined Q_OS_LINUX
+    QApplication::setGraphicsSystem("raster");
+#endif
     QApplication app(argc, argv);
 
     /* Load translation try from /usr/share/screenie, then ./l10n/screenie then ./ */
