@@ -1,4 +1,6 @@
-Makefile
+Makefile*
+*.Debug
+*.Release
 *.o
 *.exe
 *.qm
