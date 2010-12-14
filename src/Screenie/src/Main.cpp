@@ -35,7 +35,19 @@ int main(int argc, char *argv[])
     // the "raster" paint engine on affected OSes. Note that the command line
     // argument -graphicssystem still takes precedence (which is good)
 #if defined Q_OS_MAC || defined Q_OS_LINUX
-    QApplication::setGraphicsSystem("raster");
+    // Doh! This uncovers another Qt bug: the selection borders in the
+    // QGraphicsView are not always properly drawn/updated with multiple
+    // selection (CTRL + left click): the first item is visually selected
+    // properly, the 2nd not, the 3rd yes (also rendering the 2nd item
+    // properply as selected, the 4th no, the 5th yes (again rendering all
+    // selected items so far correct)... (note that the model itself is always
+    // marked selected properly).
+    //
+    // So for now we live with the graphical artifact when rotating images,
+    // which is less serious than broken selection.
+    // Setting the QGraphicsView to OpenGL would probably also help (no artifacts
+    // there either, selection is hopefully fine).
+    // QApplication::setGraphicsSystem("raster");
 #endif
     QApplication app(argc, argv);
 
