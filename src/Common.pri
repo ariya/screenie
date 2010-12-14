@@ -9,9 +9,21 @@ macx {
   CONFIG      -= x86 ppc
 }
 
+    OBJECTS_DIR    = obj/debug
+    MOC_DIR        = GeneratedFiles/debug
+    UI_DIR         = GeneratedFiles/debug
+    INCLUDEPATH   += GeneratedFiles/debug
+
 DEFINES       += QT_NO_COMPAT
-OBJECTS_DIR    = obj
-MOC_DIR        = GeneratedFiles
-UI_DIR         = GeneratedFiles
-INCLUDEPATH   += GeneratedFiles
-debug:DEFINES += DEBUG
+CONFIG(debug, debug|release) {
+    OBJECTS_DIR    = obj/debug
+    MOC_DIR        = GeneratedFiles/debug
+    UI_DIR         = GeneratedFiles/debug
+    INCLUDEPATH   += GeneratedFiles/debug
+    DEFINES += DEBUG
+} else {
+    OBJECTS_DIR    = obj/release
+    MOC_DIR        = GeneratedFiles/release
+    UI_DIR         = GeneratedFiles/release
+    INCLUDEPATH   += GeneratedFiles/release
+}

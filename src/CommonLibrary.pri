@@ -9,7 +9,17 @@ macx {
 }
 
 macx {
-  DESTDIR = $$PWD/../bin/$${APP_NAME}.app/Contents/Frameworks
+    CONFIG(debug,release|debug) {
+        DESTDIR = $$PWD/../bin/debug/$${APP_NAME}.app/Contents/Frameworks
+        message(Building $$TARGET in debug mode)
+    } else {
+        DESTDIR = $$PWD/../bin/release/$${APP_NAME}.app/Contents/Frameworks
+        message(Building $$TARGET in release mode)
+    }
 } else {
-  DESTDIR = $$PWD/../bin/
+    CONFIG(debug,release|debug) {
+        DESTDIR = $$PWD/../bin/debug
+    } else {
+        DESTDIR = $$PWD/../bin/release
+    }
 }

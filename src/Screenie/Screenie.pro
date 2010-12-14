@@ -5,14 +5,17 @@ include(Sources.pri)
 
 TARGET = $${APP_NAME}
 TEMPLATE = app
+# OpenGL support later
 # QT += opengl
 
-# For now we don't build an Application bundle on Mac (comes later...)	
-macx {
-  # CONFIG -= app_bundle
+DESTDIR = $$PWD/../../bin/debug
+CONFIG(debug, debug|release) {
+    DESTDIR = $$PWD/../../bin/debug
+    message(Building $$TARGET in debug mode)
+} else {
+    DESTDIR = $$PWD/../../bin/release
+    message(Building $$TARGET in release mode)
 }
-
-DESTDIR = $$PWD/../../bin
 
 macx {
     LIBS += -L$${DESTDIR}/$${APP_NAME}.app/Contents/Frameworks
@@ -30,7 +33,6 @@ macx {
 }
 
 win32 {
-   OBJECTS_DIR = obj
    RC_FILE = res/Screenie.rc
 }
 

@@ -1,7 +1,3 @@
-# *********************************
-# platform dependend configurations
-#
-
 unix:linux* {
     QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
     QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes

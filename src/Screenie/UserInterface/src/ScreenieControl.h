@@ -40,7 +40,7 @@ class ScreenieGraphicsScene;
 class ScreeniePixmapItem;
 class Reflection;
 
-#include "../../Model/src/DefaultScreenieModel.h"
+#include "../../../Model/src/DefaultScreenieModel.h"
 
 /*!
  * This is the controller of the ScreenieScene (model): it modifies the <em>selected</em> ScreenieModelInterface.

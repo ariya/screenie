@@ -64,7 +64,7 @@ QPixmap Reflection::addReflection(const QPixmap &pixmap, int opacityPercent, int
 QPixmap Reflection::reflect(const QPixmap &pixmap, int offset)
 {
     QLinearGradient gradient(QPoint(0, 0), QPoint(0, pixmap.height()));
-    if (offset <= 0.0) {
+    if (offset <= 0) {
         // make sure the black offset is never 0.0, but at least 1% (arbitrarily small);
         // otherwise the entire "gradient" would be white
         offset = 1;
