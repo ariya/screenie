@@ -25,6 +25,8 @@
 #include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 
+#include "ModelLib.h"
+
 class QString;
 
 class ScreenieModelInterface : public QObject
@@ -33,7 +35,7 @@ class ScreenieModelInterface : public QObject
 
 public:
 
-    static const int MaxDistance;
+    MODEL_API static const int MaxDistance;
 
     virtual ~ScreenieModelInterface() {}
 
@@ -89,10 +91,24 @@ public:
     virtual void setReflectionEnabled(bool enable) = 0;
 
     virtual int getReflectionOffset() const = 0;
+
+    /*!
+     * \param reflectionOffset
+     *        the reflection offset in percent [1, 100]
+     */
     virtual void setReflectionOffset(int reflectionOffset) = 0;
 
+    /*!
+     * \sa #reflectionChanged()
+     */
+    virtual void addReflectionOffset(int reflectionOffset) = 0;
+
     virtual int getReflectionOpacity() const = 0;
+    /*!
+     * \sa #reflectionChanged()
+     */
     virtual void setReflectionOpacity(int reflectionOpacity) = 0;
+    virtual void addReflectionOpacity(int reflectionOpacity) = 0;
 
     virtual void convert(ScreenieModelInterface &source) = 0;
 

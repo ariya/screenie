@@ -52,9 +52,11 @@ public:
 
     virtual int getReflectionOffset() const;
     virtual void setReflectionOffset(int reflectionOffset);
+    virtual void addReflectionOffset(int reflectionOffset);
 
     virtual int getReflectionOpacity() const;
     virtual void setReflectionOpacity(int reflectionOpacity);
+    virtual void addReflectionOpacity(int reflectionOpacity);
 
     virtual void convert(ScreenieModelInterface &source);
 

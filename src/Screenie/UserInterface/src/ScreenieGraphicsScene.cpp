@@ -96,6 +96,7 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 void ScreenieGraphicsScene::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key()) {
+    case Qt::Key_Backspace: // fall-thru intended
     case Qt::Key_Delete:
         emit removeItems();
         event->accept();

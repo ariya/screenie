@@ -149,6 +149,22 @@ void AbstractScreenieModel::setReflectionOffset(int reflectionOffset)
     }
 }
 
+void AbstractScreenieModel::addReflectionOffset(int reflectionOffset)
+{
+    if (reflectionOffset != 0) {
+        int oldReflectionOffset = d->reflectionOffset;
+        d->reflectionOffset += reflectionOffset;
+        if (d->reflectionOffset < 1) {
+            d->reflectionOffset = 1;
+        } else if (d->reflectionOffset > 100) {
+            d->reflectionOffset = 100;
+        }
+        if (d->reflectionOffset != oldReflectionOffset) {
+            emit reflectionChanged();
+        }
+    }
+}
+
 int AbstractScreenieModel::getReflectionOpacity() const
 {
     return d->reflectionOpacity;
@@ -159,6 +175,22 @@ void AbstractScreenieModel::setReflectionOpacity(int reflectionOpacity)
     if (d->reflectionOpacity != reflectionOpacity) {
         d->reflectionOpacity = reflectionOpacity;
         emit reflectionChanged();
+    }
+}
+
+void AbstractScreenieModel::addReflectionOpacity(int reflectionOpacity)
+{
+    if (reflectionOpacity != 0) {
+        int oldReflectionOpacity = d->reflectionOpacity;
+        d->reflectionOpacity += reflectionOpacity;
+        if (d->reflectionOpacity < 0) {
+            d->reflectionOpacity = 0;
+        } else if (d->reflectionOpacity > 100) {
+            d->reflectionOpacity = 100;
+        }
+        if (d->reflectionOpacity != oldReflectionOpacity) {
+            emit reflectionChanged();
+        }
     }
 }
 

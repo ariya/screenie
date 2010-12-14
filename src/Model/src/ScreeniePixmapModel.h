@@ -30,7 +30,12 @@
 
 class ScreeniePixmapModelPrivate;
 
-class ScreeniePixmapModel : public AbstractScreenieModel
+/*!
+ * Implementation note: we need do export the whole class here, since
+ * we also need to export the QObject::staticMetaObject methods from
+ * the QObject base class.
+ */
+class MODEL_API ScreeniePixmapModel : public AbstractScreenieModel
 {
     Q_OBJECT
 public:
@@ -39,17 +44,17 @@ public:
      *
      * \sa #readPixmap()
      */
-    MODEL_API explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
-    MODEL_API virtual ~ScreeniePixmapModel();
+    explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
+    virtual ~ScreeniePixmapModel();
 
-    MODEL_API virtual QPixmap readPixmap();
-    MODEL_API virtual QSize getSize() const;
-    MODEL_API virtual bool isValid() const;
+    virtual QPixmap readPixmap();
+    virtual QSize getSize() const;
+    virtual bool isValid() const;
 
-    MODEL_API virtual void convert(ScreenieModelInterface &source);
+    virtual void convert(ScreenieModelInterface &source);
 
-    MODEL_API QPixmap getPixmap() const;
-    MODEL_API void setPixmap(QPixmap pixmap);
+    QPixmap getPixmap() const;
+    void setPixmap(QPixmap pixmap);
 
 private:
     ScreeniePixmapModelPrivate *d;

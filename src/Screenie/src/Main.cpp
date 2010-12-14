@@ -32,9 +32,23 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(Resources);
 
     // workaround for http://bugreports.qt.nokia.com/browse/QTBUG-15663: use
-    // the "raster" paint engine on affected OSes. Note that the command line
-    // argument -graphicssystem still takes precedence (which is good)
-#if defined Q_OS_MAC || defined Q_OS_LINUX
+    // the "raster" paint engine on affected OSes (Mac and Linux, Qt 4.7.1).
+    // Note that the command line argument -graphicssystem still takes precedence (which is good)
+// #if defined Q_OS_MAC || defined Q_OS_LINUX
+#ifdef Q_OS_LINUX
+    // Doh! This uncovers another Qt bug, at least on Mac with Qt 4.7.1
+    // (Linux with Qt 4.7.0 seems to work though): the selection borders in the
+    // QGraphicsView are not always properly drawn/updated with multiple
+    // selection (CTRL + left click): the first item is visually selected
+    // properly, the 2nd not, the 3rd yes (also rendering the 2nd item
+    // properply as selected, the 4th no, the 5th yes (again rendering all
+    // selected items so far correct)... (note that the model itself is always
+    // marked selected properly).
+    //
+    // So for now we live with the graphical artifact when rotating images,
+    // which is less serious than broken selection.
+    // Setting the QGraphicsView to OpenGL would probably also help (no artifacts
+    // there either, selection is hopefully fine).
     QApplication::setGraphicsSystem("raster");
 #endif
     QApplication app(argc, argv);

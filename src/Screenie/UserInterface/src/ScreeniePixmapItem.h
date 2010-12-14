@@ -52,6 +52,7 @@ public:
 
 protected:
     virtual int type() const;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
@@ -61,10 +62,17 @@ private:
     ScreenieModelInterface &m_screenieModel;
     ScreenieControl &m_screenieControl;
     Reflection &m_reflection;
+    bool m_transformPixmap;
 
     void frenchConnection();
     void rotate(int angle);
     void addDistance(int distance);
+    bool isInsidePixmap(QPointF itemPosition);
+    void transformPixmap(QGraphicsSceneMouseEvent *event);
+    void changeReflection(QGraphicsSceneMouseEvent *event);
+    void addReflectionOpacity(int reflectionOpacity);
+
+    void selectExclusive();
 
 private slots:
     void updateReflection();
