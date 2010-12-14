@@ -25,6 +25,8 @@
 #include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 
+#include "ModelLib.h"
+
 class QString;
 
 class ScreenieModelInterface : public QObject
@@ -33,7 +35,7 @@ class ScreenieModelInterface : public QObject
 
 public:
 
-    static const int MaxDistance;
+    MODEL_API static const int MaxDistance;
 
     virtual ~ScreenieModelInterface() {}
 

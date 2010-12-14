@@ -39,8 +39,8 @@ class ScreenieScene : public QObject
     Q_OBJECT
 
 public:
-    explicit ScreenieScene(QObject *parent = 0);
-    virtual ~ScreenieScene();
+    MODEL_API explicit ScreenieScene(QObject *parent = 0);
+    MODEL_API virtual ~ScreenieScene();
 
     /*!
      * Adds the \p screenieModel to this ScreenieScene. This ScreenieScene takes ownership and
