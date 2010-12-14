@@ -187,6 +187,7 @@ void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
         } else if (percent > 100) {
             percent = 100;
         }
+        selectExclusive();
         m_screenieControl.setReflectionOffset(percent);
         event->accept();
         break;
@@ -197,6 +198,7 @@ void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
         } else if (percent > 100) {
             percent = 100;
         }
+        selectExclusive();
         m_screenieControl.setReflectionOpacity(percent);
         event->accept();
         break;
