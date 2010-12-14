@@ -8,7 +8,6 @@ TEMPLATE = app
 # OpenGL support later
 # QT += opengl
 
-DESTDIR = $$PWD/../../bin/debug
 CONFIG(debug, debug|release) {
     DESTDIR = $$PWD/../../bin/debug
     message(Building $$TARGET in debug mode)
