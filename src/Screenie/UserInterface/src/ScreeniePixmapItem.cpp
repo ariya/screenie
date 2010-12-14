@@ -39,7 +39,8 @@ const int ScreeniePixmapItem::ScreeniePixmapType = QGraphicsItem::UserType + 1;
 ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection)
     : m_screenieModel(screenieModel),
       m_screenieControl(screenieControl),
-      m_reflection(reflection)
+      m_reflection(reflection),
+      m_transformPixmap(true)
 {
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -70,38 +71,29 @@ int ScreeniePixmapItem::type() const
     return ScreeniePixmapType;
 }
 
+void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+   m_transformPixmap = isInsidePixmap(event->pos());
+   event->accept();
+}
+
 void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    int deltaX, deltaY;
-
-    switch (event->buttons()) {
-    case Qt::RightButton:
-        deltaX = event->lastScreenPos().x() - event->screenPos().x();
-        rotate(deltaX);
-        event->accept();
-        break;
-
-     case Qt::MiddleButton:
-        deltaY = event->lastScreenPos().y() - event->screenPos().y();
-        addDistance(deltaY);
-        event->accept();
-        break;
-
-    case Qt::LeftButton:
-        QGraphicsPixmapItem::mouseMoveEvent(event);
-        m_screenieModel.setPosition(scenePos());
-        event->accept();
-        break;
-     default:
-        QGraphicsPixmapItem::mouseMoveEvent(event);
-        break;
+    if (isInsidePixmap(event->pos()) && m_transformPixmap) {
+        transformPixmap(event);
+    } else if (!m_transformPixmap) {
+        changeReflection(event);
     }
 }
 
 void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    int distance = event->delta() / 12;
-    addDistance(distance);
+    int value = event->delta() / 12;
+    if (isInsidePixmap(event->pos())) {
+        addDistance(value);
+    } else {
+        addReflectionOpacity(value);
+    }
     event->accept();
 }
 
@@ -134,20 +126,99 @@ void ScreeniePixmapItem::frenchConnection()
 
 void ScreeniePixmapItem::rotate(int angle)
 {
-    if (!isSelected()) {
-        scene()->clearSelection();
-        setSelected(true);
-    }
+    selectExclusive();
     m_screenieControl.rotate(angle);
 }
 
 void ScreeniePixmapItem::addDistance(int distance)
 {
+    selectExclusive();
+    m_screenieControl.addDistance(distance);
+}
+
+bool ScreeniePixmapItem::isInsidePixmap(QPointF itemPosition)
+{
+    bool result;
+    if (m_screenieModel.isReflectionEnabled()) {
+        QRectF boundingRect = this->boundingRect();
+        result = itemPosition.y() < boundingRect.height() / 2.0;
+    } else {
+        result = true;
+    }
+    return result;
+}
+
+void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
+{
+    int deltaX, deltaY;
+    switch (event->buttons()) {
+    case Qt::RightButton:
+        deltaX = event->lastScreenPos().x() - event->screenPos().x();
+        rotate(deltaX);
+        event->accept();
+        break;
+
+     case Qt::MiddleButton:
+        deltaY = event->lastScreenPos().y() - event->screenPos().y();
+        addDistance(deltaY);
+        event->accept();
+        break;
+
+    case Qt::LeftButton:
+        QGraphicsPixmapItem::mouseMoveEvent(event);
+        m_screenieModel.setPosition(scenePos());
+        event->accept();
+        break;
+     default:
+        QGraphicsPixmapItem::mouseMoveEvent(event);
+        break;
+    }
+}
+
+void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
+{
+    qreal height_2 = boundingRect().height() / 2.0;
+    qreal factor  = (event->pos().y() - height_2) / height_2;
+    int percent = qRound(factor * 100.0);
+    switch (event->buttons()) {
+    case Qt::LeftButton:
+        if (percent < 1) {
+            percent = 1;
+        } else if (percent > 100) {
+            percent = 100;
+        }
+        m_screenieControl.setReflectionOffset(percent);
+        event->accept();
+        break;
+
+    case Qt::RightButton:
+        if (percent < 0) {
+            percent = 0;
+        } else if (percent > 100) {
+            percent = 100;
+        }
+        m_screenieControl.setReflectionOpacity(percent);
+        event->accept();
+        break;
+
+    default:
+        QGraphicsPixmapItem::mouseMoveEvent(event);
+        break;
+    }
+}
+
+void ScreeniePixmapItem::addReflectionOpacity(int reflectionOpacity)
+{
+    selectExclusive();
+    m_screenieControl.addReflectionOpacity(reflectionOpacity);
+}
+
+void ScreeniePixmapItem::selectExclusive()
+{
     if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
     }
-    m_screenieControl.addDistance(distance);
 }
 
 // private slots

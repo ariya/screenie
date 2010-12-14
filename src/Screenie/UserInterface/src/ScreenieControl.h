@@ -82,7 +82,9 @@ public slots:
 
     void setReflectionEnabled(bool enable);
     void setReflectionOffset(int reflectionOffset);
+    void addReflectionOffset(int reflectionOffset);
     void setReflectionOpacity(int reflectionOpacity);
+    void addReflectionOpacity(int reflectionOpacity);
 
     void setBackgroundEnabled(bool enable);
     void setBackgroundColor(QColor color);

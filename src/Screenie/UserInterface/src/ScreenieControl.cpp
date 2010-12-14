@@ -226,12 +226,32 @@ void ScreenieControl::setReflectionOffset(int reflectionOffset)
     m_qualityTimer.start();
 }
 
+void ScreenieControl::addReflectionOffset(int reflectionOffset)
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->addReflectionOffset(reflectionOffset);
+    }
+    m_qualityTimer.start();
+}
+
 void ScreenieControl::setReflectionOpacity(int reflectionOpacity)
 {
     setRenderQuality(Low);
     QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOpacity(reflectionOpacity);
+    }
+    m_qualityTimer.start();
+}
+
+void ScreenieControl::addReflectionOpacity(int reflectionOpacity)
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->addReflectionOpacity(reflectionOpacity);
     }
     m_qualityTimer.start();
 }
