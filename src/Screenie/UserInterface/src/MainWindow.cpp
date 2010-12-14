@@ -37,6 +37,8 @@
 #include "../../../Model/src/ScreenieScene.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
 #include "../../../Model/src/ScreenieFilePathModel.h"
+#include "../../../Model/src/Dao/ScreenieSceneDao.h"
+#include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
 #include "../../../Kernel/src/ExportImage.h"
 #include "../../../Kernel/src/ExportPDF.h"
 #include "ScreenieControl.h"
@@ -90,6 +92,12 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
     connect(m_screenieScene, SIGNAL(changed()),
             this, SLOT(updateUi()));
+}
+
+bool MainWindow::save(const QString &filePath)
+{
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(*m_screenieScene);
+    return screenieSceneDao->store(filePath);
 }
 
 void MainWindow::updateTransformationUi()
@@ -172,6 +180,14 @@ void MainWindow::initializeUi()
 }
 
 // private slots
+
+void MainWindow::on_saveAsAction_triggered()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), "*.xsc");
+    if (!filePath.isNull()) {
+        bool ok = save(filePath);
+    }
+}
 
 void MainWindow::on_addImageAction_triggered()
 {

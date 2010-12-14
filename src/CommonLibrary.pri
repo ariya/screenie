@@ -1,5 +1,12 @@
 include(Common.pri)
 
+# Actually we want prevent qmake from generating symbolic links (Unix, Mac)
+# and adding the version number into the library file name (Unix, Windows, Mac)
+# by putting the 'plugin' keyword into the CONFIG.
+# But on Mac this apparently also prevents the the install_name_tool (?)
+# from being applied on the generated library.
+# But since the libraries are put into the application bundle anyway
+# (which is easy to be moved around in the file system) this is not so bad.
 !macx {
   CONFIG += plugin
 }

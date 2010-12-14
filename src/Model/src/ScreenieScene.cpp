@@ -83,6 +83,11 @@ void ScreenieScene::removeModel(int index)
     delete screenieModel;    
 }
 
+int ScreenieScene::count() const
+{
+    return d->screenieModels.count();
+}
+
 bool ScreenieScene::isBackgroundEnabled() const
 {
     return d->backgroundEnabled;

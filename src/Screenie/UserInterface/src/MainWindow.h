@@ -55,12 +55,15 @@ private:
 
     void frenchConnection();
 
+    bool save(const QString &filePath);
+
     void updateTransformationUi();
     void updateReflectionUi();
     void updateColorUi();
     void initializeUi();
 
 private slots:
+    void on_saveAsAction_triggered();
     void on_addImageAction_triggered();
     void on_exportAction_triggered();
     void on_exportPDFAction_triggered();
