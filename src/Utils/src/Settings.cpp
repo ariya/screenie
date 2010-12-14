@@ -20,7 +20,10 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
+#include <QtCore/QSettings>
+#include <QtGui/QDesktopServices>
 
+#include "Version.h"
 #include "Settings.h"
 
 class SettingsPrivate
@@ -28,13 +31,34 @@ class SettingsPrivate
 public:
     static Settings *instance;
 
+    static const QSize DefaultMaximumImageSize;
+    static const QString DefaultLastImageDirectoryPath;
+
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
 
-    SettingsPrivate() : maximumImageSize(QSize(640, 640)) {}
+    QSettings *settings;
+
+    SettingsPrivate() : maximumImageSize(DefaultMaximumImageSize) {
+#ifdef Q_OS_WIN
+        // On Windows prefer INI format over Registry (= NativeFormat)
+        QSettings::Format format = QSettings::IniFormat;
+#else
+        QSettings::Format format = QSettings::NativeFormat;
+#endif
+        settings = new QSettings(format, QSettings::UserScope, "till-art.net", Version::getApplicationName());
+    }
+
+    ~SettingsPrivate() {
+        delete settings;
+    }
 };
 
 Settings *SettingsPrivate::instance = 0;
+
+const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
+const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+
 
 // public
 
@@ -78,10 +102,25 @@ void Settings::setLastImageDirectoryPath(const QString &lastImageDirectoryPath)
     }
 }
 
+// public slots
+
+void Settings::store()
+{
+    d->settings->setValue("scene/maximumImageSize", d->maximumImageSize);
+    d->settings->setValue("paths/lastImageDirectoryPath", d->lastImageDirectoryPath);
+}
+
+void Settings::restore()
+{
+    d->maximumImageSize = d->settings->value("scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
+    d->lastImageDirectoryPath = d->settings->value("paths/lastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
+}
+
 // protected
 
 Settings::~Settings()
 {
+    store();
     delete d;
 }
 
@@ -90,4 +129,5 @@ Settings::~Settings()
 Settings::Settings()
 {
     d = new SettingsPrivate();
+    restore();
 }

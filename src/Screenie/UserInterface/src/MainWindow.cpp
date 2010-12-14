@@ -20,7 +20,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QPointF>
-#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     ui->graphicsView->setAcceptDrops(true);
+    // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     m_screenieScene = new ScreenieScene();
@@ -74,6 +75,9 @@ MainWindow::~MainWindow()
     delete m_screenieScene;
     delete m_screenieControl;
     delete ui;
+
+    // destroy singletons
+    Settings::destroyInstance();
 }
 
 // private
@@ -171,12 +175,13 @@ void MainWindow::initializeUi()
 
 void MainWindow::on_addImageAction_triggered()
 {
-    QString lastImageDirectoryPath = Settings::getInstance().getLastImageDirectoryPath();
+    Settings &settings = Settings::getInstance();
+    QString lastImageDirectoryPath = settings.getLastImageDirectoryPath();
     QString filePath = QFileDialog::getOpenFileName(this, tr("Add Image"), lastImageDirectoryPath);
     if (!filePath.isNull()) {
         m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
-        lastImageDirectoryPath = QDir(filePath).absolutePath();
-        Settings::getInstance().setLastImageDirectoryPath(lastImageDirectoryPath);
+        lastImageDirectoryPath = QFileInfo(filePath).absolutePath();
+        settings.setLastImageDirectoryPath(lastImageDirectoryPath);
     }
 }
 

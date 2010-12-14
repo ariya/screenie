@@ -29,21 +29,59 @@ class QSize;
 
 class SettingsPrivate;
 
+/*!
+ * The application settings. These settings are persisted to user configuration
+ * files.
+ *
+ * Implementation note:
+ *
+ * - \b Windows: INI format
+ * - \b Mac: Native format (CFPreferences API)
+ * - \b Linux: INI format
+ */
 class Settings : public QObject
 {
     Q_OBJECT
 
 public:
+    /*!
+     * \sa #changed()
+     */
     UTILS_API static Settings &getInstance();
     UTILS_API static void destroyInstance();
 
     UTILS_API const QSize &getMaximumImageSize() const;
+
+    /*!
+     * \sa #changed()
+     */
     UTILS_API void setMaximumImageSize(const QSize &maximumImageSize);
 
     UTILS_API const QString &getLastImageDirectoryPath() const;
+
+    /*!
+     * \sa #changed()
+     */
     UTILS_API void setLastImageDirectoryPath(const QString &lastImageDirectoryPath);
 
+public slots:
+    /*!
+     * Stores these Settings to a user configuration file.
+     */
+    UTILS_API void store();
+
+    /*!
+     * Restores these Settings from a user configuration file. If no user
+     * configuration is present the settings are set to default values.
+     *
+     * \sa #changed()
+     */
+    UTILS_API void restore();
+
 signals:
+    /*!
+     * Emitted when these Settings have changed.
+     */
     void changed();
 
 protected:
