@@ -18,35 +18,35 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef XMLSCREENIEFILEPATHMODELDAO_H
-#define XMLSCREENIEFILEPATHMODELDAO_H
+#ifndef ABSTRACTXMLSCREENIEMODELDAO_H
+#define ABSTRACTXMLSCREENIEMODELDAO_H
 
 class QXmlStreamWriter;
 
-#include "../ScreenieFilePathModelDao.h"
-#include "AbstractXmlScreenieModelDao.h"
-
-class ScreenieFilePathModel;
-class XmlScreenieFilePathModelDaoPrivate;
+class AbstractScreenieModel;
+class AbstractXmlScreenieModelDaoPrivate;
 
 /*!
  * Internal class.
  */
-class XmlScreenieFilePathModelDao : public AbstractXmlScreenieModelDao, public ScreenieFilePathModelDao
+class AbstractXmlScreenieModelDao
 {
 public:
-    explicit XmlScreenieFilePathModelDao(QXmlStreamWriter &xmlStreamWriter);
-    virtual ~XmlScreenieFilePathModelDao();
+    explicit AbstractXmlScreenieModelDao(QXmlStreamWriter &xmlStreamWriter);
+    virtual ~AbstractXmlScreenieModelDao();
 
-    virtual bool write(const ScreenieFilePathModel &screenieFilePathModel);
-    virtual ScreenieFilePathModel *read();
+    virtual bool writeCommon(const AbstractScreenieModel &screenieModel);
+
+    virtual bool readCommon(AbstractScreenieModel &screenieModel);
 
 protected:
-    virtual bool writeSpecific();
-    virtual bool readSpecific();
+    QXmlStreamWriter &getStreamWriter() const;
+
+    virtual bool writeSpecific() = 0;
+    virtual bool readSpecific() = 0;
 
 private:
-    XmlScreenieFilePathModelDaoPrivate *d;
+    AbstractXmlScreenieModelDaoPrivate *d;
 };
 
-#endif // XMLSCREENIEFILEPATHMODELDAO_H
+#endif // ABSTRACTXMLSCREENIEMODELDAO_H

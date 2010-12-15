@@ -27,12 +27,19 @@ class QString;
 #include "../ScreenieSceneDao.h"
 
 class ScreenieScene;
+class ScreenieFilePathModel;
+class ScreeniePixmapModel;
 class XmlScreenieSceneDaoPrivate;
 
+/*!
+ * This Data Access Object (DAO) implements an XML persistence and
+ * is the public class to use for reading and writing
+ * ScreenieScene objects from/to a given file path.
+ */
 class XmlScreenieSceneDao : public ScreenieSceneDao
 {
 public:
-    MODEL_API XmlScreenieSceneDao(const QString &filePath);
+    MODEL_API explicit XmlScreenieSceneDao(const QString &filePath);
     MODEL_API virtual ~XmlScreenieSceneDao();
 
     MODEL_API virtual bool write(const ScreenieScene &screenieScene);
@@ -43,6 +50,8 @@ private:
 
     bool writeScreenieScene(const ScreenieScene &screenieScene);
     bool writeScreenieModels(const ScreenieScene &screenieScene);
+    bool writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel);
+    bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
     void cleanUp();
 };
 

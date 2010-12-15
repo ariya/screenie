@@ -25,8 +25,10 @@
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
 #include "../../ScreenieFilePathModel.h"
+#include "../../ScreeniePixmapModel.h"
 #include "../ScreenieFilePathModelDao.h"
 #include "XmlScreenieFilePathModelDao.h"
+#include "XmlScreeniePixmapModelDao.h"
 #include "XmlScreenieSceneDao.h"
 
 // public
@@ -38,7 +40,8 @@ public:
         : filePath(path),
           version("1.0"),
           streamWriter(0),
-          screenieFilePathModelDao(0)
+          screenieFilePathModelDao(0),
+          screeniePixmapModelDao(0)
     {
     }
 
@@ -46,6 +49,7 @@ public:
     QString version;
     QXmlStreamWriter *streamWriter;
     ScreenieFilePathModelDao *screenieFilePathModelDao;
+    ScreeniePixmapModelDao *screeniePixmapModelDao;
 };
 
 XmlScreenieSceneDao::XmlScreenieSceneDao(const QString &filePath)
@@ -92,8 +96,14 @@ bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
     bool result = true;
     d->streamWriter->writeStartElement("screeniescene");
     {
-        d->streamWriter->writeAttribute("background", screenieScene.isBackgroundEnabled() ? "true" : "false");
-        d->streamWriter->writeAttribute("bgcolor", screenieScene.getBackgroundColor().name());
+        d->streamWriter->writeStartElement("background");
+        {
+            QXmlStreamAttributes backgroundAttributes;
+            backgroundAttributes.append("enabled", screenieScene.isBackgroundEnabled() ? "true" : "false");
+            backgroundAttributes.append("bgcolor", screenieScene.getBackgroundColor().name());
+            d->streamWriter->writeAttributes(backgroundAttributes);
+        }
+        d->streamWriter->writeEndElement();
         d->streamWriter->writeStartElement("items");
         {
             result = writeScreenieModels(screenieScene);
@@ -113,16 +123,41 @@ bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene
     for (int i = 0; result && i < n; ++i) {
         ScreenieModelInterface *screenieModel = screenieScene.getModel(i);
         if (screenieModel->inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-            if (d->screenieFilePathModelDao == 0) {
-                d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(*d->streamWriter);
-            }
-            d->streamWriter->writeStartElement("filepathmodel");
-            {
-                result = d->screenieFilePathModelDao->write(dynamic_cast<ScreenieFilePathModel &>(*screenieModel));
-            }
-            d->streamWriter->writeEndElement();
+            result = writeFilePathModel(dynamic_cast<ScreenieFilePathModel &>(*screenieModel));
+        } else if (screenieModel->inherits(ScreeniePixmapModel::staticMetaObject.className())) {
+            result = writePixmapModel(dynamic_cast<ScreeniePixmapModel &>(*screenieModel));
         }
     }
+    return result;
+}
+
+bool XmlScreenieSceneDao::writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel)
+{
+    bool result;
+    if (d->screenieFilePathModelDao == 0) {
+        d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(*d->streamWriter);
+    }
+    d->streamWriter->writeStartElement("filepathmodel");
+    {
+        result = d->screenieFilePathModelDao->write(screenieFilePathModel);
+    }
+    d->streamWriter->writeEndElement();
+
+    return result;
+}
+
+bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel)
+{
+    bool result;
+    if (d->screeniePixmapModelDao == 0) {
+        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(*d->streamWriter);
+    }
+    d->streamWriter->writeStartElement("pixmapmodel");
+    {
+        result = d->screeniePixmapModelDao->write(screeniePixmapModel);
+    }
+    d->streamWriter->writeEndElement();
+
     return result;
 }
 
@@ -131,6 +166,10 @@ void XmlScreenieSceneDao::cleanUp()
     if (d->screenieFilePathModelDao != 0) {
         delete d->screenieFilePathModelDao;
         d->screenieFilePathModelDao = 0;
+    }
+    if (d->screeniePixmapModelDao != 0) {
+        delete d->screeniePixmapModelDao;
+        d->screeniePixmapModelDao = 0;
     }
     if (d->streamWriter != 0) {
         delete d->streamWriter;

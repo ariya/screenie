@@ -20,7 +20,6 @@
 
 #include <QtCore/QString>
 #include <QtXml/QXmlStreamWriter>
-#include <QtXml/QXmlStreamAttributes>
 
 #include "../../ScreenieFilePathModel.h"
 #include "XmlScreenieFilePathModelDao.h"
@@ -28,19 +27,15 @@
 class XmlScreenieFilePathModelDaoPrivate
 {
 public:
-    XmlScreenieFilePathModelDaoPrivate(QXmlStreamWriter &xmlStreamWriter)
-        : streamWriter(xmlStreamWriter)
-    {
-    }
-
-    QXmlStreamWriter &streamWriter;
+    const ScreenieFilePathModel *screenieFilePathModel;
 };
 
 //  public
 
 XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter &streamWriter)
+    : AbstractXmlScreenieModelDao(streamWriter)
 {
-    d = new XmlScreenieFilePathModelDaoPrivate(streamWriter);
+    d = new XmlScreenieFilePathModelDaoPrivate();
 }
 
 XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao(){
@@ -49,36 +44,9 @@ XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao(){
 
 bool XmlScreenieFilePathModelDao::write(const ScreenieFilePathModel &screenieFilePathModel)
 {
-    bool result = true;
-    d->streamWriter.writeStartElement("item");
-    {
-        QXmlStreamAttributes itemAttributes;
-        itemAttributes.append("path", screenieFilePathModel.getFilePath());
-        d->streamWriter.writeAttributes(itemAttributes);
-
-        d->streamWriter.writeStartElement("position");
-        {
-            QXmlStreamAttributes positionAttributes;
-            QPointF position = screenieFilePathModel.getPosition();
-            positionAttributes.append("x", QString::number(position.x()));
-            positionAttributes.append("y", QString::number(position.y()));
-            positionAttributes.append("dist", QString::number(screenieFilePathModel.getDistance()));
-            positionAttributes.append("rot", QString::number(screenieFilePathModel.getRotation()));
-            d->streamWriter.writeAttributes(positionAttributes);
-        }
-        d->streamWriter.writeEndElement();
-
-        d->streamWriter.writeStartElement("reflection");
-        {
-            QXmlStreamAttributes reflectionAttributes;
-            reflectionAttributes.append("enabled", screenieFilePathModel.isReflectionEnabled() ? "true" : "false");
-            reflectionAttributes.append("offset", QString::number(screenieFilePathModel.getReflectionOffset()));
-            reflectionAttributes.append("opacity", QString::number(screenieFilePathModel.getReflectionOpacity()));
-            d->streamWriter.writeAttributes(reflectionAttributes);
-        }
-        d->streamWriter.writeEndElement();
-    }
-    d->streamWriter.writeEndElement();
+    bool result;
+    d->screenieFilePathModel = &screenieFilePathModel;
+    result = AbstractXmlScreenieModelDao::writeCommon(screenieFilePathModel);
     return result;
 }
 
@@ -87,3 +55,20 @@ ScreenieFilePathModel *XmlScreenieFilePathModelDao::read()
     ScreenieFilePathModel *result = 0;
     return result;
 }
+
+// protected
+
+bool XmlScreenieFilePathModelDao::writeSpecific()
+{
+    bool result = true;
+    getStreamWriter().writeAttribute("path", d->screenieFilePathModel->getFilePath());
+    return result;
+}
+
+bool XmlScreenieFilePathModelDao::readSpecific()
+{
+    bool result;
+    result = false;
+    return result;
+}
+
