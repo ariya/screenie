@@ -1,6 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>img/ApplicationIcon.png</file>
-        <file>img/AddImageIcon.png</file>
+        <file>img/insert-image.png</file>
+        <file>img/application-exit.png</file>
+        <file>img/document-save-as.png</file>
+        <file>img/document-save.png</file>
+        <file>img/document-open.png</file>
     </qresource>
 </RCC>
