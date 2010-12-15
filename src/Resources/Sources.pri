@@ -1,4 +1,4 @@
-DEPENDPATH += $$PWD/Utils/src \
+DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/GeneratedFiles \
               $$PWD/src
 

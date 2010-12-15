@@ -1,7 +1,9 @@
-DEPENDPATH += $$PWD/Utils/src \
-              $$PWD/Resources/src \
-              $$PWD/Model/src \
-              $$PWD/Kernel/src \
+DEPENDPATH += $$PWD/../Utils/src \
+              $$PWD/../Resources/src \
+              $$PWD/../Model/src \
+              $$PWD/../Model/src/Dao \
+              $$PWD/../Model/src/Dao/Xml \
+              $$PWD/../Kernel/src \
               $$PWD/UserInterface/src \
               $$PWD/GeneratedFiles \
               $$PWD/src

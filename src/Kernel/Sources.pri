@@ -1,6 +1,6 @@
-DEPENDPATH += $$PWD/Utils/src \
-              $$PWD/Resources/src \
-              $$PWD/Model/src \
+DEPENDPATH += $$PWD/../Utils/src \
+              $$PWD/../Resources/src \
+              $$PWD/../Model/src \
               $$PWD/GeneratedFiles \
               $$PWD/src
 
