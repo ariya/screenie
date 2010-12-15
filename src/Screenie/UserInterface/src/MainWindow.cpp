@@ -96,8 +96,8 @@ void MainWindow::frenchConnection()
 
 bool MainWindow::save(const QString &filePath)
 {
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(*m_screenieScene);
-    return screenieSceneDao->store(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
+    return screenieSceneDao->write(*m_screenieScene);
 }
 
 void MainWindow::updateTransformationUi()
@@ -186,6 +186,9 @@ void MainWindow::on_saveAsAction_triggered()
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), "*.xsc");
     if (!filePath.isNull()) {
         bool ok = save(filePath);
+#ifdef DEBUG
+        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
+#endif
     }
 }
 

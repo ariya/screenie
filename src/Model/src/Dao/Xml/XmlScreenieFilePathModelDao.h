@@ -18,34 +18,27 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIESCENEDAO_H
-#define SCREENIESCENEDAO_H
+#ifndef XMLSCREENIEFILEPATHMODELDAO_H
+#define XMLSCREENIEFILEPATHMODELDAO_H
 
-class ScreenieScene;
+class QXmlStreamWriter;
 
-class ScreenieSceneDao
+#include "../ScreenieFilePathModelDao.h"
+
+class ScreenieFilePathModel;
+class XmlScreenieFilePathModelDaoPrivate;
+
+class XmlScreenieFilePathModelDao : public ScreenieFilePathModelDao
 {
 public:
+    XmlScreenieFilePathModelDao(QXmlStreamWriter &xmlStreamWriter);
+    virtual ~XmlScreenieFilePathModelDao();
 
-    virtual ~ScreenieSceneDao() {}
+    virtual bool write(const ScreenieFilePathModel &screenieFilePathModel);
+    virtual ScreenieFilePathModel *read();
 
-    /*!
-     * Writes the \p screenieScene.
-     *
-     * \param screenieScene
-     *        the ScreenieScene to be written
-     * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
-     */
-    virtual bool write(const ScreenieScene &screenieScene) = 0;
-
-    /*!
-     * Creates and reads the \em current ScreenieScene. The caller is then the owner
-     * of the returned instance.
-     *
-     * \return the ScreenieScene read from the \em current position in the persistence stream;
-     *         must be \c deleted by the caller; may be 0
-     */
-    virtual ScreenieScene *read() = 0;
+private:
+    XmlScreenieFilePathModelDaoPrivate *d;
 };
 
-#endif // SCREENIESCENEDAO_H
+#endif // XMLSCREENIEFILEPATHMODELDAO_H

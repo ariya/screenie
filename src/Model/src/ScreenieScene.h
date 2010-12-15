@@ -64,6 +64,12 @@ public:
      * \sa #changed()
      */
     MODEL_API void removeModel(int index);
+
+    /*!
+     * \return the ScreenieModelInterface identified by \p index; may be 0
+     * \sa #count()
+     */
+    MODEL_API ScreenieModelInterface *getModel(int index) const;
     MODEL_API int count() const;
 
     MODEL_API bool isBackgroundEnabled() const;

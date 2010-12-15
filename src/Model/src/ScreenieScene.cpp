@@ -33,11 +33,12 @@ public:
           backgroundColor(QColor(255, 255, 255))
     {}
 
-    QPixmap pixmap;
     bool backgroundEnabled;
     QColor backgroundColor;
     QList<ScreenieModelInterface *> screenieModels;
 };
+
+// public
 
 ScreenieScene::ScreenieScene(QObject *parent)
     : QObject(parent), d(new ScreenieScenePrivate())
@@ -81,6 +82,18 @@ void ScreenieScene::removeModel(int index)
     d->screenieModels.removeAt(index);
     emit modelRemoved(*screenieModel);
     delete screenieModel;    
+}
+
+ScreenieModelInterface *ScreenieScene::getModel(int index) const
+{
+    ScreenieModelInterface *result;
+    int n = count();
+    if (index >= 0 && index < n) {
+        result = d->screenieModels.at(index);
+    } else {
+        result = 0;
+    }
+    return result;
 }
 
 int ScreenieScene::count() const

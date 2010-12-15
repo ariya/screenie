@@ -12,7 +12,9 @@ HEADERS += $$PWD/src/AbstractScreenieModel.h \
            $$PWD/src/ScreenieScene.h \
            $$PWD/src/ModelLib.h \
            $$PWD/src/Dao/ScreenieSceneDao.h \
-           $$PWD/src/Dao/Xml/XmlScreenieSceneDao.h
+           $$PWD/src/Dao/ScreenieFilePathModelDao.h \
+           $$PWD/src/Dao/Xml/XmlScreenieSceneDao.h \           
+           $$PWD/src/Dao/Xml/XmlScreenieFilePathModelDao.h
 
 SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/DefaultScreenieModel.cpp \
@@ -20,4 +22,5 @@ SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/ScreenieModelInterface.cpp \
            $$PWD/src/ScreeniePixmapModel.cpp \
            $$PWD/src/ScreenieScene.cpp \
-           $$PWD/src/Dao/Xml/XmlScreenieSceneDao.cpp
+           $$PWD/src/Dao/Xml/XmlScreenieSceneDao.cpp \
+           $$PWD/src/Dao/Xml/XmlScreenieFilePathModelDao.cpp

@@ -9,4 +9,6 @@ DEFINES += MODEL_EXPORT
 LIBS += -L$${DESTDIR} \
         -lUtils
 
+HEADERS +=
 
+SOURCES +=

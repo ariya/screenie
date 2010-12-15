@@ -18,34 +18,33 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIESCENEDAO_H
-#define SCREENIESCENEDAO_H
+#ifndef SCREENIEFILEPATHMODELDAO_H
+#define SCREENIEFILEPATHMODELDAO_H
 
-class ScreenieScene;
+class ScreenieFilePathModel;
 
-class ScreenieSceneDao
+class ScreenieFilePathModelDao
 {
 public:
-
-    virtual ~ScreenieSceneDao() {}
+    virtual ~ScreenieFilePathModelDao() {}
 
     /*!
-     * Writes the \p screenieScene.
+     * Writes the \p screenieFilePathModel.
      *
-     * \param screenieScene
-     *        the ScreenieScene to be written
+     * \param screenieFilePathModel
+     *        the ScreenieFilePathModel to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
-    virtual bool write(const ScreenieScene &screenieScene) = 0;
+    virtual bool write(const ScreenieFilePathModel &screenieFilePathModel) = 0;
 
     /*!
-     * Creates and reads the \em current ScreenieScene. The caller is then the owner
+     * Creates and reads the \em current ScreenieFilePathModel. The caller is then the owner
      * of the returned instance.
      *
-     * \return the ScreenieScene read from the \em current position in the persistence stream;
+     * \return the ScreenieFilePathModel read from the \em current position in the persistence stream;
      *         must be \c deleted by the caller; may be 0
      */
-    virtual ScreenieScene *read() = 0;
+    virtual ScreenieFilePathModel *read() = 0;
 };
 
-#endif // SCREENIESCENEDAO_H
+#endif // SCREENIEFILEPATHMODELDAO_H

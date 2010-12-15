@@ -23,6 +23,10 @@
 #include <QtXml/QXmlStreamWriter>
 
 #include "../../ScreenieScene.h"
+#include "../../ScreenieModelInterface.h"
+#include "../../ScreenieFilePathModel.h"
+#include "../ScreenieFilePathModelDao.h"
+#include "XmlScreenieFilePathModelDao.h"
 #include "XmlScreenieSceneDao.h"
 
 // public
@@ -30,57 +34,106 @@
 class XmlScreenieSceneDaoPrivate
 {
 public:
-    XmlScreenieSceneDaoPrivate(ScreenieScene &scene)
-        : screenieScene(scene),
-          version("1.0")
-    {}
+    XmlScreenieSceneDaoPrivate(const QString &path)
+        : filePath(path),
+          version("1.0"),
+          streamWriter(0),
+          screenieFilePathModelDao(0)
+    {
+    }
 
-    ScreenieScene &screenieScene;
+    QString filePath;
     QString version;
     QXmlStreamWriter *streamWriter;
+    ScreenieFilePathModelDao *screenieFilePathModelDao;
 };
 
-XmlScreenieSceneDao::XmlScreenieSceneDao(ScreenieScene &screenieScene)
+XmlScreenieSceneDao::XmlScreenieSceneDao(const QString &filePath)
 {
-    d = new XmlScreenieSceneDaoPrivate(screenieScene);
+    d = new XmlScreenieSceneDaoPrivate(filePath);
 }
 
 XmlScreenieSceneDao::~XmlScreenieSceneDao()
 {
+    cleanUp();
     delete d;
 }
 
-bool XmlScreenieSceneDao::store(const QString &filePath)
+bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
 {
     bool result;
-    QFile file(filePath);
+    QFile file(d->filePath);
     if (file.open(QIODevice::WriteOnly)) {
         d->streamWriter = new QXmlStreamWriter(&file);
         d->streamWriter->setAutoFormatting(true);
         d->streamWriter->writeStartDocument(d->version, true);
-        writeScreenieScene();
+        result = writeScreenieScene(screenieScene);
         d->streamWriter->writeEndDocument();
-        delete d->streamWriter;
         file.close();
-        result = QFile::NoError == file.error();
+        result = result && QFile::NoError == file.error();
     } else {
         result = false;
     }
+    cleanUp();
     return result;
 }
 
-bool XmlScreenieSceneDao::restore(const QString &filePath)
+ScreenieScene *XmlScreenieSceneDao::read()
 {
-    bool result = true;
+    ScreenieScene *result = 0;
     /*!\todo Implement this */
     return result;
 }
 
 // private
 
-void XmlScreenieSceneDao::writeScreenieScene()
+bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
 {
+    bool result = true;
     d->streamWriter->writeStartElement("screeniescene");
-    d->streamWriter->writeTextElement("nofitems", QString::number(d->screenieScene.count()));
+    {
+        d->streamWriter->writeAttribute("background", screenieScene.isBackgroundEnabled() ? "true" : "false");
+        d->streamWriter->writeAttribute("bgcolor", screenieScene.getBackgroundColor().name());
+        d->streamWriter->writeStartElement("items");
+        {
+            result = writeScreenieModels(screenieScene);
+        }
+        d->streamWriter->writeEndElement();
+    }
     d->streamWriter->writeEndElement();
+    return result;
+}
+
+bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene)
+{
+    bool result;
+    int n = screenieScene.count();
+    d->streamWriter->writeAttribute("count", QString::number(n));
+    result = true;
+    for (int i = 0; result && i < n; ++i) {
+        ScreenieModelInterface *screenieModel = screenieScene.getModel(i);
+        if (screenieModel->inherits(ScreenieFilePathModel::staticMetaObject.className())) {
+            if (d->screenieFilePathModelDao == 0) {
+                d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(*d->streamWriter);
+            }
+            d->streamWriter->writeStartElement("filepathmodel");
+            {
+                result = d->screenieFilePathModelDao->write(dynamic_cast<ScreenieFilePathModel &>(*screenieModel));
+            }
+            d->streamWriter->writeEndElement();
+        }
+    }
+    return result;
+}
+
+void XmlScreenieSceneDao::cleanUp()
+{
+    if (d->screenieFilePathModelDao != 0) {
+        delete d->screenieFilePathModelDao;
+        d->screenieFilePathModelDao = 0;
+    }
+    if (d->streamWriter != 0) {
+        delete d->streamWriter;
+        d->streamWriter = 0;
+    }
 }

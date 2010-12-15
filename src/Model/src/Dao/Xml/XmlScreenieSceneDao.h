@@ -32,15 +32,18 @@ class XmlScreenieSceneDaoPrivate;
 class XmlScreenieSceneDao : public ScreenieSceneDao
 {
 public:
-    MODEL_API XmlScreenieSceneDao(ScreenieScene &screenieScene);
+    MODEL_API XmlScreenieSceneDao(const QString &filePath);
     MODEL_API virtual ~XmlScreenieSceneDao();
 
-    MODEL_API virtual bool store(const QString &filePath);
-    MODEL_API virtual bool restore(const QString &filePath);
+    MODEL_API virtual bool write(const ScreenieScene &screenieScene);
+    MODEL_API virtual ScreenieScene *read();
+
 private:
     XmlScreenieSceneDaoPrivate *d;
 
-    void writeScreenieScene();
+    bool writeScreenieScene(const ScreenieScene &screenieScene);
+    bool writeScreenieModels(const ScreenieScene &screenieScene);
+    void cleanUp();
 };
 
 #endif // XMLSCREENIESCENEDAO_H

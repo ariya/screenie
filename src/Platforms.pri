@@ -5,9 +5,9 @@ unix:linux* {
     QMAKE_LFLAGS += -Wl,--rpath=\'\$\$ORIGIN\'
 }
 
-win32 {
-    QMAKE_CXXFLAGS += 
-    QMAKE_CFLAGS +=
+win32-g++ {
+    QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
+    QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes
 }
 
 macx {
