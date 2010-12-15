@@ -26,7 +26,9 @@ macx {
 } else {
     CONFIG(debug,release|debug) {
         DESTDIR = $$PWD/../bin/debug
+        message(Building $$TARGET in debug mode)
     } else {
         DESTDIR = $$PWD/../bin/release
+        message(Building $$TARGET in release mode)
     }
 }

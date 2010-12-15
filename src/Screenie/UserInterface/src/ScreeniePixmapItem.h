@@ -21,6 +21,7 @@
 #ifndef SCREENIEPIXMAPITEM_H
 #define SCREENIEPIXMAPITEM_H
 
+#include <QtCore/QPointF>
 #include <QtGui/QGraphicsPixmapItem>
 
 class QGraphicsSceneMouseEvent;
@@ -65,6 +66,7 @@ private:
     bool m_transformPixmap;
 
     void frenchConnection();
+    void moveTo(QPointF scenePosition);
     void rotate(int angle);
     void addDistance(int distance);
     bool isInsidePixmap(QPointF itemPosition);

@@ -124,6 +124,12 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updatePixmap()));
 }
 
+void ScreeniePixmapItem::moveTo(QPointF scenePosition)
+{
+    selectExclusive();
+    m_screenieModel.setPosition(scenePosition);
+}
+
 void ScreeniePixmapItem::rotate(int angle)
 {
     selectExclusive();
@@ -165,10 +171,11 @@ void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
         break;
 
     case Qt::LeftButton:
+        moveTo(event->scenePos());
         QGraphicsPixmapItem::mouseMoveEvent(event);
-        m_screenieModel.setPosition(scenePos());
         event->accept();
         break;
+
      default:
         QGraphicsPixmapItem::mouseMoveEvent(event);
         break;
