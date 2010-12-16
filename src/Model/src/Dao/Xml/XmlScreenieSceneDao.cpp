@@ -20,7 +20,9 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QString>
+#include <QtCore/QStringRef>
 #include <QtXml/QXmlStreamWriter>
+#include <QtXml/QXmlStreamReader>
 
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
@@ -40,6 +42,7 @@ public:
         : filePath(path),
           version("1.0"),
           streamWriter(0),
+          streamReader(0),
           screenieFilePathModelDao(0),
           screeniePixmapModelDao(0)
     {
@@ -48,6 +51,7 @@ public:
     QString filePath;
     QString version;
     QXmlStreamWriter *streamWriter;
+    QXmlStreamReader *streamReader;
     ScreenieFilePathModelDao *screenieFilePathModelDao;
     ScreeniePixmapModelDao *screeniePixmapModelDao;
 };
@@ -70,7 +74,7 @@ bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
     if (file.open(QIODevice::WriteOnly)) {
         d->streamWriter = new QXmlStreamWriter(&file);
         d->streamWriter->setAutoFormatting(true);
-        d->streamWriter->writeStartDocument(d->version, true);
+        d->streamWriter->writeStartDocument();
         result = writeScreenieScene(screenieScene);
         d->streamWriter->writeEndDocument();
         file.close();
@@ -82,10 +86,51 @@ bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
     return result;
 }
 
-ScreenieScene *XmlScreenieSceneDao::read()
+ScreenieScene *XmlScreenieSceneDao::read() const
 {
-    ScreenieScene *result = 0;
-    /*!\todo Implement this */
+    ScreenieScene *result;
+    QFile file(d->filePath);
+    if (file.open(QIODevice::ReadOnly)) {
+        d->streamReader = new QXmlStreamReader(&file);
+        while (!d->streamReader->atEnd()) {
+            d->streamReader->readNext();
+            if (d->streamReader->isStartDocument()) {
+                QStringRef documentVersion = d->streamReader->documentVersion();
+
+//                if (xml.readNextStartElement()) {
+//                         if (xml.name() == "xbel" && xml.attributes().value("version") == "1.0")
+//                             readXBEL();
+//                         else
+//                             xml.raiseError(QObject::tr("The file is not an XBEL version 1.0 file."));
+//                     }
+
+#ifdef DEBUG
+                qDebug("XmlScreenieSceneDao::read: document version: %s", qPrintable(*documentVersion.string()));
+#endif
+                QXmlStreamAttributes attributes = d->streamReader->attributes();
+                int nofAttributes = attributes.size();
+#ifdef DEBUG
+                qDebug("XmlScreenieSceneDao::read: nofAttributes: %d", nofAttributes);
+#endif
+                if (attributes.hasAttribute("version")) {
+                    QStringRef version = attributes.value("version");
+#ifdef DEBUG
+                    qDebug("XmlScreenieSceneDao::read: version: %s", qPrintable(*version.string()));
+#endif
+                }
+            } else if (d->streamReader->isStartElement()) {
+#ifdef DEBUG
+
+                qDebug("XmlScreenieSceneDao::read: value: %s", qPrintable(*d->streamReader->name().string()));
+#endif
+            }
+        }
+        result = readScreenieScene();
+        file.close();
+    } else {
+        result = 0;
+    }
+    cleanUp();
     return result;
 }
 
@@ -94,7 +139,9 @@ ScreenieScene *XmlScreenieSceneDao::read()
 bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
 {
     bool result = true;
+    d->streamWriter->writeDTD("<!DOCTYPE screenie>");
     d->streamWriter->writeStartElement("screeniescene");
+    d->streamWriter->writeAttribute("version", d->version);
     {
         d->streamWriter->writeStartElement("background");
         {
@@ -161,7 +208,14 @@ bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePi
     return result;
 }
 
-void XmlScreenieSceneDao::cleanUp()
+ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
+{
+    ScreenieScene *result = new ScreenieScene();
+    /*! \todo Implement this */
+    return result;
+}
+
+void XmlScreenieSceneDao::cleanUp() const
 {
     if (d->screenieFilePathModelDao != 0) {
         delete d->screenieFilePathModelDao;
@@ -174,5 +228,9 @@ void XmlScreenieSceneDao::cleanUp()
     if (d->streamWriter != 0) {
         delete d->streamWriter;
         d->streamWriter = 0;
+    }
+    if (d->streamReader != 0) {
+        delete d->streamReader;
+        d->streamReader = 0;
     }
 }

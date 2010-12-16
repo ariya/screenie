@@ -55,7 +55,8 @@ private:
 
     void frenchConnection();
 
-    bool save(const QString &filePath);
+    bool read(const QString &filePath);
+    bool write(const QString &filePath);
 
     void updateTransformationUi();
     void updateReflectionUi();
@@ -63,6 +64,7 @@ private:
     void initializeUi();
 
 private slots:
+    void on_openAction_triggered();
     void on_saveAsAction_triggered();
     void on_addImageAction_triggered();
     void on_exportAction_triggered();

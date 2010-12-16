@@ -46,6 +46,9 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setTransformationMode(Qt::SmoothTransformation);
+    // we also want to be able to change the reflection also in the fully translucent areas
+    // of the reflection
+    setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     QPixmap pixmap = m_screenieModel.readPixmap();
     updatePixmap(pixmap);
     setAcceptDrops(true);

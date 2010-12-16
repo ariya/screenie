@@ -43,7 +43,7 @@ public:
     MODEL_API virtual ~XmlScreenieSceneDao();
 
     MODEL_API virtual bool write(const ScreenieScene &screenieScene);
-    MODEL_API virtual ScreenieScene *read();
+    MODEL_API virtual ScreenieScene *read() const;
 
 private:
     XmlScreenieSceneDaoPrivate *d;
@@ -52,7 +52,10 @@ private:
     bool writeScreenieModels(const ScreenieScene &screenieScene);
     bool writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel);
     bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
-    void cleanUp();
+
+    ScreenieScene *readScreenieScene() const;
+
+    void cleanUp() const;
 };
 
 #endif // XMLSCREENIESCENEDAO_H

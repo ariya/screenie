@@ -45,7 +45,7 @@ public:
      * \return the ScreenieScene read from the \em current position in the persistence stream;
      *         must be \c deleted by the caller; may be 0
      */
-    virtual ScreenieScene *read() = 0;
+    virtual ScreenieScene *read() const = 0;
 };
 
 #endif // SCREENIESCENEDAO_H

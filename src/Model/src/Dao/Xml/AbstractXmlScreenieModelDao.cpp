@@ -61,8 +61,8 @@ bool AbstractXmlScreenieModelDao::writeCommon(const AbstractScreenieModel &scree
             QPointF position = screenieModel.getPosition();
             positionAttributes.append("x", QString::number(position.x()));
             positionAttributes.append("y", QString::number(position.y()));
-            positionAttributes.append("dist", QString::number(screenieModel.getDistance()));
-            positionAttributes.append("rot", QString::number(screenieModel.getRotation()));
+            positionAttributes.append("z", QString::number(screenieModel.getDistance()));
+            positionAttributes.append("roty", QString::number(screenieModel.getRotation()));
             d->streamWriter.writeAttributes(positionAttributes);
         }
         d->streamWriter.writeEndElement();

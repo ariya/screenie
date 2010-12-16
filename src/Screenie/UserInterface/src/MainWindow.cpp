@@ -94,7 +94,22 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
 }
 
-bool MainWindow::save(const QString &filePath)
+bool MainWindow::read(const QString &filePath)
+{
+    bool result;
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
+    ScreenieScene *test = screenieSceneDao->read();
+    /*!\todo Implement this */
+    if (test != 0) {
+        result = true;
+        delete test;
+    } else {
+        result = false;
+    }
+    return result;
+}
+
+bool MainWindow::write(const QString &filePath)
 {
     ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
     return screenieSceneDao->write(*m_screenieScene);
@@ -181,11 +196,22 @@ void MainWindow::initializeUi()
 
 // private slots
 
+void MainWindow::on_openAction_triggered()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), QString(), tr("*.xsc"));
+    if (!filePath.isNull()) {
+        bool ok = read(filePath);
+#ifdef DEBUG
+        qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
+#endif
+    }
+}
+
 void MainWindow::on_saveAsAction_triggered()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), "*.xsc");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), tr("*.xsc"));
     if (!filePath.isNull()) {
-        bool ok = save(filePath);
+        bool ok = write(filePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
 #endif
