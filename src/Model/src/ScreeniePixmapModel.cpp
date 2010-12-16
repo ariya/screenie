@@ -50,7 +50,7 @@ ScreeniePixmapModel::~ScreeniePixmapModel()
 #endif
 }
 
-QPixmap ScreeniePixmapModel::readPixmap()
+QPixmap ScreeniePixmapModel::readPixmap() const
 {
     return d->pixmap;
 }

@@ -24,7 +24,7 @@
 
 #include "PaintTools.h"
 
-
+// public
 
 QPixmap PaintTools::createDefaultImage()
 {
@@ -45,6 +45,12 @@ QPixmap PaintTools::createDefaultImage()
     painter.end();
 
     return result;
+}
+
+QPixmap PaintTools::createTemplateImage()
+{
+    /*!\todo Implement this - for now we simply return a default image */
+    return PaintTools::createDefaultImage();
 }
 
 QPixmap PaintTools::upperHalf(const QPixmap &pixmap)

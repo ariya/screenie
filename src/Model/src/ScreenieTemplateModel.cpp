@@ -18,35 +18,44 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PAINTTOOLS_H
-#define PAINTTOOLS_H
+#include <QtCore/QSize>
 
-#include <QtGui/QPixmap>
+#include "../../Utils/src/PaintTools.h"
+#include "ScreenieTemplateModel.h"
 
-#include "UtilsLib.h"
-
-/*!
- * Helper paint functions.
- */
-class PaintTools
+class ScreenieTemplateModelPrivate
 {
 public:
-    /*!
-     * Creates a stub image with a big '?' in the center.
-     */
-    UTILS_API static QPixmap createDefaultImage();
-
-    /*!
-     * Creates a template image.
-     */
-    UTILS_API static QPixmap createTemplateImage();
-
-    /*!
-     * Returns the upper half of the \p pixmap.
-     *
-     * \return A QPixmap with a copy of the upper half area of the \p pixmap
-     */
-    UTILS_API static QPixmap upperHalf(const QPixmap &pixmap);
+    ScreenieTemplateModelPrivate(const QSize &theSize)
+        : size(theSize) {}
+    QSize size;
 };
 
-#endif // PAINTTOOLS_H
+// public
+
+ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
+    : d(new ScreenieTemplateModelPrivate(size))
+{
+}
+
+ScreenieTemplateModel::~ScreenieTemplateModel()
+{
+    delete d;
+}
+
+QPixmap ScreenieTemplateModel::readPixmap() const
+{
+     QPixmap result = PaintTools::createDefaultImage();
+     return result;
+}
+
+QSize ScreenieTemplateModel::getSize() const
+{
+    return d->size;
+}
+
+bool ScreenieTemplateModel::isValid() const
+{
+    return true;
+}
+

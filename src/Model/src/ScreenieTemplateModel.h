@@ -18,35 +18,46 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PAINTTOOLS_H
-#define PAINTTOOLS_H
+#ifndef SCREENIETEMPLATEMODEL_H
+#define SCREENIETEMPLATEMODEL_H
 
-#include <QtGui/QPixmap>
+class QSize;
 
-#include "UtilsLib.h"
+#include "AbstractScreenieModel.h"
+#include "ModelLib.h"
+
+class ScreenieTemplateModelPrivate;
 
 /*!
- * Helper paint functions.
+ * The template model acts as a placeholder for the actual pixmap to
+ * be added to the ScreenieScene.
+ *
+ * Implementation note: we need do export the whole class here, since
+ * we also need to export the QObject::staticMetaObject methods from
+ * the QObject base class.
  */
-class PaintTools
+class MODEL_API ScreenieTemplateModel : public AbstractScreenieModel
 {
 public:
-    /*!
-     * Creates a stub image with a big '?' in the center.
-     */
-    UTILS_API static QPixmap createDefaultImage();
+    ScreenieTemplateModel(const QSize &size);
+    virtual ~ScreenieTemplateModel();
+
+    virtual QPixmap readPixmap() const;
 
     /*!
-     * Creates a template image.
-     */
-    UTILS_API static QPixmap createTemplateImage();
-
-    /*!
-     * Returns the upper half of the \p pixmap.
+     * Returns the requested \c size.
      *
-     * \return A QPixmap with a copy of the upper half area of the \p pixmap
+     * \sa ScreenieTemplateModel(const QSize &)
      */
-    UTILS_API static QPixmap upperHalf(const QPixmap &pixmap);
+    virtual QSize getSize() const;
+
+    /*!
+     * \return always \c true
+     */
+    virtual bool isValid() const;
+
+private:
+    ScreenieTemplateModelPrivate *d;
 };
 
-#endif // PAINTTOOLS_H
+#endif // SCREENIETEMPLATEMODEL_H

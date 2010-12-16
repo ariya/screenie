@@ -44,7 +44,7 @@ public:
      *
      * \sa #setFilePath(const QString &)
      */
-    virtual QPixmap readPixmap() = 0;
+    virtual QPixmap readPixmap() const = 0;
 
     /*!
      * Returns \c true if #readPixmap() returned a valid QPixmap. Call #readPixmap() first.

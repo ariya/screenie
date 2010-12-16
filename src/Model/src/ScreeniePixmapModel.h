@@ -47,7 +47,7 @@ public:
     explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
     virtual ~ScreeniePixmapModel();
 
-    virtual QPixmap readPixmap();
+    virtual QPixmap readPixmap() const;
     virtual QSize getSize() const;
     virtual bool isValid() const;
 

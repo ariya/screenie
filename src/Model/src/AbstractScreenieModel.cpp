@@ -206,7 +206,7 @@ void AbstractScreenieModel::convert(ScreenieModelInterface &source)
 
 // protected
 
-QPixmap AbstractScreenieModel::fitToMaximumSize(QPixmap pixmap)
+QPixmap AbstractScreenieModel::fitToMaximumSize(QPixmap pixmap) const
 {
     QPixmap result;
     QSize maximumImageSize = Settings::getInstance().getMaximumImageSize();

@@ -49,7 +49,7 @@ public:
     explicit ScreenieFilePathModel(const QString &filePath = QString());
     virtual ~ScreenieFilePathModel();
 
-    virtual QPixmap readPixmap();
+    virtual QPixmap readPixmap() const;
     virtual QSize getSize() const;
     virtual bool isValid() const;
 

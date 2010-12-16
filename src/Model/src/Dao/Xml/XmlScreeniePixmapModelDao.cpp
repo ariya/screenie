@@ -35,9 +35,10 @@ public:
 //  public
 
 XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamWriter &streamWriter)
-    : AbstractXmlScreenieModelDao(streamWriter)
+    : AbstractXmlScreenieModelDao(streamWriter),
+      d(new XmlScreeniePixmapModelDaoPrivate())
 {
-    d = new XmlScreeniePixmapModelDaoPrivate();
+
 }
 
 XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao(){

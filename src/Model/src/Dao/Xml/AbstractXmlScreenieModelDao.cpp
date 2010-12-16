@@ -39,8 +39,8 @@ public:
 // public
 
 AbstractXmlScreenieModelDao::AbstractXmlScreenieModelDao(QXmlStreamWriter &xmlStreamWriter)
-{
-    d = new AbstractXmlScreenieModelDaoPrivate(xmlStreamWriter);
+    : d(new AbstractXmlScreenieModelDaoPrivate(xmlStreamWriter))
+{    
 }
 
 AbstractXmlScreenieModelDao::~AbstractXmlScreenieModelDao()

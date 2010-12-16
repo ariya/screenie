@@ -50,7 +50,7 @@ ScreenieFilePathModel::~ScreenieFilePathModel()
 #endif
 }
 
-QPixmap ScreenieFilePathModel::readPixmap()
+QPixmap ScreenieFilePathModel::readPixmap() const
 {
     QPixmap result;
 

@@ -33,9 +33,9 @@ public:
 //  public
 
 XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter &streamWriter)
-    : AbstractXmlScreenieModelDao(streamWriter)
-{
-    d = new XmlScreenieFilePathModelDaoPrivate();
+    : AbstractXmlScreenieModelDao(streamWriter),
+      d(new XmlScreenieFilePathModelDaoPrivate())
+{    
 }
 
 XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao(){
