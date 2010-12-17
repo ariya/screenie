@@ -18,6 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QSize>
 #include <QtGui/QPixmap>
 #include <QtGui/QLinearGradient>
 #include <QtGui/QPainter>
@@ -29,33 +30,44 @@
 QPixmap PaintTools::createDefaultImage()
 {
     QPixmap result = QPixmap(400, 300);
-
-    QLinearGradient gradient(QPoint(0, 0), QPoint(0, result.height()));
-    gradient.setColorAt(0, QColor(192, 192, 192));
-    gradient.setColorAt(1, QColor(128, 128, 128));
     QPainter painter(&result);
-    painter.fillRect(result.rect(), gradient);
-    painter.setPen(QPen(QColor(96, 96, 96), 3, Qt::SolidLine));
-    painter.drawRect(result.rect());
-    QFont font;
-    font.setPixelSize(100);
-    painter.setFont(font);
-    painter.setPen(Qt::white);
-    painter.drawText(result.rect(), Qt::AlignCenter, "?");
-    painter.end();
-
+    drawBackground(painter, result);
+    drawText("?", painter, result);
     return result;
 }
 
-QPixmap PaintTools::createTemplateImage()
+QPixmap PaintTools::createTemplateImage(const QSize &size)
 {
-    /*!\todo Implement this - for now we simply return a default image */
-    return PaintTools::createDefaultImage();
+    QPixmap result = QPixmap(size);
+    QPainter painter(&result);
+    drawBackground(painter, result);
+    drawText("T", painter, result);
+    return result;
 }
 
 QPixmap PaintTools::upperHalf(const QPixmap &pixmap)
 {
     return pixmap.copy(0, 0, pixmap.width(), pixmap.height() / 2);
+}
+
+void PaintTools::drawBackground(QPainter &painter, QPixmap &pixmap)
+{
+    QLinearGradient gradient(QPoint(0, 0), QPoint(0, pixmap.height()));
+    gradient.setColorAt(0, QColor(192, 192, 192));
+    gradient.setColorAt(1, QColor(128, 128, 128));
+    painter.fillRect(pixmap.rect(), gradient);
+    painter.setPen(QPen(QColor(96, 96, 96), 3, Qt::SolidLine));
+    painter.drawRect(pixmap.rect());
+}
+
+void PaintTools::drawText(const QString &text, QPainter &painter, QPixmap &pixmap)
+{
+    QFont font;
+    font.setPixelSize(100);
+    painter.setFont(font);
+    painter.setPen(Qt::white);
+    painter.drawText(pixmap.rect(), Qt::AlignCenter, text);
+    painter.end();
 }
 
 

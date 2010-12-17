@@ -45,7 +45,7 @@ ScreenieTemplateModel::~ScreenieTemplateModel()
 
 QPixmap ScreenieTemplateModel::readPixmap() const
 {
-     QPixmap result = PaintTools::createDefaultImage();
+     QPixmap result = PaintTools::createTemplateImage(d->size);
      return result;
 }
 

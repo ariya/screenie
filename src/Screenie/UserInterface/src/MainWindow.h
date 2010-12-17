@@ -65,6 +65,7 @@ private:
 private slots:
     void on_saveAsAction_triggered();
     void on_addImageAction_triggered();
+    void on_addTemplateAction_triggered();
     void on_exportAction_triggered();
     void on_exportPDFAction_triggered();
 

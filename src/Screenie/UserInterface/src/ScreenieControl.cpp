@@ -39,6 +39,7 @@
 #include "../../../Model/src/ScreenieModelInterface.h"
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../../../Model/src/ScreeniePixmapModel.h"
+#include "../../../Model/src/ScreenieTemplateModel.h"
 #include "../../../Kernel/src/Reflection.h"
 #include "ScreenieGraphicsScene.h"
 #include "ScreeniePixmapItem.h"
@@ -154,6 +155,15 @@ void ScreenieControl::addImages(QList<QPixmap> pixmaps, QPointF position)
         screenieModel->setPosition(position);       
         m_screenieScene.addModel(screenieModel);
     }
+}
+
+void ScreenieControl::addTemplate(QPointF position)
+{
+    QSize size(640, 480);
+    ScreenieTemplateModel *screenieModel = new ScreenieTemplateModel(size);
+    applyDefaultValues(*screenieModel);
+    screenieModel->setPosition(position);
+    m_screenieScene.addModel(screenieModel);
 }
 
 void ScreenieControl::setRotation(int angle)

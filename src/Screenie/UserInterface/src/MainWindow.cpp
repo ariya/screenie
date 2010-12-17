@@ -204,6 +204,11 @@ void MainWindow::on_addImageAction_triggered()
     }
 }
 
+void MainWindow::on_addTemplateAction_triggered()
+{
+    m_screenieControl->addTemplate(QPointF(0.0, 0.0));
+}
+
 void MainWindow::on_exportAction_triggered()
 {
     QString filter = tr("Portable Network Graphics (*.png)");

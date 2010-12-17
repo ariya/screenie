@@ -73,6 +73,7 @@ public slots:
     void addImages(QStringList filePaths, QPointF position);
     void addImage(QPixmap pixmap, QPointF position);
     void addImages(QList<QPixmap> pixmaps, QPointF position);
+    void addTemplate(QPointF position);
 
     void setRotation(int angle);
     void rotate(int angle);    

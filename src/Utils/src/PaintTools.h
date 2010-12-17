@@ -23,6 +23,10 @@
 
 #include <QtGui/QPixmap>
 
+class QPainter;
+class QString;
+class QSize;
+
 #include "UtilsLib.h"
 
 /*!
@@ -39,7 +43,7 @@ public:
     /*!
      * Creates a template image.
      */
-    UTILS_API static QPixmap createTemplateImage();
+    UTILS_API static QPixmap createTemplateImage(const QSize &size);
 
     /*!
      * Returns the upper half of the \p pixmap.
@@ -47,6 +51,9 @@ public:
      * \return A QPixmap with a copy of the upper half area of the \p pixmap
      */
     UTILS_API static QPixmap upperHalf(const QPixmap &pixmap);
+private:
+   static void drawBackground(QPainter &painter, QPixmap &pixmap);
+   static void drawText(const QString &text, QPainter &painter, QPixmap &pixmap);
 };
 
 #endif // PAINTTOOLS_H

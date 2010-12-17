@@ -236,7 +236,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -273,6 +273,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="addImageAction"/>
+   <addaction name="addTemplateAction"/>
   </widget>
   <action name="quitAction">
    <property name="icon">
@@ -350,6 +351,21 @@
   <action name="exportPDFAction">
    <property name="text">
     <string>Export &amp;PDF</string>
+   </property>
+  </action>
+  <action name="addTemplateAction">
+   <property name="icon">
+    <iconset resource="../../../Resources/Resources.qrc">
+     <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Template</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Template</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>
