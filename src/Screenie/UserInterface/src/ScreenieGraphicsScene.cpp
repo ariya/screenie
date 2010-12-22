@@ -28,6 +28,7 @@
 #include <QtGui/QDropEvent>
 #include <QtGui/QGraphicsScene>
 
+#include "../../../Utils/src/MimeHelper.h"
 #include "ScreenieGraphicsScene.h"
 
 // public
@@ -49,9 +50,8 @@ ScreenieGraphicsScene::~ScreenieGraphicsScene()
 
 void ScreenieGraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    /*!\todo Make this a bit more stable, e.g. reject http:// urls (for now),
-             use the same logic as in ScreeniePixmapItem! */
-    event->setAccepted(event->mimeData()->hasUrls());
+    bool accept = MimeHelper::accept(event->mimeData(), MimeHelper::Relaxed);
+    event->setAccepted(accept);
 }
 
 void ScreenieGraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)

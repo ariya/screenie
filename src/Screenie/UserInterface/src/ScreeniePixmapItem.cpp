@@ -26,6 +26,7 @@
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsSceneMouseEvent>
 
+#include "../../../Utils/src/MimeHelper.h"
 #include "../../../Utils/src/PaintTools.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
 #include "../../../Kernel/src/Reflection.h"
@@ -100,9 +101,8 @@ void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void ScreeniePixmapItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    /*!\todo Make this a bit more stable, e.g. reject http:// urls (for now),
-             use the same logic as in ScreenieGraphicsScene! */
-    event->setAccepted(event->mimeData()->hasUrls() || event->mimeData()->hasImage());
+    bool accept = MimeHelper::accept(event->mimeData(), MimeHelper::Strict);
+    event->setAccepted(accept);
 }
 
 void ScreeniePixmapItem::dropEvent(QGraphicsSceneDragDropEvent *event)
