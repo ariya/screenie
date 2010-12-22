@@ -72,6 +72,12 @@ void AbstractScreenieModel::setPosition(QPointF position)
     }
 }
 
+void AbstractScreenieModel::translate(qreal dx, qreal dy)
+{
+    QPointF newPosition = QPointF(d->position.x() + dx, d->position.y() + dy);
+    setPosition(newPosition);
+}
+
 int AbstractScreenieModel::getDistance() const
 {
     return d->distance;

@@ -30,6 +30,8 @@ class QEvent;
 class QKeyEvent;
 class QGestureEvent;
 class QPinchGesture;
+class QPanGesture;
+class QGesture;
 class QObject;
 
 /*!
@@ -48,6 +50,7 @@ signals:
     void removeItems();
     void rotate(int angle);
     void addDistance(int distance);
+    void translate(qreal x, qreal y);
 
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
@@ -60,7 +63,8 @@ private:
     bool m_itemDragDrop;
 
     bool gestureEvent(const QGestureEvent *event);
-    void pinchTriggered(const QPinchGesture *gesture);
+    bool pinchTriggered(const QPinchGesture *gesture);
+    bool panTriggered(const QPanGesture *gesture);
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H

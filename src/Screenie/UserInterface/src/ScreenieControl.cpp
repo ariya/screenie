@@ -149,6 +149,20 @@ void ScreenieControl::addTemplate(QPointF centerPosition)
     m_screenieScene.addModel(screenieModel);
 }
 
+void ScreenieControl::translate(qreal dx, qreal dy)
+{
+    bool decreaseQuality = dx != 0.0 && dy != 0.0;
+    if (decreaseQuality) {
+        setRenderQuality(Low);
+        m_qualityTimer.start();
+    }
+    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->translate(dx, dy);
+    }
+
+}
+
 void ScreenieControl::setRotation(int angle)
 {
     setRenderQuality(Low);
@@ -302,6 +316,8 @@ void ScreenieControl::frenchConnection()
             this, SLOT(rotate(int)));
     connect(&m_screenieGraphicsScene, SIGNAL(addDistance(int)),
             this, SLOT(addDistance(int)));
+    connect(&m_screenieGraphicsScene, SIGNAL(translate(qreal, qreal)),
+            this, SLOT(translate(qreal, qreal)));
     connect(&m_qualityTimer, SIGNAL(timeout()),
             this, SLOT(restoreRenderQuality()));
 }

@@ -76,6 +76,7 @@ public slots:
     void addImages(QList<QPixmap> pixmaps, QPointF centerPosition);
     void addTemplate(QPointF centerPosition);
 
+    void translate(qreal dx, qreal dy);
     void setRotation(int angle);
     void rotate(int angle);    
     void setDistance(int distance);

@@ -64,6 +64,11 @@ public:
      */
     virtual void setPosition(QPointF position) = 0;
 
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void translate(qreal dx, qreal dy) = 0;
+
     virtual int getDistance() const = 0;
     virtual void setDistance(int distance) = 0;
     virtual void addDistance(int distance) = 0;
