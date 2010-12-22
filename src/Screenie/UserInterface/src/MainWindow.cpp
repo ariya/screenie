@@ -56,10 +56,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
+#ifdef Q_OS_MAC
+    // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
+    // For Mac there does not seem to be a common shortcut for fullscreen
+    // (unlike F11 for other platforms), but iTunes uses Meta + F
+    // Note: by default on Mac Qt swaps CTRL and META
+    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F | Qt::CTRL));
+#endif
+
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     ui->graphicsView->setAcceptDrops(true);
+    ui->graphicsView->viewport()->grabGesture(Qt::PinchGesture);
     // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
@@ -216,16 +225,20 @@ void MainWindow::on_addImageAction_triggered()
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
     if (!this->isFullScreen()) {
-        showFullScreen();
-        /*!\todo Settings which control what becomes invisible in fullscreen mode */
         ui->toolBar->setVisible(false);
         ui->sidePanel->setVisible(false);
         ui->statusbar->setVisible(false);
+        setUnifiedTitleAndToolBarOnMac(false);
+        showFullScreen();
+        /*!\todo Settings which control what becomes invisible in fullscreen mode */
+
     } else {
         showNormal();
+
         ui->toolBar->setVisible(true);
         ui->sidePanel->setVisible(true);
         ui->statusbar->setVisible(true);
+        setUnifiedTitleAndToolBarOnMac(true);
     }
 }
 
