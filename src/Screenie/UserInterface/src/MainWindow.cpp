@@ -216,10 +216,16 @@ void MainWindow::on_addImageAction_triggered()
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
     if (!this->isFullScreen()) {
-        this->showFullScreen();
+        showFullScreen();
+        /*!\todo Settings which control what becomes invisible in fullscreen mode */
+        ui->toolBar->setVisible(false);
+        ui->sidePanel->setVisible(false);
+        ui->statusbar->setVisible(false);
     } else {
-
-        this->showNormal();
+        showNormal();
+        ui->toolBar->setVisible(true);
+        ui->sidePanel->setVisible(true);
+        ui->statusbar->setVisible(true);
     }
 }
 

@@ -35,7 +35,7 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="sidePanel" native="true">
       <property name="minimumSize">
        <size>
         <width>200</width>
