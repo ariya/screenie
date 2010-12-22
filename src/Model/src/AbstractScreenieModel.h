@@ -61,7 +61,7 @@ public:
     virtual void convert(ScreenieModelInterface &source);
 
 protected:
-    QPixmap fitToMaximumSize(QPixmap pixmap) const;
+    QPixmap fitToMaximumSize(const QPixmap &pixmap) const;
 
 private:
     AbstractScreenieModelPrivate *d;

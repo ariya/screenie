@@ -40,7 +40,8 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
     : m_screenieModel(screenieModel),
       m_screenieControl(screenieControl),
       m_reflection(reflection),
-      m_transformPixmap(true)
+      m_transformPixmap(true),
+      m_ignorePositionChange(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -99,13 +100,24 @@ void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void ScreeniePixmapItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
+    /*!\todo Make this a bit more stable, e.g. reject http:// urls (for now),
+             use the same logic as in ScreenieGraphicsScene! */
     event->setAccepted(event->mimeData()->hasUrls() || event->mimeData()->hasImage());
 }
 
 void ScreeniePixmapItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    m_screenieControl.updateData(event->mimeData(), m_screenieModel);
+    m_screenieControl.updateModel(event->mimeData(), m_screenieModel);
     event->accept();
+}
+
+QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemPositionChange) {
+        QPointF position = value.toPointF();
+        m_screenieModel.setPosition(position);
+    }
+    return QGraphicsPixmapItem::itemChange(change, value);
 }
 
 // private
@@ -114,6 +126,8 @@ void ScreeniePixmapItem::frenchConnection()
 {
     connect(&m_screenieModel, SIGNAL(changed()),
             this, SLOT(updateItem()));
+    connect(&m_screenieModel, SIGNAL(positionChanged()),
+            this, SLOT(updatePosition()));
     connect(&m_screenieModel, SIGNAL(distanceChanged()),
             this, SLOT(updateItem()));
     connect(&m_screenieModel, SIGNAL(reflectionChanged()),
@@ -171,13 +185,20 @@ void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
         break;
 
     case Qt::LeftButton:
-        moveTo(event->scenePos());
+        // Welcome to the Exception To The Rule "Modify model via Controller"!
+        // moving items requires quite some logic, and we re-use that logic
+        // (the Qt implementation of handling move events, to be specific)
+        // So first we update the View, and THEN we update the Model.
+        // (see #itemChange above)
+        // As we get a signal by the model nevertheless we ignore it my raising
+        // a flag, because we already updated the View ourselves
+        m_ignorePositionChange = true;
+        selectExclusive();
         QGraphicsPixmapItem::mouseMoveEvent(event);
-        event->accept();
         break;
 
      default:
-        QGraphicsPixmapItem::mouseMoveEvent(event);
+        event->ignore();
         break;
     }
 }
@@ -285,4 +306,13 @@ void ScreeniePixmapItem::updateItem()
     translateBack.translate(-dx, -dy);
     transform = translateBack * scale * transform;
     setTransform(transform, false);
+}
+
+void ScreeniePixmapItem::updatePosition()
+{
+    // see comment in #transformPixmap
+    if (!m_ignorePositionChange) {
+        this->setPos(m_screenieModel.getPosition());
+    }
+    m_ignorePositionChange = false;
 }

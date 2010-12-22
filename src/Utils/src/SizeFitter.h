@@ -36,6 +36,7 @@ public:
     };
 
     UTILS_API SizeFitter(QSize targetSize, FitMode fitMode = Fit);
+    UTILS_API SizeFitter(const SizeFitter &other);
     UTILS_API SizeFitter();
     UTILS_API virtual ~SizeFitter();
 
@@ -64,6 +65,8 @@ public:
      */
     UTILS_API bool fit(QSize size, QSize &fittedSize, QRect *clippedArea = 0) const;
 
+    UTILS_API SizeFitter operator=(const SizeFitter &other);
+
 signals:
     void changed();
 
@@ -81,6 +84,8 @@ private:
     bool fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) const;
     bool fitToHeight(QSize size, QSize &fittedSize, QRect *clippedArea) const;
     bool exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) const;
+
+    inline void copy(const SizeFitter &other);
 };
 
 #endif // SIZEFITTER_H

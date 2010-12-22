@@ -26,6 +26,8 @@ class QSize;
 #include "AbstractScreenieModel.h"
 #include "ModelLib.h"
 
+class SizeFitter;
+
 class ScreenieTemplateModelPrivate;
 
 /*!
@@ -38,11 +40,14 @@ class ScreenieTemplateModelPrivate;
  */
 class MODEL_API ScreenieTemplateModel : public AbstractScreenieModel
 {
+    Q_OBJECT
 public:
     ScreenieTemplateModel(const QSize &size);
     virtual ~ScreenieTemplateModel();
 
-    virtual QPixmap readPixmap() const;
+    const SizeFitter &getSizeFitter() const;
+
+    virtual const QPixmap &readPixmap() const;
 
     /*!
      * Returns the requested \c size.
@@ -51,13 +56,10 @@ public:
      */
     virtual QSize getSize() const;
 
-    /*!
-     * \return always \c true
-     */
-    virtual bool isValid() const;
-
 private:
     ScreenieTemplateModelPrivate *d;
+
+    void frenchConnection();
 };
 
 #endif // SCREENIETEMPLATEMODEL_H

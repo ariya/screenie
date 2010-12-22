@@ -68,7 +68,7 @@ void AbstractScreenieModel::setPosition(QPointF position)
 {
     if (d->position != position) {
         d->position = position;
-        emit changed();
+        emit positionChanged();
     }
 }
 
@@ -206,7 +206,7 @@ void AbstractScreenieModel::convert(ScreenieModelInterface &source)
 
 // protected
 
-QPixmap AbstractScreenieModel::fitToMaximumSize(QPixmap pixmap) const
+QPixmap AbstractScreenieModel::fitToMaximumSize(const QPixmap &pixmap) const
 {
     QPixmap result;
     QSize maximumImageSize = Settings::getInstance().getMaximumImageSize();

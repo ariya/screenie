@@ -49,6 +49,8 @@ ScreenieGraphicsScene::~ScreenieGraphicsScene()
 
 void ScreenieGraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
+    /*!\todo Make this a bit more stable, e.g. reject http:// urls (for now),
+             use the same logic as in ScreeniePixmapItem! */
     event->setAccepted(event->mimeData()->hasUrls());
 }
 
@@ -69,16 +71,19 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
         QList<QUrl> urls = event->mimeData()->urls();
         QList<QPixmap> pixmaps;
         QStringList filePaths;
-        foreach (QUrl url, urls) {
-            // prefer image data over filepaths
-            if (event->mimeData()->hasImage()) {
-                QPixmap pixmap;
-                pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
-                pixmaps.append(pixmap);
-            }
-            else {
+
+        // prefer image data over filepaths
+        if (event->mimeData()->hasImage()) {
+            QPixmap pixmap;
+            pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
+            pixmaps.append(pixmap);
+        } else {
+            foreach (QUrl url, urls) {
+                /*!\todo Support for "http:// images"? For now we assume the paths can be converted to local paths. */
                 QString filePath = url.toLocalFile();
-                filePaths.append(filePath);
+                if (!filePath.isEmpty()) {
+                    filePaths.append(filePath);
+                }
             }
         }
         if (pixmaps.size() > 0) {

@@ -11,7 +11,7 @@ macx {
 
 DEFINES       += QT_NO_COMPAT
 
-CONFIG(debug, debug|release) {
+debug {
     OBJECTS_DIR    = obj/debug
     MOC_DIR        = GeneratedFiles/debug
     UI_DIR         = GeneratedFiles/debug

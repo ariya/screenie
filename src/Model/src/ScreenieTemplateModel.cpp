@@ -20,6 +20,7 @@
 
 #include <QtCore/QSize>
 
+#include "../../Utils/src/SizeFitter.h"
 #include "../../Utils/src/PaintTools.h"
 #include "ScreenieTemplateModel.h"
 
@@ -27,8 +28,12 @@ class ScreenieTemplateModelPrivate
 {
 public:
     ScreenieTemplateModelPrivate(const QSize &theSize)
-        : size(theSize) {}
-    QSize size;
+        : sizeFitter(theSize) {
+        sizeFitter.setFitMode(SizeFitter::Fit);
+        sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+    }
+    QPixmap pixmap;
+    SizeFitter sizeFitter;
 };
 
 // public
@@ -43,19 +48,29 @@ ScreenieTemplateModel::~ScreenieTemplateModel()
     delete d;
 }
 
-QPixmap ScreenieTemplateModel::readPixmap() const
+const SizeFitter &ScreenieTemplateModel::getSizeFitter() const
 {
-     QPixmap result = PaintTools::createTemplateImage(d->size);
-     return result;
+    return d->sizeFitter;
+}
+
+const QPixmap &ScreenieTemplateModel::readPixmap() const
+{
+    if (d->pixmap.isNull()) {
+        d->pixmap = PaintTools::createTemplateImage(getSize());
+    }
+    return d->pixmap;
 }
 
 QSize ScreenieTemplateModel::getSize() const
 {
-    return d->size;
+    return d->sizeFitter.getTargetSize();
 }
 
-bool ScreenieTemplateModel::isValid() const
+// private
+
+void ScreenieTemplateModel::frenchConnection()
 {
-    return true;
+    connect(&d->sizeFitter, SIGNAL(changed()),
+            this, SIGNAL(changed()));
 }
 

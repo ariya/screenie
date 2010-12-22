@@ -28,12 +28,7 @@
 class ScreeniePixmapModelPrivate
 {
 public:
-    ScreeniePixmapModelPrivate()
-        : valid(false) {}
-
     QPixmap pixmap;
-    bool valid;
-    QSize size;    
 };
 
 ScreeniePixmapModel::ScreeniePixmapModel(QPixmap pixmap)
@@ -50,7 +45,7 @@ ScreeniePixmapModel::~ScreeniePixmapModel()
 #endif
 }
 
-QPixmap ScreeniePixmapModel::readPixmap() const
+const QPixmap &ScreeniePixmapModel::readPixmap() const
 {
     return d->pixmap;
 }
@@ -58,11 +53,6 @@ QPixmap ScreeniePixmapModel::readPixmap() const
 QSize ScreeniePixmapModel::getSize() const
 {
     return d->pixmap.size();
-}
-
-bool ScreeniePixmapModel::isValid() const
-{
-    return d->valid;
 }
 
 void ScreeniePixmapModel::convert(ScreenieModelInterface &source)
@@ -73,8 +63,8 @@ void ScreeniePixmapModel::convert(ScreenieModelInterface &source)
 void ScreeniePixmapModel::setPixmap(QPixmap pixmap)
 {
     if (d->pixmap.cacheKey() != pixmap.cacheKey()) {
-        d->pixmap = pixmap;
-        emit pixmapChanged(pixmap);
+        d->pixmap = fitToMaximumSize(pixmap);
+        emit pixmapChanged(d->pixmap);
     }
 }
 

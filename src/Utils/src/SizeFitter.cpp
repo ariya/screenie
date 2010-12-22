@@ -8,9 +8,7 @@
 
 const int SizeFitter::InvalidSize = std::numeric_limits<int>::min();
 
-// **************
-// public methods
-// **************
+// public
 
 SizeFitter::SizeFitter(QSize targetSize, FitMode fitMode)
     : m_targetSize(targetSize),
@@ -24,6 +22,11 @@ SizeFitter::SizeFitter()
     m_fitMode(ExactFit)
 {
     this->setDefaultFitOptions();
+}
+
+SizeFitter::SizeFitter(const SizeFitter &other)
+{
+    copy(other);
 }
 
 SizeFitter::~SizeFitter()
@@ -121,9 +124,13 @@ bool SizeFitter::fit(QSize size, QSize &fittedSize, QRect *clippedArea) const
     return result;
 }
 
-// ***************
-// private methods
-// ***************
+SizeFitter SizeFitter::operator=(const SizeFitter &other)
+{
+    copy(other);
+    return *this;
+}
+
+// private
 
 void SizeFitter::setDefaultFitOptions()
 {
@@ -343,4 +350,11 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) con
         }
     }
     return result;
+}
+
+void SizeFitter::copy(const SizeFitter &other)
+{
+    m_fitMode = other.m_fitMode;
+    m_fitOptionArray = other.m_fitOptionArray;
+    m_targetSize = other.m_targetSize;
 }

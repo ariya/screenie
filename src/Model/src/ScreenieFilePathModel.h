@@ -30,6 +30,7 @@ class QString;
 #include "AbstractScreenieModel.h"
 #include "ModelLib.h"
 
+class SizeFitter;
 class ScreenieFilePathModelPrivate;
 
 /*!
@@ -44,14 +45,19 @@ public:
     /*!
      * Creates this ScreenieFilePathModel. Call #readPixmap() after creation.
      *
+     * \param filePath
+     *        the file path to the pixmap to be read
+     * \param sizeFitter
+     *        if given the pixmap is scaled with the \p sizeFitter; may be 0; ownership
+     *        remains with the caller
+     *
      * \sa #readPixmap()
      */
-    explicit ScreenieFilePathModel(const QString &filePath = QString());
+    explicit ScreenieFilePathModel(const QString &filePath = QString(), const SizeFitter *sizeFitter = 0);
     virtual ~ScreenieFilePathModel();
 
-    virtual QPixmap readPixmap() const;
+    virtual const QPixmap &readPixmap() const;
     virtual QSize getSize() const;
-    virtual bool isValid() const;
 
     virtual QString getFilePath() const;
     virtual void setFilePath(const QString &filePath);

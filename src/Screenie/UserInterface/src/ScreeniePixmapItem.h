@@ -22,6 +22,7 @@
 #define SCREENIEPIXMAPITEM_H
 
 #include <QtCore/QPointF>
+#include <QtCore/QVariant>
 #include <QtGui/QGraphicsPixmapItem>
 
 class QGraphicsSceneMouseEvent;
@@ -58,12 +59,14 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
     ScreenieModelInterface &m_screenieModel;
     ScreenieControl &m_screenieControl;
     Reflection &m_reflection;
     bool m_transformPixmap;
+    bool m_ignorePositionChange;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);
@@ -81,6 +84,7 @@ private slots:
     void updatePixmap(const QPixmap &pixmap);
     void updatePixmap();
     void updateItem();
+    void updatePosition();
 };
 
 #endif // SCREENIEPIXMAPITEM_H
