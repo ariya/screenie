@@ -191,6 +191,16 @@ void MainWindow::on_saveAsAction_triggered()
     }
 }
 
+void MainWindow::on_exportAction_triggered()
+{
+    QString filter = tr("Portable Network Graphics (*.png)");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
+    if (!filePath.isNull()) {
+        ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
+        exportImage.exportImage(filePath);
+    }
+}
+
 void MainWindow::on_addImageAction_triggered()
 {
     Settings &settings = Settings::getInstance();
@@ -203,19 +213,19 @@ void MainWindow::on_addImageAction_triggered()
     }
 }
 
+void MainWindow::on_toggleFullScreenAction_triggered()
+{
+    if (!this->isFullScreen()) {
+        this->showFullScreen();
+    } else {
+
+        this->showNormal();
+    }
+}
+
 void MainWindow::on_addTemplateAction_triggered()
 {
     m_screenieControl->addTemplate(QPointF(0.0, 0.0));
-}
-
-void MainWindow::on_exportAction_triggered()
-{
-    QString filter = tr("Portable Network Graphics (*.png)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
-    if (!filePath.isNull()) {
-        ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
-        exportImage.exportImage(filePath);
-    }
 }
 
 void MainWindow::on_rotationSlider_valueChanged(int value)

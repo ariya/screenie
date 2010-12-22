@@ -26,6 +26,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QGraphicsSceneDragDropEvent>
 #include <QtGui/QDropEvent>
+#include <QtGui/QWidget>
 #include <QtGui/QGraphicsScene>
 
 #include "../../../Utils/src/MimeHelper.h"
@@ -107,6 +108,7 @@ void ScreenieGraphicsScene::keyReleaseEvent(QKeyEvent *event)
         event->accept();
         break;
     default:
+        event->ignore();
         break;
     }
 }

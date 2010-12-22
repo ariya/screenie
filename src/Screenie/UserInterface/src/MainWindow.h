@@ -64,9 +64,12 @@ private:
 
 private slots:
     void on_saveAsAction_triggered();
+    void on_exportAction_triggered();
+
     void on_addImageAction_triggered();
     void on_addTemplateAction_triggered();
-    void on_exportAction_triggered();
+
+    void on_toggleFullScreenAction_triggered();
 
     void on_rotationSlider_valueChanged(int value);
     void on_distanceSlider_valueChanged(int value);

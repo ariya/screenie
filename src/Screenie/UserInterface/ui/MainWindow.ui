@@ -263,8 +263,15 @@
     <addaction name="addImageAction"/>
     <addaction name="addTemplateAction"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="toggleFullScreenAction"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Insert"/>
+   <addaction name="menu_View"/>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -366,6 +373,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="toggleFullScreenAction">
+   <property name="icon">
+    <iconset resource="../../../Resources/Resources.qrc">
+     <normaloff>:/img/view-fullscreen.png</normaloff>:/img/view-fullscreen.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Fullscreen</string>
+   </property>
+   <property name="toolTip">
+    <string>View Fullscreen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
    </property>
   </action>
  </widget>
