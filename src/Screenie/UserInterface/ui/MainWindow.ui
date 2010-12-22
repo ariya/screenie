@@ -243,12 +243,10 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="addImageAction"/>
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
     <addaction name="exportAction"/>
-    <addaction name="exportPDFAction"/>
     <addaction name="separator"/>
     <addaction name="quitAction"/>
    </widget>
@@ -258,7 +256,15 @@
     </property>
     <addaction name="aboutQtAction"/>
    </widget>
+   <widget class="QMenu" name="menu_Insert">
+    <property name="title">
+     <string>&amp;Insert</string>
+    </property>
+    <addaction name="addImageAction"/>
+    <addaction name="addTemplateAction"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Insert"/>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -273,7 +279,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="addImageAction"/>
-   <addaction name="addTemplateAction"/>
   </widget>
   <action name="quitAction">
    <property name="icon">
@@ -293,7 +298,7 @@
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
-    <string>Add Image</string>
+    <string>Image</string>
    </property>
    <property name="toolTip">
     <string>Add Image</string>
@@ -348,24 +353,19 @@
     <string>About &amp;Qt</string>
    </property>
   </action>
-  <action name="exportPDFAction">
-   <property name="text">
-    <string>Export &amp;PDF</string>
-   </property>
-  </action>
   <action name="addTemplateAction">
    <property name="icon">
     <iconset resource="../../../Resources/Resources.qrc">
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
-    <string>Add Template</string>
+    <string>Template</string>
    </property>
    <property name="toolTip">
     <string>Add Template</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+I</string>
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

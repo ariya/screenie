@@ -5,10 +5,8 @@ DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/src
 
 HEADERS += $$PWD/src/ExportImage.h \
-           $$PWD/src/ExportPDF.h \
            $$PWD/src/Reflection.h \
            $$PWD/src/KernelLib.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
-           $$PWD/src/ExportPDF.cpp \
            $$PWD/src/Reflection.cpp

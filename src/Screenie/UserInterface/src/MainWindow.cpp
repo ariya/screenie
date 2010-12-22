@@ -40,7 +40,6 @@
 #include "../../../Model/src/Dao/ScreenieSceneDao.h"
 #include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
 #include "../../../Kernel/src/ExportImage.h"
-#include "../../../Kernel/src/ExportPDF.h"
 #include "ScreenieControl.h"
 #include "ScreeniePixmapItem.h"
 #include "ScreenieGraphicsScene.h"
@@ -216,16 +215,6 @@ void MainWindow::on_exportAction_triggered()
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
         exportImage.exportImage(filePath);
-    }
-}
-
-void MainWindow::on_exportPDFAction_triggered()
-{
-    QString filter = tr("Portable Document Format (*.pdf)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
-    if (!filePath.isNull()) {
-        ExportPDF exportPDF(*m_screenieScene, *m_screenieGraphicsScene);
-        exportPDF.exportPDF(filePath);
     }
 }
 
