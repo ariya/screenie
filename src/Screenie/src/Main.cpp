@@ -54,6 +54,10 @@ int main(int argc, char *argv[])
 #endif
     QApplication app(argc, argv);
 
+#ifdef Q_OS_MAC
+    QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+#endif
+
     /* Load translation try from /usr/share/screenie, then ./l10n/screenie then ./ */
     QString locale = QLocale::system().name();
     QTranslator translator;

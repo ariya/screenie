@@ -60,7 +60,8 @@ namespace
 // public
 
 ScreenieControl::ScreenieControl(ScreenieScene &screenieScene, ScreenieGraphicsScene &screenieGraphicsScene)
-    : m_screenieScene(screenieScene),
+    : QObject(),
+      m_screenieScene(screenieScene),
       m_screenieGraphicsScene(screenieGraphicsScene),
       m_reflection(new Reflection())
 {
@@ -297,6 +298,10 @@ void ScreenieControl::frenchConnection()
             this, SLOT(addImages(QStringList, QPointF)));
     connect(&m_screenieGraphicsScene, SIGNAL(removeItems()),
             this, SLOT(removeItems()));
+    connect(&m_screenieGraphicsScene, SIGNAL(rotate(int)),
+            this, SLOT(rotate(int)));
+    connect(&m_screenieGraphicsScene, SIGNAL(addDistance(int)),
+            this, SLOT(addDistance(int)));
     connect(&m_qualityTimer, SIGNAL(timeout()),
             this, SLOT(restoreRenderQuality()));
 }
@@ -383,14 +388,14 @@ void ScreenieControl::updatePixmapModel(const QMimeData *mimeData, ScreenieModel
     pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
     if (!pixmap.isNull()) {
         if (screenieModel.inherits(ScreeniePixmapModel::staticMetaObject.className())) {
-            ScreeniePixmapModel &screeniePixmapModel = dynamic_cast<ScreeniePixmapModel &>(screenieModel);
+            ScreeniePixmapModel &screeniePixmapModel = static_cast<ScreeniePixmapModel &>(screenieModel);
             QPointF itemPosition = calculateItemPosition(screeniePixmapModel.getPosition(), screeniePixmapModel.getSize(), pixmap.size());
             screeniePixmapModel.setPixmap(pixmap);
             screeniePixmapModel.setPosition(itemPosition);
         } else {
             // convert to ScreeniePixmapModel
             if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-                pixmap = scaleToTemplate(dynamic_cast<ScreenieTemplateModel &>(screenieModel), pixmap);
+                pixmap = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), pixmap);
             }
             ScreeniePixmapModel *screeniePixmapModel = new ScreeniePixmapModel(pixmap);
             QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), pixmap.size());
@@ -406,7 +411,7 @@ void ScreenieControl::updateFilePathModel(const QMimeData *mimeData, ScreenieMod
 {
     QString filePath = mimeData->urls().first().toLocalFile();
     if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-        ScreenieFilePathModel &filePathModel = dynamic_cast<ScreenieFilePathModel &>(screenieModel);
+        ScreenieFilePathModel &filePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
         QSize oldSize = filePathModel.getSize();
         filePathModel.setFilePath(filePath);
         QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), oldSize, screenieModel.getSize());
@@ -415,7 +420,7 @@ void ScreenieControl::updateFilePathModel(const QMimeData *mimeData, ScreenieMod
         SizeFitter sizeFitter;
         ScreenieFilePathModel *screenieFilePathModel;
         if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-            sizeFitter = dynamic_cast<ScreenieTemplateModel &>(screenieModel).getSizeFitter();
+            sizeFitter = static_cast<ScreenieTemplateModel &>(screenieModel).getSizeFitter();
             screenieFilePathModel = new ScreenieFilePathModel(filePath, &sizeFitter);
         } else {
             screenieFilePathModel = new ScreenieFilePathModel(filePath);

@@ -21,6 +21,7 @@
 #include <QtCore/QPoint>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
+#include <QtCore/QEvent>
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
@@ -38,7 +39,8 @@ const int ScreeniePixmapItem::ScreeniePixmapType = QGraphicsItem::UserType + 1;
 // public
 
 ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection)
-    : m_screenieModel(screenieModel),
+    : QGraphicsPixmapItem(),
+      m_screenieModel(screenieModel),
       m_screenieControl(screenieControl),
       m_reflection(reflection),
       m_transformPixmap(true),

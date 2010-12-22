@@ -28,6 +28,7 @@
 #include <QtGui/QDropEvent>
 #include <QtGui/QWidget>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QPinchGesture>
 
 #include "../../../Utils/src/MimeHelper.h"
 #include "ScreenieGraphicsScene.h"
@@ -110,5 +111,48 @@ void ScreenieGraphicsScene::keyReleaseEvent(QKeyEvent *event)
     default:
         event->ignore();
         break;
+    }
+}
+
+bool ScreenieGraphicsScene::event(QEvent *event)
+{
+    bool result;
+    if (event->type() == QEvent::Gesture) {
+        result = gestureEvent(static_cast<QGestureEvent *>(event));
+    } else {
+        result = QGraphicsScene::event(event);
+    }
+    return result;
+}
+
+// private
+
+bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
+{
+    bool result;
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+        result = true;
+    } else {
+        result = false;
+    }
+
+    return result;
+}
+
+void ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
+{
+    /*!\todo 2.0 and 10.0 are magic factors - make them configurable
+             (they work well though on a MacBook Pro ;) */
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::RotationAngleChanged) {
+        qreal rotation = gesture->rotationAngle();
+        qreal lastRotation = gesture->lastRotationAngle();
+        qreal angle = rotation - lastRotation;
+        emit rotate(qRound(angle * 2.0));
+    }
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        qreal distance = 1.0 - gesture->scaleFactor();
+        emit addDistance(qRound(distance * 10.0));
     }
 }

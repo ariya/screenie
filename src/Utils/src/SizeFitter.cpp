@@ -25,6 +25,7 @@ SizeFitter::SizeFitter()
 }
 
 SizeFitter::SizeFitter(const SizeFitter &other)
+    : QObject()
 {
     copy(other);
 }
