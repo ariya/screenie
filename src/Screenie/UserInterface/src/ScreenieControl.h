@@ -76,6 +76,9 @@ public slots:
     void addImages(QList<QPixmap> pixmaps, QPointF centerPosition);
     void addTemplate(QPointF centerPosition);
 
+    void removeAll();
+    void selectAll();
+
     void translate(qreal dx, qreal dy);
     void setRotation(int angle);
     void rotate(int angle);    
@@ -120,7 +123,6 @@ private slots:
     void handleModelAdded(ScreenieModelInterface &screenieModel);
     void handleModelRemoved(const ScreenieModelInterface &screenieModel);
     void handleBackgroundChanged();
-    void removeItems();
     void restoreRenderQuality();
 };
 

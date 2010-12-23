@@ -60,15 +60,26 @@ private:
     void updateTransformationUi();
     void updateReflectionUi();
     void updateColorUi();
+    void updateEditActions();
     void initializeUi();
 
 private slots:
+    // File
     void on_saveAsAction_triggered();
     void on_exportAction_triggered();
 
+    // Edit
+    void on_cutAction_triggered();
+    void on_copyAction_triggered();
+    void on_pasteAction_triggered();
+    void on_deleteAction_triggered();
+    void on_selectAllAction_triggered();
+
+    // Insert
     void on_addImageAction_triggered();
     void on_addTemplateAction_triggered();
 
+    // View
     void on_toggleFullScreenAction_triggered();
 
     void on_rotationSlider_valueChanged(int value);

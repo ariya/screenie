@@ -149,6 +149,23 @@ void ScreenieControl::addTemplate(QPointF centerPosition)
     m_screenieScene.addModel(screenieModel);
 }
 
+void ScreenieControl::removeAll()
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        m_screenieScene.removeModel(screenieModel);
+    }
+    m_qualityTimer.start();
+}
+
+void ScreenieControl::selectAll()
+{
+    foreach(QGraphicsItem *item, m_screenieGraphicsScene.items()) {
+        item->setSelected(true);
+    }
+}
+
 void ScreenieControl::translate(qreal dx, qreal dy)
 {
     bool decreaseQuality = dx != 0.0 && dy != 0.0;
@@ -284,15 +301,7 @@ void ScreenieControl::setBlueBackgroundComponent(int blue)
     m_screenieScene.setBackgroundColor(backgroundColor);
 }
 
-void ScreenieControl::removeItems()
-{
-    setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
-    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
-        m_screenieScene.removeModel(screenieModel);
-    }
-    m_qualityTimer.start();
-}
+
 
 // private
 
@@ -310,8 +319,6 @@ void ScreenieControl::frenchConnection()
             this, SLOT(addImages(QList<QPixmap>, QPointF)));
     connect(&m_screenieGraphicsScene, SIGNAL(filePathsAdded(QStringList, QPointF)),
             this, SLOT(addImages(QStringList, QPointF)));
-    connect(&m_screenieGraphicsScene, SIGNAL(removeItems()),
-            this, SLOT(removeItems()));
     connect(&m_screenieGraphicsScene, SIGNAL(rotate(int)),
             this, SLOT(rotate(int)));
     connect(&m_screenieGraphicsScene, SIGNAL(addDistance(int)),

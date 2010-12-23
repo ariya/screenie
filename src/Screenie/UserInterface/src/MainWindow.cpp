@@ -30,6 +30,8 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QSlider>
 #include <QtGui/QMessageBox>
+#include <QtGui/QShortcut>
+#include <QtGui/QKeySequence>
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
@@ -56,13 +58,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
+    /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
+             as provided by Qt: http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
 #ifdef Q_OS_MAC
     // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
+    // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
     // For Mac there does not seem to be a common shortcut for fullscreen
     // (unlike F11 for other platforms), but iTunes uses Meta + F
     // Note: by default on Mac Qt swaps CTRL and META
-    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F | Qt::CTRL));
+    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 #endif
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
+    connect(shortcut, SIGNAL(activated()),
+            ui->deleteAction, SIGNAL(triggered()));
 
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
@@ -181,6 +189,14 @@ void MainWindow::updateColorUi()
     ui->blueSlider->blockSignals(false);
 }
 
+void MainWindow::updateEditActions()
+{
+    bool hasSelection = m_screenieGraphicsScene->selectedItems().size() > 0;
+    ui->cutAction->setEnabled(hasSelection);
+    ui->copyAction->setEnabled(hasSelection);
+    ui->deleteAction->setEnabled(hasSelection);
+}
+
 void MainWindow::initializeUi()
 {
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -212,6 +228,31 @@ void MainWindow::on_exportAction_triggered()
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
         exportImage.exportImage(filePath);
     }
+}
+
+void MainWindow::on_cutAction_triggered()
+{
+
+}
+
+void MainWindow::on_copyAction_triggered()
+{
+
+}
+
+void MainWindow::on_pasteAction_triggered()
+{
+
+}
+
+void MainWindow::on_deleteAction_triggered()
+{
+    m_screenieControl->removeAll();
+}
+
+void MainWindow::on_selectAllAction_triggered()
+{
+    m_screenieControl->selectAll();
 }
 
 void MainWindow::on_addImageAction_triggered()
@@ -336,6 +377,7 @@ void MainWindow::updateUi()
         updateTransformationUi();
         updateReflectionUi();
         updateColorUi();
+        updateEditActions();
     }
     updateDefaultValues();
 }

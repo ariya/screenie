@@ -27,7 +27,6 @@
 
 class QGraphicsSceneDragDropEvent;
 class QEvent;
-class QKeyEvent;
 class QGestureEvent;
 class QPinchGesture;
 class QPanGesture;
@@ -47,7 +46,6 @@ public:
 signals:
     void pixmapsAdded(QList<QPixmap> pixmaps, QPointF position);
     void filePathsAdded(QStringList filePaths, QPointF position);
-    void removeItems();
     void rotate(int angle);
     void addDistance(int distance);
     void translate(qreal x, qreal y);
@@ -56,7 +54,6 @@ protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-    virtual void keyReleaseEvent(QKeyEvent *event);
     virtual bool event(QEvent *event);
 
 private:
