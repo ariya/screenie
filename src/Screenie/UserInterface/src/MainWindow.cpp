@@ -207,7 +207,7 @@ void MainWindow::on_saveAsAction_triggered()
 void MainWindow::on_exportAction_triggered()
 {
     QString filter = tr("Portable Network Graphics (*.png)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), QString(), filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
         exportImage.exportImage(filePath);
