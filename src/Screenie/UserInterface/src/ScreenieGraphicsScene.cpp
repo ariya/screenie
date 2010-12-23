@@ -159,10 +159,6 @@ bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 
 bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
 {
-    QPointF hotSpot = gesture->hotSpot();
-    qDebug ("Hotspot: %f, %f has spot: %d", hotSpot.x(), hotSpot.y(), gesture->hasHotSpot());
-    static int count = 0;
-    qDebug ("pan triggered, count: %d", ++count);
     bool result = true;
     this->updateGestureCursor(gesture, Qt::SizeAllCursor);
     QPointF delta = gesture->delta();

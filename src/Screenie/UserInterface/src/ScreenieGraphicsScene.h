@@ -64,6 +64,7 @@ protected:
 
 private:
     bool m_itemDragDrop;
+    // temporary workaround for http://bugreports.qt.nokia.com/browse/QTBUG-16281
     QTimer m_cursorTimer;
 
     void frenchConnection();
