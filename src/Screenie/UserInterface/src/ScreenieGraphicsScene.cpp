@@ -23,6 +23,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QList>
+#include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 #include <QtGui/QGraphicsSceneDragDropEvent>
 #include <QtGui/QDropEvent>
@@ -40,6 +41,9 @@ ScreenieGraphicsScene::ScreenieGraphicsScene(QObject *parent)
     : QGraphicsScene(parent),
       m_itemDragDrop(false)
 {
+    m_cursorTimer.setSingleShot(true);
+    m_cursorTimer.setInterval(1000);
+    frenchConnection();
 }
 
 ScreenieGraphicsScene::~ScreenieGraphicsScene()
@@ -129,14 +133,20 @@ bool ScreenieGraphicsScene::event(QEvent *event)
 
 // private
 
+void ScreenieGraphicsScene::frenchConnection()
+{
+    connect(&m_cursorTimer, SIGNAL(timeout()),
+            this, SLOT(restoreCursor()));
+}
+
 bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 {
     bool result;
     if (selectedItems().size() > 0) {
-        if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
-            result = pinchTriggered(static_cast<QPinchGesture *>(pinch));
-        } else if (QGesture *pan = event->gesture(Qt::PanGesture)) {
+        if (QGesture *pan = event->gesture(Qt::PanGesture)) {
             result = panTriggered(static_cast<QPanGesture *>(pan));
+        } else if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
+            result = pinchTriggered(static_cast<QPinchGesture *>(pinch));
         } else {
             result = false;
         }
@@ -147,10 +157,24 @@ bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
     return result;
 }
 
+bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
+{
+    QPointF hotSpot = gesture->hotSpot();
+    qDebug ("Hotspot: %f, %f has spot: %d", hotSpot.x(), hotSpot.y(), gesture->hasHotSpot());
+    static int count = 0;
+    qDebug ("pan triggered, count: %d", ++count);
+    bool result = true;
+    this->updateGestureCursor(gesture, Qt::SizeAllCursor);
+    QPointF delta = gesture->delta();
+    qreal x = delta.x();
+    qreal y = delta.y();
+    emit translate(x, y);
+    return result;
+}
+
 bool ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
 {
     bool result;
-
     /*!\todo Values 2.0 and 10.0 are magic factors - make them configurable (they work well though on a MacBook Pro ;) */
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     if (changeFlags & QPinchGesture::RotationAngleChanged) {
@@ -170,12 +194,34 @@ bool ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
     return result;
 }
 
-bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
+void ScreenieGraphicsScene::updateGestureCursor(const QGesture *gesture, const QCursor &gestureCursor)
 {
-    bool result = true;
-    QPointF delta = gesture->delta();
-    qreal x = delta.x();
-    qreal y = delta.y();
-    emit translate(x, y);
-    return result;
+    QCursor cursor;
+    switch (gesture->state()) {
+        case Qt::GestureStarted:
+        case Qt::GestureUpdated:
+            cursor = gestureCursor;
+            m_cursorTimer.start();
+            break;
+        default:
+            cursor = Qt::ArrowCursor;
+            m_cursorTimer.stop();
+            break;
+    }
+    updateCursor(cursor);
 }
+
+void ScreenieGraphicsScene::updateCursor(const QCursor &cursor)
+{
+    foreach (QGraphicsView *view, views()) {
+        view->setCursor(cursor);
+    }
+}
+
+// private slots
+
+void ScreenieGraphicsScene::restoreCursor()
+{
+    updateCursor(Qt::ArrowCursor);
+}
+

@@ -22,12 +22,15 @@
 #define SCREENIEGRAPHICSSCENE_H
 
 #include <QtCore/QList>
+#include <QtCore/QTimer>
 #include <QtGui/QPixmap>
 #include <QtGui/QGraphicsScene>
 
 class QGraphicsSceneDragDropEvent;
 class QEvent;
+class QCursor;
 class QKeyEvent;
+class QGesture;
 class QGestureEvent;
 class QPinchGesture;
 class QPanGesture;
@@ -61,10 +64,20 @@ protected:
 
 private:
     bool m_itemDragDrop;
+    QTimer m_cursorTimer;
+
+    void frenchConnection();
 
     bool gestureEvent(const QGestureEvent *event);
-    bool pinchTriggered(const QPinchGesture *gesture);
     bool panTriggered(const QPanGesture *gesture);
+    bool pinchTriggered(const QPinchGesture *gesture);
+
+    void updateGestureCursor(const QGesture *gesture, const QCursor &gestureCursor);
+    void updateCursor(const QCursor &cursor);
+
+private slots:
+    void restoreCursor();
+
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H
