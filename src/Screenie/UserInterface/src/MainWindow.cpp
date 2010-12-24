@@ -42,6 +42,7 @@
 #include "../../../Model/src/Dao/ScreenieSceneDao.h"
 #include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
 #include "../../../Kernel/src/ExportImage.h"
+#include "../../../Kernel/src/Clipboard/Clipboard.h"
 #include "ScreenieControl.h"
 #include "ScreeniePixmapItem.h"
 #include "ScreenieGraphicsScene.h"
@@ -86,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_screenieScene = new ScreenieScene();
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    m_clipboard = new Clipboard(*m_screenieGraphicsScene, *m_screenieScene, this);
+
     initializeUi();
     updateUi();
     setUnifiedTitleAndToolBarOnMac(true);
@@ -111,6 +114,8 @@ void MainWindow::frenchConnection()
     connect(m_screenieGraphicsScene, SIGNAL(selectionChanged()),
             this, SLOT(updateUi()));
     connect(m_screenieScene, SIGNAL(changed()),
+            this, SLOT(updateUi()));
+    connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
 }
 
@@ -191,10 +196,13 @@ void MainWindow::updateColorUi()
 
 void MainWindow::updateEditActions()
 {
+    bool hasItems = m_screenieGraphicsScene->items().size() > 0;
     bool hasSelection = m_screenieGraphicsScene->selectedItems().size() > 0;
     ui->cutAction->setEnabled(hasSelection);
     ui->copyAction->setEnabled(hasSelection);
+    ui->pasteAction->setEnabled(m_clipboard->hasData());
     ui->deleteAction->setEnabled(hasSelection);
+    ui->selectAllAction->setEnabled(hasItems);
 }
 
 void MainWindow::initializeUi()
@@ -232,17 +240,17 @@ void MainWindow::on_exportAction_triggered()
 
 void MainWindow::on_cutAction_triggered()
 {
-
+    m_clipboard->cut();
 }
 
 void MainWindow::on_copyAction_triggered()
 {
-
+    m_clipboard->copy();
 }
 
 void MainWindow::on_pasteAction_triggered()
 {
-
+    m_clipboard->paste();
 }
 
 void MainWindow::on_deleteAction_triggered()
@@ -269,7 +277,7 @@ void MainWindow::on_addImageAction_triggered()
 
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
-    if (!this->isFullScreen()) {
+    if (isFullScreen()) {
         /*!\todo Settings which control what becomes invisible in fullscreen mode */
         ui->toolBar->setVisible(false);
         ui->sidePanel->setVisible(false);
@@ -280,10 +288,8 @@ void MainWindow::on_toggleFullScreenAction_triggered()
         // The Qt documentation recommends anyway to do so.
         setUnifiedTitleAndToolBarOnMac(false);
         showFullScreen();
-
     } else {
         showNormal();
-
         ui->toolBar->setVisible(true);
         ui->sidePanel->setVisible(true);
         ui->statusbar->setVisible(true);

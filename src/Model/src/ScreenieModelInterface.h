@@ -116,6 +116,20 @@ public:
 
     virtual void convert(ScreenieModelInterface &source) = 0;
 
+    /*!
+     * Creates a copy of this instance and all its associated data. The caller
+     * is the owner.
+     *
+     * \return a copy of this instance; must be \c deleted by the caller
+     */
+    virtual ScreenieModelInterface *copy() const = 0;
+
+    /*!
+     * \sa #selectionChanged()
+     */
+    virtual void setSelected(bool enable) = 0;
+    virtual bool isSelected() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();
@@ -123,6 +137,7 @@ signals:
     void changed();
     void pixmapChanged(const QPixmap &pixmap);
     void filePathChanged(const QString &filePath);
+    void selectionChanged();
 };
 
 #endif // SCREENIEMODELINTERFACE_H

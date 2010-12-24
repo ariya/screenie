@@ -70,6 +70,8 @@ public:
      * \sa #count()
      */
     MODEL_API ScreenieModelInterface *getModel(int index) const;
+    MODEL_API const QList<ScreenieModelInterface *> getModels() const;
+    MODEL_API const QList<ScreenieModelInterface *> getSelectedModels() const;
     MODEL_API int count() const;
 
     MODEL_API bool isBackgroundEnabled() const;
@@ -119,6 +121,7 @@ signals:
     void modelRemoved(const ScreenieModelInterface &screenieModel);
     void backgroundChanged();
     void distanceChanged();
+    void selectionChanged();
 
 private:
     ScreenieScenePrivate *d;

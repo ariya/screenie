@@ -35,20 +35,40 @@ public:
           rotation(DefaultScreenieModel::Rotation),
           reflectionEnabled(DefaultScreenieModel::ReflectionEnabled),
           reflectionOffset(DefaultScreenieModel::ReflectionOffset),
-          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity) {}
+          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity),
+          selected(false)
+
+    {}
+
+    AbstractScreenieModelPrivate(const AbstractScreenieModelPrivate &other)
+        : position(other.position),
+          distance(other.distance),
+          rotation(other.rotation),
+          reflectionEnabled(other.reflectionEnabled),
+          reflectionOffset(other.reflectionOffset),
+          reflectionOpacity(other.reflectionOpacity),
+          selected(other.selected)
+    {}
 
     QPointF position;
     int distance;
     int rotation;
     int reflectionEnabled;
     int reflectionOffset;
-    int reflectionOpacity;    
+    int reflectionOpacity;
+    bool selected;
 };
 
 // public
 
 AbstractScreenieModel::AbstractScreenieModel()
     : d(new AbstractScreenieModelPrivate())
+{
+}
+
+AbstractScreenieModel::AbstractScreenieModel(const AbstractScreenieModel &other)
+    : ScreenieModelInterface(),
+      d(new AbstractScreenieModelPrivate(*other.d))
 {
 }
 
@@ -198,6 +218,22 @@ void AbstractScreenieModel::addReflectionOpacity(int reflectionOpacity)
             emit reflectionChanged();
         }
     }
+}
+
+void AbstractScreenieModel::setSelected(bool enable)
+{
+    if (d->selected != enable) {
+        d->selected = enable;
+#ifdef DEBUG
+        qDebug("AbstractScreenieModel::setSelected: %d", d->selected);
+#endif
+        emit selectionChanged();
+    }
+}
+
+bool AbstractScreenieModel::isSelected() const
+{
+    return d->selected;
 }
 
 void AbstractScreenieModel::convert(ScreenieModelInterface &source)

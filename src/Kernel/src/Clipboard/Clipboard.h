@@ -18,42 +18,48 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef REFLECTION_H
-#define REFLECTION_H
+#ifndef CLIPBOARD_H
+#define CLIPBOARD_H
 
-class ReflectionPrivate;
+#include <QtCore/QObject>
 
-#include <QtGui/QPixmap>
+class QGraphicsScene;
 
-#include "KernelLib.h"
+#include "../KernelLib.h"
+
+class ScreenieScene;
+class ClipboardPrivate;
 
 /*!
- * Glass reflection effect.
+ * Support for cut/copy/paste operations.
  */
-class Reflection
+class Clipboard : public QObject
 {
+    Q_OBJECT
 public:
-    KERNEL_API Reflection();
-    KERNEL_API ~Reflection();
+    KERNEL_API explicit Clipboard(const QGraphicsScene &graphicsScene, ScreenieScene &screenieScene, QObject *parent = 0);
+    KERNEL_API virtual ~Clipboard();
 
     /*!
-     * Creates a reflected version of the \p pixmap, along with gradient translucency
-     * defined by \p opacity and \p offset.
-     *
-     * \param pixmap
-     *        the QPixmap to which the reflection is to be added
-     * \param opacity
-     *        the opacity (translucency) of the reflection in percent [0, 100];
-     *        0: fully translucent; 1: fully opaque
-     * \param offset
-     *        the offset of the gradient in percent [1, 100] of the \c pixmap's height
+     * \return \c true if this Clipboard has valid MIME data to paste; \c false else
      */
-    KERNEL_API QPixmap addReflection(const QPixmap &pixmap, int opacity, int offset);
+    KERNEL_API bool hasData() const;
+
+signals:
+    /*!
+     * Connected to the underlying QClipboard::dataChanged() signal.
+     */
+    void dataChanged();
+
+public slots:
+    KERNEL_API void cut();
+    KERNEL_API void copy();
+    KERNEL_API void paste();
 
 private:
-    ReflectionPrivate *d;
+    ClipboardPrivate *d;
 
-    QPixmap reflect(const QPixmap &pixmap, int offset);
+    void frenchConnection();
 };
 
-#endif // PAINTTOOLS_H
+#endif // CLIPBOARD_H

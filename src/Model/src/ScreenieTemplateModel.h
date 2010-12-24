@@ -42,15 +42,17 @@ class MODEL_API ScreenieTemplateModel : public AbstractScreenieModel
 {
     Q_OBJECT
 public:
-    ScreenieTemplateModel(const QSize &size);
+    explicit ScreenieTemplateModel(const QSize &size);
+    explicit ScreenieTemplateModel(const ScreenieTemplateModel &other);
     virtual ~ScreenieTemplateModel();
+
+    virtual const QPixmap &readPixmap() const;
+    virtual ScreenieModelInterface *copy() const;
 
     const SizeFitter &getSizeFitter() const;
 
-    virtual const QPixmap &readPixmap() const;
-
     /*!
-     * Returns the requested \c size.
+     * Returns the requested size.
      *
      * \sa ScreenieTemplateModel(const QSize &)
      */

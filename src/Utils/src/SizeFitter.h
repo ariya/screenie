@@ -36,6 +36,10 @@ public:
     };
 
     UTILS_API SizeFitter(QSize targetSize, FitMode fitMode = Fit);
+
+    /*!
+     * Copy c'tor.
+     */
     UTILS_API SizeFitter(const SizeFitter &other);
     UTILS_API SizeFitter();
     UTILS_API virtual ~SizeFitter();

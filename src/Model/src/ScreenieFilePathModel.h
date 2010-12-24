@@ -54,15 +54,16 @@ public:
      * \sa #readPixmap()
      */
     explicit ScreenieFilePathModel(const QString &filePath = QString(), const SizeFitter *sizeFitter = 0);
+    explicit ScreenieFilePathModel(const ScreenieFilePathModel &other);
     virtual ~ScreenieFilePathModel();
 
     virtual const QPixmap &readPixmap() const;
     virtual QSize getSize() const;
 
+    virtual ScreenieModelInterface *copy() const;
+
     virtual QString getFilePath() const;
     virtual void setFilePath(const QString &filePath);
-
-    virtual void convert(ScreenieModelInterface &source);
 
 private:
     ScreenieFilePathModelPrivate *d;

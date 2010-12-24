@@ -66,7 +66,7 @@ private:
     ScreenieControl &m_screenieControl;
     Reflection &m_reflection;
     bool m_transformPixmap;
-    bool m_ignorePositionChange;
+    bool m_ignoreUpdates;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);
@@ -85,6 +85,7 @@ private slots:
     void updatePixmap();
     void updateItem();
     void updatePosition();
+    void updateSelection();
 };
 
 #endif // SCREENIEPIXMAPITEM_H

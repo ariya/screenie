@@ -4,6 +4,7 @@ DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/../Model/src/Dao \
               $$PWD/../Model/src/Dao/Xml \
               $$PWD/../Kernel/src \
+              $$PWD/../Kernel/src/Clipboard \
               $$PWD/UserInterface/src \
               $$PWD/GeneratedFiles \
               $$PWD/src

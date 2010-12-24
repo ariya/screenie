@@ -32,6 +32,14 @@ public:
     ScreenieFilePathModelPrivate(const QString &theFilePath, const SizeFitter *theSizeFitter)
         : filePath(theFilePath),
           sizeFitter(theSizeFitter) {}
+
+    ScreenieFilePathModelPrivate(const ScreenieFilePathModelPrivate &other)
+        : filePath(other.filePath),
+          pixmap(other.pixmap),
+          sizeFitter(other.sizeFitter)
+    {
+    }
+
     QString filePath;
     QPixmap pixmap;
     const SizeFitter *sizeFitter;
@@ -39,6 +47,12 @@ public:
 
 ScreenieFilePathModel::ScreenieFilePathModel(const QString &filePath, const SizeFitter *sizeFitter)
     : d(new ScreenieFilePathModelPrivate(filePath, sizeFitter))
+{
+}
+
+ScreenieFilePathModel::ScreenieFilePathModel(const ScreenieFilePathModel &other)
+    : AbstractScreenieModel(other),
+      d(new ScreenieFilePathModelPrivate(*other.d))
 {
 }
 
@@ -81,9 +95,10 @@ QSize ScreenieFilePathModel::getSize() const
     return result;
 }
 
-void ScreenieFilePathModel::convert(ScreenieModelInterface &source)
+ScreenieModelInterface *ScreenieFilePathModel::copy() const
 {
-    AbstractScreenieModel::convert(source);
+    ScreenieFilePathModel *result = new ScreenieFilePathModel(*this);
+    return result;
 }
 
 void ScreenieFilePathModel::setFilePath(const QString &filePath)

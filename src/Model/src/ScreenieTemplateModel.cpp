@@ -32,6 +32,10 @@ public:
         sizeFitter.setFitMode(SizeFitter::Fit);
         sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
     }
+
+    ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
+        : pixmap(other.pixmap),
+          sizeFitter(other.sizeFitter) {}
     QPixmap pixmap;
     SizeFitter sizeFitter;
 };
@@ -43,14 +47,15 @@ ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
 {
 }
 
+ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
+    : AbstractScreenieModel(other),
+      d(new ScreenieTemplateModelPrivate(*other.d))
+{
+}
+
 ScreenieTemplateModel::~ScreenieTemplateModel()
 {
     delete d;
-}
-
-const SizeFitter &ScreenieTemplateModel::getSizeFitter() const
-{
-    return d->sizeFitter;
 }
 
 const QPixmap &ScreenieTemplateModel::readPixmap() const
@@ -60,6 +65,19 @@ const QPixmap &ScreenieTemplateModel::readPixmap() const
     }
     return d->pixmap;
 }
+
+ScreenieModelInterface *ScreenieTemplateModel::copy() const
+{
+    ScreenieTemplateModel *result = new ScreenieTemplateModel(*this);
+    return result;
+}
+
+const SizeFitter &ScreenieTemplateModel::getSizeFitter() const
+{
+    return d->sizeFitter;
+}
+
+
 
 QSize ScreenieTemplateModel::getSize() const
 {

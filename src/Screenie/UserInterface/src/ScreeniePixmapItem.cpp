@@ -44,7 +44,7 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
       m_screenieControl(screenieControl),
       m_reflection(reflection),
       m_transformPixmap(true),
-      m_ignorePositionChange(false)
+      m_ignoreUpdates(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -118,6 +118,11 @@ QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVarian
     if (change == ItemPositionChange) {
         QPointF position = value.toPointF();
         m_screenieModel.setPosition(position);
+    } else if (change == ItemSelectedChange) {
+        QGraphicsPixmapItem::itemChange(change, value);
+        // See comment below in #transformPixmap
+        m_ignoreUpdates = true;
+        m_screenieModel.setSelected(value.toBool());
     }
     return QGraphicsPixmapItem::itemChange(change, value);
 }
@@ -138,6 +143,8 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updatePixmap(const QPixmap &)));
     connect(&m_screenieModel, SIGNAL(filePathChanged(const QString &)),
             this, SLOT(updatePixmap()));
+    connect(&m_screenieModel, SIGNAL(selectionChanged()),
+            this, SLOT(updateSelection()));
 }
 
 void ScreeniePixmapItem::moveTo(QPointF scenePosition)
@@ -194,7 +201,7 @@ void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
         // (see #itemChange above)
         // As we get a signal by the model nevertheless we ignore it my raising
         // a flag, because we already updated the View ourselves
-        m_ignorePositionChange = true;
+        m_ignoreUpdates = true;
         selectExclusive();
         QGraphicsPixmapItem::mouseMoveEvent(event);
         break;
@@ -313,8 +320,17 @@ void ScreeniePixmapItem::updateItem()
 void ScreeniePixmapItem::updatePosition()
 {
     // see comment in #transformPixmap
-    if (!m_ignorePositionChange) {
-        this->setPos(m_screenieModel.getPosition());
+    if (!m_ignoreUpdates) {
+        setPos(m_screenieModel.getPosition());
     }
-    m_ignorePositionChange = false;
+    m_ignoreUpdates = false;
+}
+
+void ScreeniePixmapItem::updateSelection()
+{
+    // see comment in #transformPixmap
+    if (!m_ignoreUpdates) {
+        setSelected(m_screenieModel.isSelected());
+    }
+    m_ignoreUpdates = false;
 }

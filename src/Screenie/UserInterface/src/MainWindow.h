@@ -32,6 +32,7 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreeniePixmapItem;
 class ScreenieControl;
+class Clipboard;
 class ScreenieGraphicsScene;
 
 namespace Ui {
@@ -52,6 +53,7 @@ private:
     ScreenieScene *m_screenieScene;
     ScreenieControl *m_screenieControl;
     bool m_ignoreUpdateSignals;
+    Clipboard *m_clipboard;
 
     void frenchConnection();
 

@@ -34,6 +34,10 @@ class AbstractScreenieModel : public ScreenieModelInterface
 
 public:
     AbstractScreenieModel();
+    /*!
+     * Copy c'tor.
+     */
+    explicit AbstractScreenieModel(const AbstractScreenieModel &other);
     virtual ~AbstractScreenieModel();
 
     virtual QPointF getPosition() const;
@@ -58,6 +62,8 @@ public:
     virtual int getReflectionOpacity() const;
     virtual void setReflectionOpacity(int reflectionOpacity);
     virtual void addReflectionOpacity(int reflectionOpacity);
+    virtual void setSelected(bool enable);
+    virtual bool isSelected() const;
 
     virtual void convert(ScreenieModelInterface &source);
 
