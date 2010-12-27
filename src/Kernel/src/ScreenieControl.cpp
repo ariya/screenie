@@ -42,7 +42,7 @@
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../../../Model/src/ScreeniePixmapModel.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
-#include "../../../Kernel/src/Reflection.h"
+#include "Reflection.h"
 #include "ScreenieGraphicsScene.h"
 #include "ScreeniePixmapItem.h"
 
@@ -100,6 +100,15 @@ void ScreenieControl::updateModel(const QMimeData *mimeData, ScreenieModelInterf
     } else {
         updateFilePathModel(mimeData, screenieModel);
     }
+}
+
+ScreenieScene &ScreenieControl::getScreenieScene() const
+{
+    return m_screenieScene;
+}
+ScreenieGraphicsScene &ScreenieControl::getScreenieGraphicsScene() const
+{
+    return m_screenieGraphicsScene;
 }
 
 // public slots

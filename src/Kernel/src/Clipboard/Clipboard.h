@@ -27,7 +27,7 @@ class QGraphicsScene;
 
 #include "../KernelLib.h"
 
-class ScreenieScene;
+class ScreenieControl;
 class ClipboardPrivate;
 
 /*!
@@ -37,7 +37,7 @@ class Clipboard : public QObject
 {
     Q_OBJECT
 public:
-    KERNEL_API explicit Clipboard(const QGraphicsScene &graphicsScene, ScreenieScene &screenieScene, QObject *parent = 0);
+    KERNEL_API explicit Clipboard(ScreenieControl &screenieControl, QObject *parent = 0);
     KERNEL_API virtual ~Clipboard();
 
     /*!

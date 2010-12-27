@@ -224,9 +224,6 @@ void AbstractScreenieModel::setSelected(bool enable)
 {
     if (d->selected != enable) {
         d->selected = enable;
-#ifdef DEBUG
-        qDebug("AbstractScreenieModel::setSelected: %d", d->selected);
-#endif
         emit selectionChanged();
     }
 }

@@ -41,7 +41,8 @@ class ScreeniePixmapItem;
 class ScreenieTemplateModel;
 class Reflection;
 
-#include "../../../Model/src/DefaultScreenieModel.h"
+#include "../../Model/src/DefaultScreenieModel.h"
+#include "KernelLib.h"
 
 /*!
  * This is the controller of the ScreenieScene (model): it modifies the <em>selected</em> ScreenieModelInterface.
@@ -60,42 +61,45 @@ public:
         High /*!< Antialiasing enabled, smooth pixmap transformation */
     };
 
-    ScreenieControl(ScreenieScene &screenieScene, ScreenieGraphicsScene &screenieGraphicsScene);
-    virtual ~ScreenieControl();
+    KERNEL_API ScreenieControl(ScreenieScene &screenieScene, ScreenieGraphicsScene &screenieGraphicsScene);
+    KERNEL_API virtual ~ScreenieControl();
 
-    QList<ScreenieModelInterface *> getSelectedScreenieModels() const;
+    KERNEL_API QList<ScreenieModelInterface *> getSelectedScreenieModels() const;
 
-    DefaultScreenieModel &getDefaultScreenieModel();
+    KERNEL_API DefaultScreenieModel &getDefaultScreenieModel();
 
-    void updateModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+    KERNEL_API void updateModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+
+    ScreenieScene &getScreenieScene() const;
+    ScreenieGraphicsScene &getScreenieGraphicsScene() const;
 
 public slots:
-    void addImage(QString filePath, QPointF centerPosition);
-    void addImages(QStringList filePaths, QPointF centerPosition);
-    void addImage(QPixmap pixmap, QPointF centerPosition);
-    void addImages(QList<QPixmap> pixmaps, QPointF centerPosition);
-    void addTemplate(QPointF centerPosition);
+    KERNEL_API void addImage(QString filePath, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addImages(QStringList filePaths, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addImage(QPixmap pixmap, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addImages(QList<QPixmap> pixmaps, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addTemplate(QPointF centerPosition = QPointF(0.0, 0.0));
 
-    void removeAll();
-    void selectAll();
+    KERNEL_API void removeAll();
+    KERNEL_API void selectAll();
 
-    void translate(qreal dx, qreal dy);
-    void setRotation(int angle);
-    void rotate(int angle);    
-    void setDistance(int distance);
-    void addDistance(int distance);
+    KERNEL_API void translate(qreal dx, qreal dy);
+    KERNEL_API void setRotation(int angle);
+    KERNEL_API void rotate(int angle);
+    KERNEL_API void setDistance(int distance);
+    KERNEL_API void addDistance(int distance);
 
-    void setReflectionEnabled(bool enable);
-    void setReflectionOffset(int reflectionOffset);
-    void addReflectionOffset(int reflectionOffset);
-    void setReflectionOpacity(int reflectionOpacity);
-    void addReflectionOpacity(int reflectionOpacity);
+    KERNEL_API void setReflectionEnabled(bool enable);
+    KERNEL_API void setReflectionOffset(int reflectionOffset);
+    KERNEL_API void addReflectionOffset(int reflectionOffset);
+    KERNEL_API void setReflectionOpacity(int reflectionOpacity);
+    KERNEL_API void addReflectionOpacity(int reflectionOpacity);
 
-    void setBackgroundEnabled(bool enable);
-    void setBackgroundColor(QColor color);
-    void setRedBackgroundComponent(int red);
-    void setGreenBackgroundComponent(int green);
-    void setBlueBackgroundComponent(int blue);
+    KERNEL_API void setBackgroundEnabled(bool enable);
+    KERNEL_API void setBackgroundColor(QColor color);
+    KERNEL_API void setRedBackgroundComponent(int red);
+    KERNEL_API void setGreenBackgroundComponent(int green);
+    KERNEL_API void setBlueBackgroundComponent(int blue);
 
 private:
     ScreenieScene &m_screenieScene;

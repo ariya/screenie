@@ -21,6 +21,7 @@
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 
+#include "ScreenieMimeData.h"
 #include "MimeHelper.h"
 
 // public
@@ -32,20 +33,28 @@ MimeHelper::MimeHelper()
 bool MimeHelper::accept(const QMimeData *mimeData, Mode mode)
 {
     bool result;
-    if (mimeData->hasImage()) {
-        result = true;
-    } else if (mimeData->hasUrls()) {
-        result = false;
-        foreach(QUrl url, mimeData->urls()) {
-            if (!url.toLocalFile().isEmpty()) {
-                result = true;
-                if (mode == Relaxed) {
+    if (mimeData != 0) {
+        if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
+            const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);
+            result = screenieMimeData->hasScreenieModels();
+        }
+        else if (mimeData->hasImage()) {
+            result = true;
+        } else if (mimeData->hasUrls()) {
+            result = false;
+            foreach(QUrl url, mimeData->urls()) {
+                if (!url.toLocalFile().isEmpty()) {
+                    result = true;
+                    if (mode == Relaxed) {
+                        break;
+                    }
+                } else if (mode == Strict) {
+                    result = false;
                     break;
                 }
-            } else if (mode == Strict) {
-                result = false;
-                break;
             }
+        } else {
+            result = false;
         }
     } else {
         result = false;

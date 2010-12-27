@@ -31,7 +31,7 @@
 #include <QtGui/QPinchGesture>
 #include <QtGui/QGraphicsView>
 
-#include "../../../Utils/src/MimeHelper.h"
+#include "Clipboard/MimeHelper.h"
 #include "ScreenieGraphicsScene.h"
 
 // public

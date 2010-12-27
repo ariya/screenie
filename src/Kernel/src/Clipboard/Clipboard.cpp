@@ -18,34 +18,40 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QUrl>
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtGui/QClipboard>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QImage>
 #include <QtGui/QApplication>
 
 #include "../../../Model/src/ScreenieScene.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../ExportImage.h"
+#include "../ScreenieControl.h"
+#include "../ScreenieGraphicsScene.h"
+#include "MimeHelper.h"
 #include "ScreenieMimeData.h"
 #include "Clipboard.h"
 
 class ClipboardPrivate
 {
 public:
-    ClipboardPrivate(const QGraphicsScene &theGraphicsScene, ScreenieScene &theScreenieScene)
-        : graphicsScene(theGraphicsScene),
-          screenieScene(theScreenieScene)
+    ClipboardPrivate(ScreenieControl &control)
+        : screenieControl(control),
+          exportImage(control.getScreenieScene(), control.getScreenieGraphicsScene())
     {}
 
-    const QGraphicsScene &graphicsScene;
-    ScreenieScene &screenieScene;
+    ScreenieControl &screenieControl;
+    ExportImage exportImage;
 };
 
 // public
 
-Clipboard::Clipboard(const QGraphicsScene &graphicsScene, ScreenieScene &screenieScene, QObject *parent) :
+Clipboard::Clipboard(ScreenieControl &screenieControl, QObject *parent) :
     QObject(parent),
-    d(new ClipboardPrivate(graphicsScene, screenieScene))
+    d(new ClipboardPrivate(screenieControl))
 {
     frenchConnection();
 }
@@ -57,15 +63,10 @@ Clipboard::~Clipboard()
 
 bool Clipboard::hasData() const
 {
-    bool result = false;
+    bool result;
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
-    if (mimeData != 0) {
-        if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
-            const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);
-            result = screenieMimeData->hasScreenieModels();
-        }
-    }
+    result = MimeHelper::accept(mimeData, MimeHelper::Relaxed);
     return result;
 }
 
@@ -74,9 +75,9 @@ bool Clipboard::hasData() const
 void Clipboard::cut()
 {
     QList<const ScreenieModelInterface *> copies;
-    foreach (ScreenieModelInterface *screenieModel, d->screenieScene.getSelectedModels()) {
+    foreach (ScreenieModelInterface *screenieModel, d->screenieControl.getScreenieScene().getSelectedModels()) {
         ScreenieModelInterface *copy = screenieModel->copy();
-        d->screenieScene.removeModel(screenieModel);
+        d->screenieControl.getScreenieScene().removeModel(screenieModel);
         copies.append(copy);
     }
 
@@ -90,16 +91,18 @@ void Clipboard::cut()
 void Clipboard::copy()
 {
     QList<const ScreenieModelInterface *> copies;
-    foreach (ScreenieModelInterface *screenieModel, d->screenieScene.getSelectedModels()) {
+    foreach (ScreenieModelInterface *screenieModel, d->screenieControl.getScreenieScene().getSelectedModels()) {
         ScreenieModelInterface *copy = screenieModel->copy();
         copies.append(copy);
     }
-#ifdef DEBUG
-    qDebug("Clipboard::copy: Copies count: %d", copies.count());
-#endif
+
     if (copies.count() > 0) {
         QClipboard *clipboard = QApplication::clipboard();
         ScreenieMimeData *screenieMimeData = new ScreenieMimeData(copies);
+
+        // Image data
+        QImage image = d->exportImage.exportImage(ExportImage::Selected);
+        screenieMimeData->setImageData(image);
         clipboard->setMimeData(screenieMimeData);
     }
 }
@@ -108,13 +111,27 @@ void Clipboard::paste()
 {
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
-    if (mimeData != 0) {
+    if (MimeHelper::accept(mimeData, MimeHelper::Relaxed)) {
         if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
             const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);
             const QList<const ScreenieModelInterface *> copies = screenieMimeData->getScreenieModels();
             foreach (const ScreenieModelInterface *clipboardModel, copies) {
                 ScreenieModelInterface *copy = clipboardModel->copy();
-                d->screenieScene.addModel(copy);
+                d->screenieControl.getScreenieScene().addModel(copy);
+            }
+        } else if (mimeData->hasImage()) {
+            QPixmap pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
+            d->screenieControl.addImage(pixmap);
+        } else if (mimeData->hasUrls()) {
+            QList<QUrl> urls = mimeData->urls();
+            foreach(QUrl url, urls) {
+                QString filePath = url.toLocalFile();
+#ifdef DEBUG
+                qDebug("Clipboard::paste: filepath: %s", qPrintable(filePath));
+#endif
+                if (!filePath.isNull()) {
+                    d->screenieControl.addImage(filePath);
+                }
             }
         }
     }

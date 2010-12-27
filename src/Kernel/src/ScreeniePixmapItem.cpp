@@ -27,10 +27,11 @@
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsSceneMouseEvent>
 
-#include "../../../Utils/src/MimeHelper.h"
+
 #include "../../../Utils/src/PaintTools.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
-#include "../../../Kernel/src/Reflection.h"
+#include "Clipboard/MimeHelper.h"
+#include "Reflection.h"
 #include "ScreenieControl.h"
 #include "ScreeniePixmapItem.h"
 

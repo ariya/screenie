@@ -35,17 +35,17 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
-#include "../../../Utils/src/Settings.h"
-#include "../../../Model/src/ScreenieScene.h"
-#include "../../../Model/src/ScreenieModelInterface.h"
-#include "../../../Model/src/ScreenieFilePathModel.h"
-#include "../../../Model/src/Dao/ScreenieSceneDao.h"
-#include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
-#include "../../../Kernel/src/ExportImage.h"
-#include "../../../Kernel/src/Clipboard/Clipboard.h"
-#include "ScreenieControl.h"
-#include "ScreeniePixmapItem.h"
-#include "ScreenieGraphicsScene.h"
+#include "../../Utils/src/Settings.h"
+#include "../../Model/src/ScreenieScene.h"
+#include "../../Model/src/ScreenieModelInterface.h"
+#include "../../Model/src/ScreenieFilePathModel.h"
+#include "../../Model/src/Dao/ScreenieSceneDao.h"
+#include "../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
+#include "../../Kernel/src/ExportImage.h"
+#include "../../Kernel/src/Clipboard/Clipboard.h"
+#include "../../Kernel/src/ScreenieControl.h"
+#include "../../Kernel/src/ScreenieGraphicsScene.h"
+#include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_screenieScene = new ScreenieScene();
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
-    m_clipboard = new Clipboard(*m_screenieGraphicsScene, *m_screenieScene, this);
+    m_clipboard = new Clipboard(*m_screenieControl, this);
 
     initializeUi();
     updateUi();

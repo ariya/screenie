@@ -33,6 +33,10 @@ class QPanGesture;
 class QGesture;
 class QObject;
 
+#include "KernelLib.h"
+
+#include "KernelLib.h"
+
 /*!
  * Provides the drag'n'drop functionality for opening image and scene files.
  */
@@ -40,8 +44,8 @@ class ScreenieGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit ScreenieGraphicsScene(QObject *parent = 0);
-    virtual ~ScreenieGraphicsScene();
+    KERNEL_API explicit ScreenieGraphicsScene(QObject *parent = 0);
+    KERNEL_API virtual ~ScreenieGraphicsScene();
 
 signals:
     void pixmapsAdded(QList<QPixmap> pixmaps, QPointF position);
