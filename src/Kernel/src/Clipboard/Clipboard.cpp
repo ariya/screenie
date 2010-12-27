@@ -21,6 +21,8 @@
 #include <QtCore/QUrl>
 #include <QtCore/QObject>
 #include <QtCore/QList>
+//#include <QtCore/QByteArray>
+//#include <QtCore/QBuffer>
 #include <QtGui/QClipboard>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QImage>
@@ -102,6 +104,18 @@ void Clipboard::copy()
 
         // Image data
         QImage image = d->exportImage.exportImage(ExportImage::Selected);
+
+        /*!\todo Make copy/paste into Gimp work. And what about alpha channel support?
+                 E.g. copy/past from OpenOffice Draw into Gimp works. But nowhere (on Windows so far)
+                 I have seen proper alpha support, always the background of the originating application is set */
+
+//        QByteArray data;
+//        QBuffer buffer(&data);
+//        buffer.open(QIODevice::WriteOnly);
+//        image.save(&buffer, "PNG");
+//        buffer.close();
+//        screenieMimeData->setData("application/x-qt-windows-mime/png", data);
+
         screenieMimeData->setImageData(image);
         clipboard->setMimeData(screenieMimeData);
     }
@@ -111,6 +125,12 @@ void Clipboard::paste()
 {
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
+#ifdef DEBUG
+    foreach(QString format, mimeData->formats()) {
+        qDebug("Clipboard::paste: MIME: %s", qPrintable(format));
+    }
+#endif
+
     if (MimeHelper::accept(mimeData, MimeHelper::Relaxed)) {
         if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
             const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);

@@ -36,6 +36,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QSlider>
 
+#include "../../../Utils/src/PaintTools.h"
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieScene.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
@@ -510,23 +511,17 @@ void ScreenieControl::handleModelRemoved(const ScreenieModelInterface &screenieM
 
 void ScreenieControl::handleBackgroundChanged()
 {
-    QBrush bgbrush;
+    QBrush backgroundBrush;
     if (m_screenieScene.isBackgroundEnabled()) {
         QColor backgroundColor = m_screenieScene.getBackgroundColor();
-        bgbrush = QBrush(backgroundColor);
+        backgroundBrush = QBrush(backgroundColor);
     } else {
-        if (m_checkerBoard.style() == Qt::NoBrush) {
-            QImage checker(16, 16, QImage::Format_ARGB32_Premultiplied);
-            QPainter painter(&checker);
-            painter.fillRect(checker.rect(), QColor(153, 153, 153));
-            painter.fillRect(0, 0, 8, 8, QColor(102, 102, 102));
-            painter.fillRect(8, 8, 8, 8, QColor(102, 102, 102));
-            painter.end();
-            m_checkerBoard.setTextureImage(checker);
+        if (m_checkerBoardBrush.style() == Qt::NoBrush) {
+            m_checkerBoardBrush = PaintTools::createCheckerPattern();
         }
-        bgbrush = m_checkerBoard;
+        backgroundBrush = m_checkerBoardBrush;
     }
-    m_screenieGraphicsScene.setBackgroundBrush(bgbrush);
+    m_screenieGraphicsScene.setBackgroundBrush(backgroundBrush);
 }
 
 void ScreenieControl::restoreRenderQuality()

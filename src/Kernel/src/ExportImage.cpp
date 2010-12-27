@@ -48,6 +48,7 @@ void ExportImage::exportImage(const QString &filePath, Selection selection) cons
 QImage ExportImage::exportImage(Selection selection) const
 {
     QRectF sourceRect;
+    QBrush oldBackgroundBrush;
     QList<QGraphicsItem *> selectedItems = m_graphicsScene.selectedItems();
     QList<QGraphicsItem *> items = m_graphicsScene.items();
     QList<QGraphicsItem *> invisibleItems;
@@ -73,13 +74,16 @@ QImage ExportImage::exportImage(Selection selection) const
         sourceRect = m_graphicsScene.itemsBoundingRect();
         break;
     }
-
-    QImage result(qRound(sourceRect.width()), qRound(sourceRect.height()), QImage::Format_ARGB32_Premultiplied);
+    QImage result(qRound(sourceRect.width()), qRound(sourceRect.height()), QImage::Format_ARGB32);
     result.fill(0);
     QPainter painter(&result);
     painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing, true);
     if (m_screenieScene.isBackgroundEnabled()) {
         painter.fillRect(0, 0, result.width(), result.height(), m_screenieScene.getBackgroundColor());
+    } else {
+        QBrush transparent(QColor(0, 0, 0, 0));
+        oldBackgroundBrush = m_graphicsScene.backgroundBrush();
+        m_graphicsScene.setBackgroundBrush(transparent);
     }
     m_graphicsScene.clearSelection();
     m_graphicsScene.render(&painter, QRectF(), sourceRect);
@@ -91,6 +95,9 @@ QImage ExportImage::exportImage(Selection selection) const
     foreach(QGraphicsItem *current, invisibleItems) {
         current->setVisible(true);
     }
-
+    // restore background
+    if (oldBackgroundBrush != Qt::NoBrush) {
+        m_graphicsScene.setBackgroundBrush(oldBackgroundBrush);
+    }
     return result;
 }

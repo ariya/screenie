@@ -22,6 +22,7 @@
 #define PAINTTOOLS_H
 
 #include <QtGui/QPixmap>
+#include <QtGui/QBrush>
 
 class QPainter;
 class QString;
@@ -51,6 +52,14 @@ public:
      * \return A QPixmap with a copy of the upper half area of the \p pixmap
      */
     UTILS_API static QPixmap upperHalf(const QPixmap &pixmap);
+
+    /*!
+     * Creates a 16x16 checker pattern.
+     *
+     * \return the QBrush containing the checker pattern
+     */
+    UTILS_API static QBrush createCheckerPattern();
+
 private:
    static void drawBackground(QPainter &painter, QPixmap &pixmap);
    static void drawText(const QString &text, QPainter &painter, QPixmap &pixmap);

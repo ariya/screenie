@@ -104,7 +104,7 @@ public slots:
 private:
     ScreenieScene &m_screenieScene;
     ScreenieGraphicsScene &m_screenieGraphicsScene;
-    QBrush m_checkerBoard;
+    QBrush m_checkerBoardBrush;
     QTimer m_qualityTimer;
     Reflection *m_reflection; /*! \todo The Reflection effect does not belong here. Add an "FX Manager" which keeps track of effects instead */
     DefaultScreenieModel m_defaultScreenieModel;
