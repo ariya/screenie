@@ -50,9 +50,9 @@ public:
      *
      * \param mimeData
      *        the QMimeData to be validated
-     * \parm mode
-     *       in case of Urls defines whether at least one or all Urls
-     *       must be valid
+     * \param mode
+     *        in case of Urls defines whether at least one or all Urls
+     *        must be valid
      * \return \c true, if the \p mimeData contains either an image or
      *          valid Urls according to \p mode
      */

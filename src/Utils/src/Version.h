@@ -29,7 +29,11 @@
 class VersionPrivate;
 
 /*!
- * Application version: [major].[minor].[subminor]
+ * The default constructor creates an instance which represents the current \em application version.
+ * Other constructors exist to construct \em document versions, for example, which can be compared against
+ * the \em application version.
+ *
+ * The version string has the form "[major].[minor].[subminor]", for example "1.2.3".
  */
 class Version
 {
@@ -53,10 +57,12 @@ public:
     UTILS_API Version(int major, int minor, int subMinor);
 
     /*!
-     * Creates this Version by parsing the \p version string value.
+     * Creates this Version by parsing the \p version string value. This
+     * Version can then be compared against the application version, for example.
      *
      * \param version
      *        a QString containing the version of the expected [major].[minor].[subminor]
+     * \sa #operator<
      */
     UTILS_API Version(const QString &version);
     UTILS_API ~Version();
@@ -66,26 +72,28 @@ public:
      *
      * \return the major version number
      */
-    UTILS_API static int getMajor();
+    UTILS_API int getMajor();
 
     /*!
      * Returns the minor version number.
      *
      * \return the minor version number
      */
-    UTILS_API static int getMinor();
+    UTILS_API int getMinor();
 
     /*!
      * Returns the subminor version number.
      *
      * \return the subminor version number
      */
-    UTILS_API static int getSubMinor();
+    UTILS_API int getSubminor();
 
     /*!
-     * Returns a user-friendly version string.
+     * Returns a string representation of the form "[major].[minor].[subminor]" of this Version
+     * which can be used to construct another Version instance.
      *
      * \return a QString containing a user-friendly version value
+     * \sa Version(const QString &)
      */
     UTILS_API QString toString();
 
