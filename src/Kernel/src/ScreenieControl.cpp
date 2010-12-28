@@ -148,10 +148,12 @@ void ScreenieControl::addImage(QString filePath, QPointF centerPosition)
 
 void ScreenieControl::addImages(QStringList filePaths, QPointF centerPosition)
 {
+    QPointF position = centerPosition;
     foreach (QString filePath, filePaths) {
         ScreenieModelInterface *screenieModel = new ScreenieFilePathModel(filePath);
         applyDefaultValues(*screenieModel);
-        QPointF itemPosition = calculateItemPosition(*screenieModel, centerPosition);
+        QPointF itemPosition = calculateItemPosition(*screenieModel, position);
+        position += QPointF(20.0, 20.0);
         screenieModel->setPosition(itemPosition);
         d->screenieScene.addModel(screenieModel);
     }
@@ -166,10 +168,12 @@ void ScreenieControl::addImage(QPixmap pixmap, QPointF centerPosition)
 
 void ScreenieControl::addImages(QList<QPixmap> pixmaps, QPointF centerPosition)
 {
+    QPointF position = centerPosition;
     foreach (QPixmap pixmap, pixmaps) {
         ScreeniePixmapModel *screenieModel = new ScreeniePixmapModel(pixmap);
         applyDefaultValues(*screenieModel);
-        QPointF itemPosition = calculateItemPosition(*screenieModel, centerPosition);
+        QPointF itemPosition = calculateItemPosition(*screenieModel, position);
+        position += QPointF(20.0, 20.0);
         screenieModel->setPosition(itemPosition);
         d->screenieScene.addModel(screenieModel);
     }
