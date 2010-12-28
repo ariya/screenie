@@ -90,6 +90,13 @@ public:
      */
     MODEL_API void setBackgroundColor(QColor colour);
 
+    /*!
+     * Returns whether this ScreenieScene has any template models.
+     *
+     * \sa ScreenieModelInterface#isTemplate
+     */
+    MODEL_API bool hasTemplates() const;
+
 signals:
     /*!
      * Emitted whenever this ScreenieScene or one of the instances of the ScreenieModelInterface has changed.
@@ -115,10 +122,11 @@ signals:
      * \c deleted right after the signal has been emitted, so don't store and re-use the reference later on.
      *
      * This signal is emitted <em>in addition</em> to the #changed() signal.
+     *
      * Connect to this signal in order to remove the corresponding view items from the view, which refer to this
      * \p screenieModel, for example.
      */
-    void modelRemoved(const ScreenieModelInterface &screenieModel);
+    void modelRemoved(ScreenieModelInterface &screenieModel);
     void backgroundChanged();
     void distanceChanged();
     void selectionChanged();

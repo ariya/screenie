@@ -71,6 +71,11 @@ ScreenieModelInterface *ScreeniePixmapModel::copy() const
     return result;
 }
 
+bool ScreeniePixmapModel::isTemplate() const
+{
+    return false;
+}
+
 void ScreeniePixmapModel::setPixmap(QPixmap pixmap)
 {
     if (d->pixmap.cacheKey() != pixmap.cacheKey()) {

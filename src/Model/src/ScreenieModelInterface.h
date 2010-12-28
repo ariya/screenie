@@ -130,6 +130,8 @@ public:
     virtual void setSelected(bool enable) = 0;
     virtual bool isSelected() const = 0;
 
+    virtual bool isTemplate() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();

@@ -90,10 +90,10 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
             }
         }
         if (pixmaps.size() > 0) {
-            emit pixmapsAdded(pixmaps, event->scenePos());
+            emit pixmapsDropped(pixmaps, event->scenePos());
         }
         if (filePaths.size() > 0) {
-            emit filePathsAdded(filePaths, event->scenePos());
+            emit filePathsDropped(filePaths, event->scenePos());
         }
         event->accept();
     } else {

@@ -48,8 +48,8 @@ public:
     KERNEL_API virtual ~ScreenieGraphicsScene();
 
 signals:
-    void pixmapsAdded(QList<QPixmap> pixmaps, QPointF position);
-    void filePathsAdded(QStringList filePaths, QPointF position);
+    void pixmapsDropped(QList<QPixmap> pixmaps, QPointF position);
+    void filePathsDropped(QStringList filePaths, QPointF position);
     void rotate(int angle);
     void addDistance(int distance);
     void translate(qreal x, qreal y);

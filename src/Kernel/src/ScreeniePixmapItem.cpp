@@ -26,6 +26,7 @@
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QPainter>
 
 
 #include "../../../Utils/src/PaintTools.h"
@@ -126,6 +127,12 @@ QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVarian
         m_screenieModel.setSelected(value.toBool());
     }
     return QGraphicsPixmapItem::itemChange(change, value);
+}
+
+void ScreeniePixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    // painter->setCompositionMode(QPainter::RasterOp_SourceAndDestination);
+    QGraphicsPixmapItem::paint(painter, option, widget);
 }
 
 // private

@@ -54,8 +54,8 @@ public:
 
     virtual const QPixmap &readPixmap() const;
     virtual QSize getSize() const;
-
     virtual ScreenieModelInterface *copy() const;
+    virtual bool isTemplate() const;
 
     QPixmap getPixmap() const;
     void setPixmap(QPixmap pixmap);

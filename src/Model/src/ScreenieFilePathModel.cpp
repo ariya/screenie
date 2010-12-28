@@ -101,6 +101,11 @@ ScreenieModelInterface *ScreenieFilePathModel::copy() const
     return result;
 }
 
+bool ScreenieFilePathModel::isTemplate() const
+{
+    return false;
+}
+
 void ScreenieFilePathModel::setFilePath(const QString &filePath)
 {
     if (d->filePath != filePath) {

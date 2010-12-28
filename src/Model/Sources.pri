@@ -4,14 +4,14 @@ DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/src/Dao/Xml \
               $$PWD/src
 
-HEADERS += $$PWD/src/AbstractScreenieModel.h \
+HEADERS += $$PWD/src/ModelLib.h \
+           $$PWD/src/AbstractScreenieModel.h \
            $$PWD/src/DefaultScreenieModel.h \
            $$PWD/src/ScreenieFilePathModel.h \
            $$PWD/src/ScreenieModelInterface.h \
            $$PWD/src/ScreeniePixmapModel.h \
            $$PWD/src/ScreenieTemplateModel.h \
            $$PWD/src/ScreenieScene.h \
-           $$PWD/src/ModelLib.h \
            $$PWD/src/Dao/ScreenieSceneDao.h \
            $$PWD/src/Dao/ScreenieFilePathModelDao.h \
            $$PWD/src/Dao/ScreeniePixmapModelDao.h \

@@ -31,6 +31,8 @@
 #include <QtGui/QColor>
 #include <QtGui/QPixmap>
 
+class QPixmap;
+class QString;
 class QStringList;
 class QMimeData;
 
@@ -40,6 +42,7 @@ class ScreenieGraphicsScene;
 class ScreeniePixmapItem;
 class ScreenieTemplateModel;
 class Reflection;
+class ScreenieControlPrivate;
 
 #include "../../Model/src/DefaultScreenieModel.h"
 #include "KernelLib.h"
@@ -50,7 +53,6 @@ class Reflection;
 class ScreenieControl : public QObject
 {
     Q_OBJECT
-
 public:
     /*!
      * Defines the QGraphicsView render quality.
@@ -102,12 +104,7 @@ public slots:
     KERNEL_API void setBlueBackgroundComponent(int blue);
 
 private:
-    ScreenieScene &m_screenieScene;
-    ScreenieGraphicsScene &m_screenieGraphicsScene;
-    QBrush m_checkerBoardBrush;
-    QTimer m_qualityTimer;
-    Reflection *m_reflection; /*! \todo The Reflection effect does not belong here. Add an "FX Manager" which keeps track of effects instead */
-    DefaultScreenieModel m_defaultScreenieModel;
+    ScreenieControlPrivate *d;
 
     void frenchConnection();
 
@@ -119,13 +116,15 @@ private:
     QPixmap scaleToTemplate(const ScreenieTemplateModel &templateModel, const QPixmap &pixmap);
     QPointF calculateItemPosition(const QPointF &sourcePosition, const QSize &sourceSize, const QSize &targetSize);
 
-    void updatePixmapModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
-    void updateFilePathModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+    void updatePixmapModel(const QPixmap &pixmap, ScreenieModelInterface &screenieModel);
+    void updateFilePathModel(const QString &filePath, ScreenieModelInterface &screenieModel);
 
 private slots:
+    void handleFilePathsDrop(QStringList filePaths, QPointF centerPosition);
+    void handlePixmapsDrop(QList<QPixmap> pixmaps, QPointF centerPosition);
     void handleDistanceChanged();
     void handleModelAdded(ScreenieModelInterface &screenieModel);
-    void handleModelRemoved(const ScreenieModelInterface &screenieModel);
+    void handleModelRemoved(ScreenieModelInterface &screenieModel);
     void handleBackgroundChanged();
     void restoreRenderQuality();
 };

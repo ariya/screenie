@@ -43,6 +43,7 @@
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../../../Model/src/ScreeniePixmapModel.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
+#include "TemplateOrganizer.h"
 #include "Reflection.h"
 #include "ScreenieGraphicsScene.h"
 #include "ScreeniePixmapItem.h"
@@ -51,35 +52,57 @@
 
 namespace
 {
-    bool zSort(ScreeniePixmapItem *item1, ScreeniePixmapItem *item2)
+    bool zSort(const ScreeniePixmapItem *item1, const ScreeniePixmapItem *item2)
     {
         // closer items come first in the sorted list
         return item1->getScreenieModel().getDistance() > item2->getScreenieModel().getDistance();
     }
 }; // anonymous
 
+class ScreenieControlPrivate
+{
+public:
+    ScreenieControlPrivate(ScreenieScene &theScreenieScene, ScreenieGraphicsScene &theScreenieGraphicsScene)
+        : screenieScene(theScreenieScene),
+          screenieGraphicsScene(theScreenieGraphicsScene),
+          reflection(new Reflection()),
+          templateOrganizer(theScreenieScene)
+    {}
+
+    ~ScreenieControlPrivate()
+    {
+        delete reflection;
+    }
+
+    ScreenieScene &screenieScene;
+    ScreenieGraphicsScene &screenieGraphicsScene;
+    QBrush checkerBoardBrush;
+    QTimer qualityTimer;
+    Reflection *reflection; /*! \todo The Reflection effect does not belong here. Add an "FX Manager" which keeps track of effects instead */
+    DefaultScreenieModel defaultScreenieModel;
+    TemplateOrganizer templateOrganizer;
+};
+
 // public
 
 ScreenieControl::ScreenieControl(ScreenieScene &screenieScene, ScreenieGraphicsScene &screenieGraphicsScene)
     : QObject(),
-      m_screenieScene(screenieScene),
-      m_screenieGraphicsScene(screenieGraphicsScene),
-      m_reflection(new Reflection())
+      d(new ScreenieControlPrivate(screenieScene, screenieGraphicsScene))
 {
-    m_qualityTimer.setSingleShot(true);
-    m_qualityTimer.setInterval(300);
+    d->qualityTimer.setSingleShot(true);
+    d->qualityTimer.setInterval(300);
     frenchConnection();
 }
 
 ScreenieControl::~ScreenieControl()
 {
-    delete m_reflection;
+    delete d;
 }
 
 QList<ScreenieModelInterface *> ScreenieControl::getSelectedScreenieModels() const
 {
     QList<ScreenieModelInterface *> result;
-    foreach (QGraphicsItem *selectedItem, m_screenieGraphicsScene.selectedItems()) {
+    foreach (QGraphicsItem *selectedItem, d->screenieGraphicsScene.selectedItems()) {
         if (selectedItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(selectedItem);
             result.append(&screeniePixmapItem->getScreenieModel());
@@ -90,26 +113,29 @@ QList<ScreenieModelInterface *> ScreenieControl::getSelectedScreenieModels() con
 
 DefaultScreenieModel &ScreenieControl::getDefaultScreenieModel()
 {
-    return m_defaultScreenieModel;
+    return d->defaultScreenieModel;
 }
 
 void ScreenieControl::updateModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel)
 {
     // prefer image data over file paths (URLs)
     if (mimeData->hasImage()) {
-        updatePixmapModel(mimeData, screenieModel);
+        /*!\todo Convert to QImage instead, as not to loose any information (on screens with fewer capabilities!) */
+        QPixmap pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
+        updatePixmapModel(pixmap, screenieModel);
     } else {
-        updateFilePathModel(mimeData, screenieModel);
+        QString filePath = mimeData->urls().first().toLocalFile();
+        updateFilePathModel(filePath, screenieModel);
     }
 }
 
 ScreenieScene &ScreenieControl::getScreenieScene() const
 {
-    return m_screenieScene;
+    return d->screenieScene;
 }
 ScreenieGraphicsScene &ScreenieControl::getScreenieGraphicsScene() const
 {
-    return m_screenieGraphicsScene;
+    return d->screenieGraphicsScene;
 }
 
 // public slots
@@ -127,7 +153,7 @@ void ScreenieControl::addImages(QStringList filePaths, QPointF centerPosition)
         applyDefaultValues(*screenieModel);
         QPointF itemPosition = calculateItemPosition(*screenieModel, centerPosition);
         screenieModel->setPosition(itemPosition);
-        m_screenieScene.addModel(screenieModel);
+        d->screenieScene.addModel(screenieModel);
     }
 }
 
@@ -145,7 +171,7 @@ void ScreenieControl::addImages(QList<QPixmap> pixmaps, QPointF centerPosition)
         applyDefaultValues(*screenieModel);
         QPointF itemPosition = calculateItemPosition(*screenieModel, centerPosition);
         screenieModel->setPosition(itemPosition);
-        m_screenieScene.addModel(screenieModel);
+        d->screenieScene.addModel(screenieModel);
     }
 }
 
@@ -156,7 +182,7 @@ void ScreenieControl::addTemplate(QPointF centerPosition)
     ScreenieTemplateModel *screenieModel = new ScreenieTemplateModel(size);
     applyDefaultValues(*screenieModel);
     screenieModel->setPosition(centerPosition);
-    m_screenieScene.addModel(screenieModel);
+    d->screenieScene.addModel(screenieModel);
 }
 
 void ScreenieControl::removeAll()
@@ -164,14 +190,14 @@ void ScreenieControl::removeAll()
     setRenderQuality(Low);
     QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
-        m_screenieScene.removeModel(screenieModel);
+        d->screenieScene.removeModel(screenieModel);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::selectAll()
 {
-    foreach(QGraphicsItem *item, m_screenieGraphicsScene.items()) {
+    foreach(QGraphicsItem *item, d->screenieGraphicsScene.items()) {
         item->setSelected(true);
     }
 }
@@ -181,7 +207,7 @@ void ScreenieControl::translate(qreal dx, qreal dy)
     bool decreaseQuality = dx != 0.0 && dy != 0.0;
     if (decreaseQuality) {
         setRenderQuality(Low);
-        m_qualityTimer.start();
+        d->qualityTimer.start();
     }
     QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
@@ -197,7 +223,7 @@ void ScreenieControl::setRotation(int angle)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setRotation(angle);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::rotate(int angle)
@@ -207,7 +233,7 @@ void ScreenieControl::rotate(int angle)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->rotate(angle);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::setDistance(int distance)
@@ -217,7 +243,7 @@ void ScreenieControl::setDistance(int distance)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setDistance(distance);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::addDistance(int distance)
@@ -227,7 +253,7 @@ void ScreenieControl::addDistance(int distance)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addDistance(distance);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::setReflectionEnabled(bool enable)
@@ -237,7 +263,7 @@ void ScreenieControl::setReflectionEnabled(bool enable)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionEnabled(enable);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::setReflectionOffset(int reflectionOffset)
@@ -247,7 +273,7 @@ void ScreenieControl::setReflectionOffset(int reflectionOffset)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOffset(reflectionOffset);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::addReflectionOffset(int reflectionOffset)
@@ -257,7 +283,7 @@ void ScreenieControl::addReflectionOffset(int reflectionOffset)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOffset(reflectionOffset);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::setReflectionOpacity(int reflectionOpacity)
@@ -267,7 +293,7 @@ void ScreenieControl::setReflectionOpacity(int reflectionOpacity)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOpacity(reflectionOpacity);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::addReflectionOpacity(int reflectionOpacity)
@@ -277,72 +303,70 @@ void ScreenieControl::addReflectionOpacity(int reflectionOpacity)
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOpacity(reflectionOpacity);
     }
-    m_qualityTimer.start();
+    d->qualityTimer.start();
 }
 
 void ScreenieControl::setBackgroundEnabled(bool enable)
 {
-    m_screenieScene.setBackgroundEnabled(enable);
+    d->screenieScene.setBackgroundEnabled(enable);
 }
 
 void ScreenieControl::setBackgroundColor(QColor color)
 {
-    m_screenieScene.setBackgroundColor(color);
+    d->screenieScene.setBackgroundColor(color);
 }
 
 void ScreenieControl::setRedBackgroundComponent(int red)
 {
-    QColor backgroundColor = m_screenieScene.getBackgroundColor();
+    QColor backgroundColor = d->screenieScene.getBackgroundColor();
     backgroundColor.setRed(red);
-    m_screenieScene.setBackgroundColor(backgroundColor);
+    d->screenieScene.setBackgroundColor(backgroundColor);
 }
 
 void ScreenieControl::setGreenBackgroundComponent(int green)
 {
-    QColor backgroundColor = m_screenieScene.getBackgroundColor();
+    QColor backgroundColor = d->screenieScene.getBackgroundColor();
     backgroundColor.setGreen(green);
-    m_screenieScene.setBackgroundColor(backgroundColor);
+    d->screenieScene.setBackgroundColor(backgroundColor);
 }
 
 void ScreenieControl::setBlueBackgroundComponent(int blue)
 {
-    QColor backgroundColor = m_screenieScene.getBackgroundColor();
+    QColor backgroundColor = d->screenieScene.getBackgroundColor();
     backgroundColor.setBlue(blue);
-    m_screenieScene.setBackgroundColor(backgroundColor);
+    d->screenieScene.setBackgroundColor(backgroundColor);
 }
-
-
 
 // private
 
 void ScreenieControl::frenchConnection()
 {
-    connect(&m_screenieScene, SIGNAL(distanceChanged()),
+    connect(&d->screenieScene, SIGNAL(distanceChanged()),
             this, SLOT(handleDistanceChanged()));
-    connect(&m_screenieScene, SIGNAL(modelAdded(ScreenieModelInterface &)),
+    connect(&d->screenieScene, SIGNAL(modelAdded(ScreenieModelInterface &)),
             this, SLOT(handleModelAdded(ScreenieModelInterface &)));
-    connect(&m_screenieScene, SIGNAL(modelRemoved(const ScreenieModelInterface &)),
-            this, SLOT(handleModelRemoved(const ScreenieModelInterface &)));
-    connect(&m_screenieScene, SIGNAL(backgroundChanged()),
+    connect(&d->screenieScene, SIGNAL(modelRemoved(ScreenieModelInterface &)),
+            this, SLOT(handleModelRemoved(ScreenieModelInterface &)));
+    connect(&d->screenieScene, SIGNAL(backgroundChanged()),
             this, SLOT(handleBackgroundChanged()));
-    connect(&m_screenieGraphicsScene, SIGNAL(pixmapsAdded(QList<QPixmap>, QPointF)),
-            this, SLOT(addImages(QList<QPixmap>, QPointF)));
-    connect(&m_screenieGraphicsScene, SIGNAL(filePathsAdded(QStringList, QPointF)),
-            this, SLOT(addImages(QStringList, QPointF)));
-    connect(&m_screenieGraphicsScene, SIGNAL(rotate(int)),
+    connect(&d->screenieGraphicsScene, SIGNAL(pixmapsDropped(QList<QPixmap>, QPointF)),
+            this, SLOT(handlePixmapsDrop(QList<QPixmap>, QPointF)));
+    connect(&d->screenieGraphicsScene, SIGNAL(filePathsDropped(QStringList, QPointF)),
+            this, SLOT(handleFilePathsDrop(QStringList, QPointF)));
+    connect(&d->screenieGraphicsScene, SIGNAL(rotate(int)),
             this, SLOT(rotate(int)));
-    connect(&m_screenieGraphicsScene, SIGNAL(addDistance(int)),
+    connect(&d->screenieGraphicsScene, SIGNAL(addDistance(int)),
             this, SLOT(addDistance(int)));
-    connect(&m_screenieGraphicsScene, SIGNAL(translate(qreal, qreal)),
+    connect(&d->screenieGraphicsScene, SIGNAL(translate(qreal, qreal)),
             this, SLOT(translate(qreal, qreal)));
-    connect(&m_qualityTimer, SIGNAL(timeout()),
+    connect(&d->qualityTimer, SIGNAL(timeout()),
             this, SLOT(restoreRenderQuality()));
 }
 
 QList<ScreeniePixmapItem *> ScreenieControl::getScreeniePixmapItems() const
 {
     QList<ScreeniePixmapItem *> result;
-    foreach (QGraphicsItem *item, m_screenieGraphicsScene.items()) {
+    foreach (QGraphicsItem *item, d->screenieGraphicsScene.items()) {
         if (item->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(item);
             result.append(screeniePixmapItem);
@@ -359,7 +383,7 @@ void ScreenieControl::setRenderQuality(RenderQuality renderQuality)
         foreach (ScreeniePixmapItem *item, items) {
             item->setTransformationMode(Qt::FastTransformation);
         }
-        foreach (QGraphicsView *view, m_screenieGraphicsScene.views()) {
+        foreach (QGraphicsView *view, d->screenieGraphicsScene.views()) {
             view->setRenderHints(QPainter::NonCosmeticDefaultPen);
         }
         break;
@@ -367,7 +391,7 @@ void ScreenieControl::setRenderQuality(RenderQuality renderQuality)
         foreach (ScreeniePixmapItem *item, items) {
             item->setTransformationMode(Qt::SmoothTransformation);
         }
-        foreach (QGraphicsView *view, m_screenieGraphicsScene.views()) {
+        foreach (QGraphicsView *view, d->screenieGraphicsScene.views()) {
             view->setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
         }
     default:
@@ -377,11 +401,11 @@ void ScreenieControl::setRenderQuality(RenderQuality renderQuality)
 
 void ScreenieControl::applyDefaultValues(ScreenieModelInterface &screenieModelInterface)
 {
-    screenieModelInterface.setDistance(m_defaultScreenieModel.getDistance());
-    screenieModelInterface.setRotation(m_defaultScreenieModel.getRotation());
-    screenieModelInterface.setReflectionEnabled(m_defaultScreenieModel.isReflectionEnabled());
-    screenieModelInterface.setReflectionOffset(m_defaultScreenieModel.getReflectionOffset());
-    screenieModelInterface.setReflectionOpacity(m_defaultScreenieModel.getReflectionOpacity());
+    screenieModelInterface.setDistance(d->defaultScreenieModel.getDistance());
+    screenieModelInterface.setRotation(d->defaultScreenieModel.getRotation());
+    screenieModelInterface.setReflectionEnabled(d->defaultScreenieModel.isReflectionEnabled());
+    screenieModelInterface.setReflectionOffset(d->defaultScreenieModel.getReflectionOffset());
+    screenieModelInterface.setReflectionOpacity(d->defaultScreenieModel.getReflectionOpacity());
 }
 
 QPointF ScreenieControl::calculateItemPosition(const ScreenieModelInterface &screenieModel, const QPointF &centerPosition)
@@ -415,34 +439,32 @@ QPointF ScreenieControl::calculateItemPosition(const QPointF &sourcePosition, co
     return result;
 }
 
-void ScreenieControl::updatePixmapModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel)
+void ScreenieControl::updatePixmapModel(const QPixmap &pixmap, ScreenieModelInterface &screenieModel)
 {
-    QPixmap pixmap;
-    pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
-    if (!pixmap.isNull()) {
+    QPixmap actualPixmap = pixmap;
+    if (!actualPixmap.isNull()) {
         if (screenieModel.inherits(ScreeniePixmapModel::staticMetaObject.className())) {
             ScreeniePixmapModel &screeniePixmapModel = static_cast<ScreeniePixmapModel &>(screenieModel);
-            QPointF itemPosition = calculateItemPosition(screeniePixmapModel.getPosition(), screeniePixmapModel.getSize(), pixmap.size());
-            screeniePixmapModel.setPixmap(pixmap);
+            QPointF itemPosition = calculateItemPosition(screeniePixmapModel.getPosition(), screeniePixmapModel.getSize(), actualPixmap.size());
+            screeniePixmapModel.setPixmap(actualPixmap);
             screeniePixmapModel.setPosition(itemPosition);
         } else {
             // convert to ScreeniePixmapModel
             if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-                pixmap = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), pixmap);
+                actualPixmap = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), actualPixmap);
             }
-            ScreeniePixmapModel *screeniePixmapModel = new ScreeniePixmapModel(pixmap);
-            QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), pixmap.size());
+            ScreeniePixmapModel *screeniePixmapModel = new ScreeniePixmapModel(actualPixmap);
+            QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), actualPixmap.size());
             screeniePixmapModel->convert(screenieModel);
             screeniePixmapModel->setPosition(itemPosition);
-            m_screenieScene.removeModel(&screenieModel);
-            m_screenieScene.addModel(screeniePixmapModel);
+            d->screenieScene.removeModel(&screenieModel);
+            d->screenieScene.addModel(screeniePixmapModel);
         }
     }
 }
 
-void ScreenieControl::updateFilePathModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel)
+void ScreenieControl::updateFilePathModel(const QString &filePath, ScreenieModelInterface &screenieModel)
 {
-    QString filePath = mimeData->urls().first().toLocalFile();
     if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
         ScreenieFilePathModel &filePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
         QSize oldSize = filePathModel.getSize();
@@ -462,23 +484,63 @@ void ScreenieControl::updateFilePathModel(const QMimeData *mimeData, ScreenieMod
         QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), size);
         screenieFilePathModel->convert(screenieModel);
         screenieFilePathModel->setPosition(itemPosition);
-        m_screenieScene.removeModel(&screenieModel);
-        m_screenieScene.addModel(screenieFilePathModel);
+        d->screenieScene.removeModel(&screenieModel);
+        d->screenieScene.addModel(screenieFilePathModel);
     }
 }
 
 // private slots
 
+void ScreenieControl::handleFilePathsDrop(QStringList filePaths, QPointF centerPosition)
+{
+    ScreenieTemplateModel *templateModel;
+    if (!d->screenieScene.hasTemplates()) {
+        addImages(filePaths, centerPosition);
+    } else {
+        QList<ScreenieTemplateModel *> templateModels = d->templateOrganizer.getOrderedTemplates();
+        int i = 0;
+        int n = filePaths.count();
+        QList<ScreenieTemplateModel *>::const_iterator it = templateModels.constBegin();
+        while (i < n && it != templateModels.constEnd()) {
+            templateModel = *it;
+            QString filePath = filePaths.at(i);
+            updateFilePathModel(filePath, *templateModel);
+            i++;
+            it++;
+        }
+    }
+}
+
+void ScreenieControl::handlePixmapsDrop(QList<QPixmap> pixmaps, QPointF centerPosition)
+{
+    ScreenieTemplateModel *templateModel;
+    if (!d->screenieScene.hasTemplates()) {
+        addImages(pixmaps, centerPosition);
+    } else {
+        QList<ScreenieTemplateModel *> templateModels = d->templateOrganizer.getOrderedTemplates();
+        int i = 0;
+        int n = pixmaps.count();
+        QList<ScreenieTemplateModel *>::const_iterator it = templateModels.constBegin();
+        while (i < n && it != templateModels.constEnd()) {
+            templateModel = *it;
+            QPixmap pixmap = pixmaps.at(i);
+            updatePixmapModel(pixmap, *templateModel);
+            i++;
+            it++;
+        }
+    }
+}
+
 void ScreenieControl::handleDistanceChanged()
 {
     QList<ScreeniePixmapItem *> screeniePixmapItems;
-    foreach (QGraphicsItem *graphicsItem, m_screenieGraphicsScene.items()) {
+    foreach (QGraphicsItem *graphicsItem, d->screenieGraphicsScene.items()) {
         if (graphicsItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(graphicsItem);
             screeniePixmapItems.append(screeniePixmapItem);
         }
     }
-    qSort(screeniePixmapItems.begin(), screeniePixmapItems.end(), zSort);
+    ::qSort(screeniePixmapItems.begin(), screeniePixmapItems.end(), zSort);
     int z = 0;
     foreach (QGraphicsItem *graphicsItem, screeniePixmapItems) {
         graphicsItem->setZValue(z++);
@@ -487,21 +549,21 @@ void ScreenieControl::handleDistanceChanged()
 
 void ScreenieControl::handleModelAdded(ScreenieModelInterface &screenieModel)
 {
-    ScreeniePixmapItem *screeniePixmapItem = new ScreeniePixmapItem(screenieModel, *this, *m_reflection);
+    ScreeniePixmapItem *screeniePixmapItem = new ScreeniePixmapItem(screenieModel, *this, *d->reflection);
     screeniePixmapItem->setPos(screenieModel.getPosition());
-    m_screenieGraphicsScene.clearSelection();
+    d->screenieGraphicsScene.clearSelection();
     screeniePixmapItem->setSelected(true);
-    m_screenieGraphicsScene.addItem(screeniePixmapItem);
+    d->screenieGraphicsScene.addItem(screeniePixmapItem);
     handleDistanceChanged();
 }
 
-void ScreenieControl::handleModelRemoved(const ScreenieModelInterface &screenieModel)
+void ScreenieControl::handleModelRemoved(ScreenieModelInterface &screenieModel)
 {
-    foreach (QGraphicsItem *graphicsItem, m_screenieGraphicsScene.items()) {
+    foreach (QGraphicsItem *graphicsItem, d->screenieGraphicsScene.items()) {
         if (graphicsItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(graphicsItem);
             if (&screenieModel == &screeniePixmapItem->getScreenieModel()) {
-                m_screenieGraphicsScene.removeItem(screeniePixmapItem);
+                d->screenieGraphicsScene.removeItem(screeniePixmapItem);
                 delete screeniePixmapItem;
                 break;
             }
@@ -512,16 +574,16 @@ void ScreenieControl::handleModelRemoved(const ScreenieModelInterface &screenieM
 void ScreenieControl::handleBackgroundChanged()
 {
     QBrush backgroundBrush;
-    if (m_screenieScene.isBackgroundEnabled()) {
-        QColor backgroundColor = m_screenieScene.getBackgroundColor();
+    if (d->screenieScene.isBackgroundEnabled()) {
+        QColor backgroundColor = d->screenieScene.getBackgroundColor();
         backgroundBrush = QBrush(backgroundColor);
     } else {
-        if (m_checkerBoardBrush.style() == Qt::NoBrush) {
-            m_checkerBoardBrush = PaintTools::createCheckerPattern();
+        if (d->checkerBoardBrush.style() == Qt::NoBrush) {
+            d->checkerBoardBrush = PaintTools::createCheckerPattern();
         }
-        backgroundBrush = m_checkerBoardBrush;
+        backgroundBrush = d->checkerBoardBrush;
     }
-    m_screenieGraphicsScene.setBackgroundBrush(backgroundBrush);
+    d->screenieGraphicsScene.setBackgroundBrush(backgroundBrush);
 }
 
 void ScreenieControl::restoreRenderQuality()

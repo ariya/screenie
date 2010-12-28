@@ -147,3 +147,15 @@ void ScreenieScene::setBackgroundColor(QColor color) {
     }
 }
 
+bool ScreenieScene::hasTemplates() const
+{
+    bool result = false;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (screenieModel->isTemplate()) {
+            result = true;
+            break;
+        }
+    }
+    return result;
+}
+
