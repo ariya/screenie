@@ -114,7 +114,7 @@ void ScreenieScene::setBackgroundEnabled(bool enable) {
 }
 
 QColor ScreenieScene::getBackgroundColor() const {
-    return d->backgroundColor;
+     return d->backgroundColor;
 }
 
 void ScreenieScene::setBackgroundColor(QColor color) {

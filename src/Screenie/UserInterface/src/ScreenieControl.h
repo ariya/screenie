@@ -43,7 +43,7 @@ class Reflection;
 #include "../../../Model/src/DefaultScreenieModel.h"
 
 /*!
- * This is the controller of the ScreenieScene (model): it modifies the <em>selected</em> ScreenieModelInterface.
+ * This is the controller of the ScreenieScene (model): it modifies the \em selected ScreenieModelInterface.
  */
 class ScreenieControl : public QObject
 {
@@ -67,6 +67,11 @@ public:
     DefaultScreenieModel &getDefaultScreenieModel();
 
     void updateData(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+
+    /*!
+     * Updates the QGraphicsView with the ScreenieScene. The QGraphicsView is first cleared.
+     */
+    void updateScene();
 
 public slots:
     void addImage(QString filePath, QPointF position);

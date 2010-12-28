@@ -63,6 +63,9 @@ private:
     void updateColorUi();
     void initializeUi();
 
+    void createScene();
+    void updateScene(ScreenieScene *screenieScene);
+
 private slots:
     void on_openAction_triggered();
     void on_saveAsAction_triggered();

@@ -20,4 +20,4 @@
 
 #include "ScreenieModelInterface.h"
 
-const int ScreenieModelInterface::MaxDistance = 200;
+const qreal ScreenieModelInterface::MaxDistance = 200.0;

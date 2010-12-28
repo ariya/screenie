@@ -39,6 +39,7 @@ class XmlScreenieSceneDaoPrivate;
 class XmlScreenieSceneDao : public ScreenieSceneDao
 {
 public:
+    /*!\todo Use a QIODevice instead of filePath */
     MODEL_API explicit XmlScreenieSceneDao(const QString &filePath);
     MODEL_API virtual ~XmlScreenieSceneDao();
 
@@ -54,6 +55,8 @@ private:
     bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
 
     ScreenieScene *readScreenieScene() const;
+    ScreenieFilePathModel *readFilePathModel() const;
+    ScreeniePixmapModel *readPixmapModel() const;
 
     void cleanUp() const;
 };

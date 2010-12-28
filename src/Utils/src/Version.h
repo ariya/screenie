@@ -37,21 +37,21 @@ public:
      *
      * \return the major version number
      */
-    UTILS_API static int getMajor();
+    UTILS_API int getMajor();
 
     /*!
      * Returns the minor version number.
      *
      * \return the minor version number
      */
-    UTILS_API static int getMinor();
+    UTILS_API int getMinor();
 
     /*!
      * Returns the subminor version number.
      *
      * \return the subminor version number
      */
-    UTILS_API static int getSubMinor();
+    UTILS_API int getSubMinor();
 
     /*!
      * A cool code name - every application needs this ;)
@@ -72,7 +72,7 @@ public:
      *
      * \return a QString containing a user-friendly version value
      */
-    UTILS_API static QString toString();
+    UTILS_API QString toString();
 };
 
 #endif // VERSION_H

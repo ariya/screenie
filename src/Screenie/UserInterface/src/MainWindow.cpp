@@ -64,8 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
-    m_screenieScene = new ScreenieScene();
-    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    createScene();
     initializeUi();
     updateUi();
     setUnifiedTitleAndToolBarOnMac(true);
@@ -98,11 +97,10 @@ bool MainWindow::read(const QString &filePath)
 {
     bool result;
     ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    ScreenieScene *test = screenieSceneDao->read();
-    /*!\todo Implement this */
-    if (test != 0) {
+    ScreenieScene *screenieScene = screenieSceneDao->read();
+    if (screenieScene != 0) {
+        updateScene(screenieScene);
         result = true;
-        delete test;
     } else {
         result = false;
     }
@@ -192,6 +190,25 @@ void MainWindow::initializeUi()
     ui->reflectionGroupBox->setChecked(defaultScreenieModel.isReflectionEnabled());
     ui->reflectionOffsetSlider->setValue(defaultScreenieModel.getReflectionOffset());
     ui->reflectionOpacitySlider->setValue(defaultScreenieModel.getReflectionOpacity());
+}
+
+void MainWindow::createScene()
+{
+    m_screenieScene = new ScreenieScene();
+    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+}
+
+void MainWindow::updateScene(ScreenieScene *screenieScene)
+{
+    delete m_screenieScene;
+    delete m_screenieControl;
+    m_screenieScene = screenieScene;
+
+    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    m_screenieControl->updateScene();
+    updateUi();
+    connect(m_screenieScene, SIGNAL(changed()),
+            this, SLOT(updateUi()));
 }
 
 // private slots

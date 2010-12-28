@@ -34,7 +34,7 @@ class DefaultScreenieModelPrivate;
 class DefaultScreenieModel
 {
 public:
-    static const int Distance;
+    static const qreal Distance;
     static const int Rotation;
     static const bool ReflectionEnabled;
     static const int ReflectionOffset;
@@ -43,8 +43,8 @@ public:
     MODEL_API DefaultScreenieModel();
     MODEL_API ~DefaultScreenieModel();
 
-    MODEL_API int getDistance() const;
-    MODEL_API void setDistance(int distance);
+    MODEL_API qreal getDistance() const;
+    MODEL_API void setDistance(qreal distance);
 
     MODEL_API int getRotation() const;
     MODEL_API void setRotation(int rotation);

@@ -20,8 +20,10 @@
 
 #include <QtCore/QString>
 #include <QtCore/QBuffer>
+#include <QtCore/QFile>
 #include <QtCore/QByteArray>
-#include <QtXml/QXmlStreamWriter>
+#include <QtCore/QXmlStreamWriter>
+#include <QtGui/QPixmap>
 
 #include "../../ScreeniePixmapModel.h"
 #include "XmlScreeniePixmapModelDao.h"
@@ -29,15 +31,22 @@
 class XmlScreeniePixmapModelDaoPrivate
 {
 public:
-    const ScreeniePixmapModel *screeniePixmapModel;
+    const ScreeniePixmapModel *writeModel;
+    ScreeniePixmapModel *readModel;
 };
 
 //  public
 
-XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamWriter &streamWriter)
-    : AbstractXmlScreenieModelDao(streamWriter)
+XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamWriter *xmlStreamWriter)
+    : AbstractXmlScreenieModelDao(xmlStreamWriter),
+      d(new XmlScreeniePixmapModelDaoPrivate())
 {
-    d = new XmlScreeniePixmapModelDaoPrivate();
+}
+
+XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamReader *xmlStreamReader)
+    : AbstractXmlScreenieModelDao(xmlStreamReader),
+      d(new XmlScreeniePixmapModelDaoPrivate())
+{
 }
 
 XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao(){
@@ -47,14 +56,16 @@ XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao(){
 bool XmlScreeniePixmapModelDao::write(const ScreeniePixmapModel &screeniePixmapModel)
 {
     bool result;
-    d->screeniePixmapModel = &screeniePixmapModel;
-    result = AbstractXmlScreenieModelDao::writeCommon(screeniePixmapModel);
+    d->writeModel = &screeniePixmapModel;
+    result = AbstractXmlScreenieModelDao::write(screeniePixmapModel);
     return result;
 }
 
 ScreeniePixmapModel *XmlScreeniePixmapModelDao::read()
 {
-    ScreeniePixmapModel *result = 0;
+    ScreeniePixmapModel *result = new ScreeniePixmapModel();
+    d->readModel = result;
+    AbstractXmlScreenieModelDao::read(*result);
     return result;
 }
 
@@ -63,24 +74,49 @@ ScreeniePixmapModel *XmlScreeniePixmapModelDao::read()
 bool XmlScreeniePixmapModelDao::writeSpecific()
 {
     bool result = true;
-    getStreamWriter().writeStartElement("img");
+    QXmlStreamWriter *streamWriter = getStreamWriter();
+    streamWriter->writeStartElement("img");
     {
         QBuffer buffer;
         buffer.open(QIODevice::WriteOnly);
-        d->screeniePixmapModel->getPixmap().save(&buffer, "PNG");
+        d->writeModel->getPixmap().save(&buffer, "PNG");
         buffer.close();
         QByteArray byteArray = buffer.buffer();
         QString data = QString(byteArray.toBase64());
-        getStreamWriter().writeCDATA(data);
+        streamWriter->writeCDATA(data);
     }
-    getStreamWriter().writeEndElement();
+    streamWriter->writeEndElement();
     return result;
 }
 
 bool XmlScreeniePixmapModelDao::readSpecific()
 {
-    bool result;
-    result = false;
+    bool result = true;
+    QXmlStreamReader *streamReader = getStreamReader();
+    streamReader->readNextStartElement();
+#ifdef DEBUG
+    qDebug("XmlScreeniePixmapModelDao::readSpecific: name: %s", qPrintable(streamReader->name().toString()));
+#endif
+    QString data = streamReader->readElementText();
+
+    if (!data.isEmpty()) {
+        QByteArray str;
+        str.append(data);
+        QByteArray png = QByteArray::fromBase64(str);
+
+        QPixmap pixmap;
+        result = pixmap.loadFromData(png, "PNG");
+#ifdef DEBUG
+        qDebug("Trying to read: %d data: %s", result, qPrintable(QString(str).left(20)));
+#endif
+        if (result && !pixmap.isNull()) {
+            d->readModel->setPixmap(pixmap);
+        } else {
+            result = false;
+        }
+    } else {
+        result = false;
+    }
     return result;
 }
 

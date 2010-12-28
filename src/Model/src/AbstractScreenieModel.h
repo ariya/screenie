@@ -39,9 +39,9 @@ public:
     virtual QPointF getPosition() const;
     virtual void setPosition(QPointF position);
 
-    virtual int getDistance() const;
-    virtual void setDistance(int distance);
-    virtual void addDistance(int distance);
+    virtual qreal getDistance() const;
+    virtual void setDistance(qreal distance);
+    virtual void addDistance(qreal distance);
 
     virtual int getRotation() const;
     virtual void setRotation(int angle);

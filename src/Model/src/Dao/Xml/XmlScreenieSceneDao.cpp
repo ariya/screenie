@@ -21,8 +21,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QString>
 #include <QtCore/QStringRef>
-#include <QtXml/QXmlStreamWriter>
-#include <QtXml/QXmlStreamReader>
+#include <QtCore/QXmlStreamWriter>
+#include <QtCore/QXmlStreamReader>
+#include <QtGui/QColor>
 
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
@@ -38,8 +39,8 @@
 class XmlScreenieSceneDaoPrivate
 {
 public:
-    XmlScreenieSceneDaoPrivate(const QString &path)
-        : filePath(path),
+    XmlScreenieSceneDaoPrivate(const QString &filePath)
+        : file(filePath),
           version("1.0"),
           streamWriter(0),
           streamReader(0),
@@ -47,8 +48,7 @@ public:
           screeniePixmapModelDao(0)
     {
     }
-
-    QString filePath;
+    QFile file;
     QString version;
     QXmlStreamWriter *streamWriter;
     QXmlStreamReader *streamReader;
@@ -70,15 +70,14 @@ XmlScreenieSceneDao::~XmlScreenieSceneDao()
 bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
 {
     bool result;
-    QFile file(d->filePath);
-    if (file.open(QIODevice::WriteOnly)) {
-        d->streamWriter = new QXmlStreamWriter(&file);
+    if (d->file.open(QIODevice::WriteOnly)) {
+        d->streamWriter = new QXmlStreamWriter(&d->file);
         d->streamWriter->setAutoFormatting(true);
         d->streamWriter->writeStartDocument();
         result = writeScreenieScene(screenieScene);
         d->streamWriter->writeEndDocument();
-        file.close();
-        result = result && QFile::NoError == file.error();
+        d->file.close();
+        result = result && QFile::NoError == d->file.error();
     } else {
         result = false;
     }
@@ -88,45 +87,26 @@ bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
 
 ScreenieScene *XmlScreenieSceneDao::read() const
 {
-    ScreenieScene *result;
-    QFile file(d->filePath);
-    if (file.open(QIODevice::ReadOnly)) {
-        d->streamReader = new QXmlStreamReader(&file);
-        while (!d->streamReader->atEnd()) {
-            d->streamReader->readNext();
-            if (d->streamReader->isStartDocument()) {
-                QStringRef documentVersion = d->streamReader->documentVersion();
-
-//                if (xml.readNextStartElement()) {
-//                         if (xml.name() == "xbel" && xml.attributes().value("version") == "1.0")
-//                             readXBEL();
-//                         else
-//                             xml.raiseError(QObject::tr("The file is not an XBEL version 1.0 file."));
-//                     }
-
-#ifdef DEBUG
-                qDebug("XmlScreenieSceneDao::read: document version: %s", qPrintable(*documentVersion.string()));
-#endif
-                QXmlStreamAttributes attributes = d->streamReader->attributes();
-                int nofAttributes = attributes.size();
-#ifdef DEBUG
-                qDebug("XmlScreenieSceneDao::read: nofAttributes: %d", nofAttributes);
-#endif
-                if (attributes.hasAttribute("version")) {
-                    QStringRef version = attributes.value("version");
-#ifdef DEBUG
-                    qDebug("XmlScreenieSceneDao::read: version: %s", qPrintable(*version.string()));
-#endif
+    ScreenieScene *result = 0;
+    if (d->file.open(QIODevice::ReadOnly)) {
+        d->streamReader = new QXmlStreamReader(&d->file);
+        QXmlStreamReader::TokenType tokenType;
+        while ((tokenType = d->streamReader->readNext()) != QXmlStreamReader::EndDocument) {
+            if (tokenType == QXmlStreamReader::StartElement) {
+                if (d->streamReader->name() == "screeniescene") {
+    #ifdef DEBUG
+                    qDebug("XmlScreenieSceneDao::read: version: %s", qPrintable(d->streamReader->attributes().value("version").toString()));
+    #endif
+                    if (d->streamReader->attributes().value("version") != d->version) {
+                        /*!\todo Convert file to current version */
+                    }
+                    result = readScreenieScene();
+                } else {
+                    result = 0;
                 }
-            } else if (d->streamReader->isStartElement()) {
-#ifdef DEBUG
-
-                qDebug("XmlScreenieSceneDao::read: value: %s", qPrintable(*d->streamReader->name().string()));
-#endif
             }
         }
-        result = readScreenieScene();
-        file.close();
+        d->file.close();
     } else {
         result = 0;
     }
@@ -151,11 +131,7 @@ bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
             d->streamWriter->writeAttributes(backgroundAttributes);
         }
         d->streamWriter->writeEndElement();
-        d->streamWriter->writeStartElement("items");
-        {
-            result = writeScreenieModels(screenieScene);
-        }
-        d->streamWriter->writeEndElement();
+        result = writeScreenieModels(screenieScene);
     }
     d->streamWriter->writeEndElement();
     return result;
@@ -165,7 +141,6 @@ bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene
 {
     bool result;
     int n = screenieScene.count();
-    d->streamWriter->writeAttribute("count", QString::number(n));
     result = true;
     for (int i = 0; result && i < n; ++i) {
         ScreenieModelInterface *screenieModel = screenieScene.getModel(i);
@@ -182,7 +157,7 @@ bool XmlScreenieSceneDao::writeFilePathModel(const ScreenieFilePathModel &screen
 {
     bool result;
     if (d->screenieFilePathModelDao == 0) {
-        d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(*d->streamWriter);
+        d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(d->streamWriter);
     }
     d->streamWriter->writeStartElement("filepathmodel");
     {
@@ -197,7 +172,7 @@ bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePi
 {
     bool result;
     if (d->screeniePixmapModelDao == 0) {
-        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(*d->streamWriter);
+        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(d->streamWriter);
     }
     d->streamWriter->writeStartElement("pixmapmodel");
     {
@@ -211,9 +186,53 @@ bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePi
 ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
 {
     ScreenieScene *result = new ScreenieScene();
-    /*! \todo Implement this */
+    while (d->streamReader->readNextStartElement() ) {
+
+        if (d->streamReader->name() == "background") {
+            QXmlStreamAttributes backgroundAttributes = d->streamReader->attributes();
+            bool enabled = backgroundAttributes.value("enabled") == "true" ? true : false;
+            result->setBackgroundEnabled(enabled);
+            QColor color(backgroundAttributes.value("bgcolor").toString());
+            result->setBackgroundColor(color);
+            d->streamReader->skipCurrentElement();
+        } else if (d->streamReader->name() == "filepathmodel") {
+            ScreenieFilePathModel *filePathModel = readFilePathModel();
+            result->addModel(filePathModel);
+        } else if (d->streamReader->name() == "pixmapmodel") {
+            ScreeniePixmapModel *pixmapPathModel = readPixmapModel();
+            result->addModel(pixmapPathModel);
+        } else {
+            d->streamReader->skipCurrentElement();
+        }
+    }
+#ifdef DEBUG
+        qDebug("XmlScreenieSceneDao::readScreenieScene: error: %d", d->streamReader->error());
+#endif
     return result;
 }
+
+ScreenieFilePathModel *XmlScreenieSceneDao::readFilePathModel() const
+{
+    ScreenieFilePathModel *result;
+
+    if (d->screenieFilePathModelDao == 0) {
+        d->screenieFilePathModelDao = new XmlScreenieFilePathModelDao(d->streamReader);
+    }
+    result = d->screenieFilePathModelDao->read();
+    return result;
+}
+
+ScreeniePixmapModel *XmlScreenieSceneDao::readPixmapModel() const
+{
+    ScreeniePixmapModel *result;
+
+    if (d->screeniePixmapModelDao == 0) {
+        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(d->streamReader);
+    }
+    result = d->screeniePixmapModelDao->read();
+    return result;
+}
+
 
 void XmlScreenieSceneDao::cleanUp() const
 {

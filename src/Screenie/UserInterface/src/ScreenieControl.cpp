@@ -121,6 +121,20 @@ void ScreenieControl::updateData(const QMimeData *mimeData, ScreenieModelInterfa
     }
 }
 
+void ScreenieControl::updateScene()
+{
+   m_screenieGraphicsScene.clear();
+#ifdef DEBUG
+   qDebug("ScreenieControl::updateScene: bgcolour: %s", qPrintable(m_screenieScene.getBackgroundColor().name()));
+#endif
+   handleBackgroundChanged();
+   int n = m_screenieScene.count();
+   for (int i = 0; i < n; ++i) {
+       ScreenieModelInterface *screenieModel = m_screenieScene.getModel(i);
+       handleModelAdded(*screenieModel);
+   }
+}
+
 // public slots
 
 void ScreenieControl::addImage(QString filePath, QPointF position)
@@ -375,7 +389,7 @@ void ScreenieControl::handleDistanceChanged()
             screeniePixmapItems.append(screeniePixmapItem);
         }
     }
-    qSort(screeniePixmapItems.begin(), screeniePixmapItems.end(), zSort);
+    ::qStableSort(screeniePixmapItems.begin(), screeniePixmapItems.end(), zSort);
     int z = 0;
     foreach (QGraphicsItem *graphicsItem, screeniePixmapItems) {
         graphicsItem->setZValue(z++);
@@ -413,6 +427,7 @@ void ScreenieControl::handleBackgroundChanged()
         QColor backgroundColor = m_screenieScene.getBackgroundColor();
         bgbrush = QBrush(backgroundColor);
     } else {
+        /*!\todo Move this into the Utils#PaintTools class */
         if (m_checkerBoard.style() == Qt::NoBrush) {
             QImage checker(16, 16, QImage::Format_ARGB32_Premultiplied);
             QPainter painter(&checker);

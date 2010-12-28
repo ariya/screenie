@@ -35,7 +35,7 @@ class ScreenieModelInterface : public QObject
 
 public:
 
-    MODEL_API static const int MaxDistance;
+    MODEL_API static const qreal MaxDistance;
 
     virtual ~ScreenieModelInterface() {}
 
@@ -65,9 +65,9 @@ public:
     virtual QPointF getPosition() const = 0;
     virtual void setPosition(QPointF position) = 0;
 
-    virtual int getDistance() const = 0;
-    virtual void setDistance(int distance) = 0;
-    virtual void addDistance(int distance) = 0;
+    virtual qreal getDistance() const = 0;
+    virtual void setDistance(qreal distance) = 0;
+    virtual void addDistance(qreal distance) = 0;
 
     virtual int getRotation() const = 0;
 

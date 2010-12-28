@@ -18,6 +18,8 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <cstdlib>
+
 #include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 
@@ -38,12 +40,15 @@ public:
           reflectionOpacity(DefaultScreenieModel::ReflectionOpacity) {}
 
     QPointF position;
-    int distance;
+    qreal distance;
     int rotation;
     int reflectionEnabled;
     int reflectionOffset;
-    int reflectionOpacity;    
+    int reflectionOpacity;
+    static const qreal Epsilon;
 };
+
+const qreal AbstractScreenieModelPrivate::Epsilon = 0.001;
 
 // public
 
@@ -72,30 +77,30 @@ void AbstractScreenieModel::setPosition(QPointF position)
     }
 }
 
-int AbstractScreenieModel::getDistance() const
+qreal AbstractScreenieModel::getDistance() const
 {
     return d->distance;
 }
 
-void AbstractScreenieModel::setDistance(int distance)
+void AbstractScreenieModel::setDistance(qreal distance)
 {
-    if (d->distance != distance && 0 <= distance && distance <= MaxDistance) {
+    if (::abs(d->distance - distance) > AbstractScreenieModelPrivate::Epsilon && 0 <= distance && distance <= MaxDistance) {
         d->distance = distance;
         emit distanceChanged();
     }
 }
 
-void AbstractScreenieModel::addDistance(int distance)
+void AbstractScreenieModel::addDistance(qreal distance)
 {
-    if (distance != 0) {
+    if (::abs(distance) > AbstractScreenieModelPrivate::Epsilon) {
         int oldDistance = d->distance;
         d->distance += distance;
-        if (d->distance < 0) {
-            d->distance = 0;
+        if (d->distance < 0.0) {
+            d->distance = 0.0;
         } else if (d->distance > MaxDistance) {
             d->distance = MaxDistance;
         }
-        if (d->distance != oldDistance) {
+        if (::abs(d->distance - oldDistance) > AbstractScreenieModelPrivate::Epsilon) {
             emit distanceChanged();
         }
     }
