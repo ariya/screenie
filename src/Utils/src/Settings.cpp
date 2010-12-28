@@ -21,6 +21,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
+#include <QtCore/QDir>
 #include <QtGui/QDesktopServices>
 
 #include "Version.h"
@@ -33,9 +34,12 @@ public:
 
     static const QSize DefaultMaximumImageSize;
     static const QString DefaultLastImageDirectoryPath;
+    static const QString DefaultLastExportDirectoryPath;
 
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
+    QString lastExportDirectoryPath;
+    Version version;
 
     QSettings *settings;
 
@@ -58,7 +62,7 @@ Settings *SettingsPrivate::instance = 0;
 
 const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
 const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
-
+const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
 
 // public
 
@@ -96,8 +100,23 @@ const QString &Settings::getLastImageDirectoryPath() const
 
 void Settings::setLastImageDirectoryPath(const QString &lastImageDirectoryPath)
 {
-    if (d->lastImageDirectoryPath != lastImageDirectoryPath) {
-        d->lastImageDirectoryPath = lastImageDirectoryPath;
+    QString qtPath = QDir::fromNativeSeparators(lastImageDirectoryPath);
+    if (d->lastImageDirectoryPath != qtPath) {
+        d->lastImageDirectoryPath = qtPath;
+        emit changed();
+    }
+}
+
+const QString &Settings::getLastExportDirectoryPath() const
+{
+    return d->lastExportDirectoryPath;
+}
+
+void Settings::setLastExportDirectoryPath(const QString &lastExportDirectoryPath)
+{
+    QString qtPath = QDir::fromNativeSeparators(lastExportDirectoryPath);
+    if (d->lastExportDirectoryPath != qtPath) {
+        d->lastExportDirectoryPath = qtPath;
         emit changed();
     }
 }
@@ -106,14 +125,28 @@ void Settings::setLastImageDirectoryPath(const QString &lastImageDirectoryPath)
 
 void Settings::store()
 {
-    d->settings->setValue("scene/maximumImageSize", d->maximumImageSize);
-    d->settings->setValue("paths/lastImageDirectoryPath", d->lastImageDirectoryPath);
+    d->settings->setValue("Version", d->version.toString());
+    d->settings->setValue("Scene/MaximumImageSize", d->maximumImageSize);
+    d->settings->setValue("Paths/LastImageDirectoryPath", d->lastImageDirectoryPath);
+    d->settings->setValue("Paths/LastExportDirectoryPath", d->lastExportDirectoryPath);
 }
 
 void Settings::restore()
 {
-    d->maximumImageSize = d->settings->value("scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
-    d->lastImageDirectoryPath = d->settings->value("paths/lastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
+    QString version;
+    Version appVersion;
+    version = d->settings->value("Version", appVersion.toString()).toString();
+    Version settingsVersion(version);
+    if (settingsVersion < appVersion) {
+#ifdef DEBUG
+        qDebug("Settings::restore: app version: %s, settings version: %s, conversion necessary!",
+               qPrintable(appVersion.toString()), qPrintable(settingsVersion.toString()));
+        /*!\todo Settings conversion as necessary */
+#endif
+    }
+    d->maximumImageSize = d->settings->value("Scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
+    d->lastImageDirectoryPath = d->settings->value("Paths/LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
+    d->lastExportDirectoryPath = d->settings->value("Paths/LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
 }
 
 // protected

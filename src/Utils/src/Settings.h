@@ -64,6 +64,13 @@ public:
      */
     UTILS_API void setLastImageDirectoryPath(const QString &lastImageDirectoryPath);
 
+    UTILS_API const QString &getLastExportDirectoryPath() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setLastExportDirectoryPath(const QString &lastExportDirectoryPath);
+
 public slots:
     /*!
      * Stores these Settings to a user configuration file.

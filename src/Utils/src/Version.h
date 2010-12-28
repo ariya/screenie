@@ -26,12 +26,41 @@
 
 #include "UtilsLib.h"
 
+class VersionPrivate;
+
 /*!
- * Application version settings.
+ * Application version: [major].[minor].[subminor]
  */
 class Version
 {
 public:
+    /*!
+     * Creates this Version with the current values of the application version.
+     */
+    UTILS_API Version();
+
+    /*!
+     * Creates this Version with \p major, \p minor and \p subMinor values. This
+     * Version can then be compared against the application version, for example.
+     *
+     * \param major
+     *        major version number
+     * \param minor
+     *        minor version number
+     * \param subMinor
+     *        sub-minor version number
+     */
+    UTILS_API Version(int major, int minor, int subMinor);
+
+    /*!
+     * Creates this Version by parsing the \p version string value.
+     *
+     * \param version
+     *        a QString containing the version of the expected [major].[minor].[subminor]
+     */
+    UTILS_API Version(const QString &version);
+    UTILS_API ~Version();
+
     /*!
      * Returns the major version number.
      *
@@ -54,6 +83,19 @@ public:
     UTILS_API static int getSubMinor();
 
     /*!
+     * Returns a user-friendly version string.
+     *
+     * \return a QString containing a user-friendly version value
+     */
+    UTILS_API QString toString();
+
+    UTILS_API bool operator==(const Version &other);
+
+    UTILS_API bool operator>=(const Version &other);
+
+    UTILS_API bool operator<(const Version &other);
+
+    /*!
      * A cool code name - every application needs this ;)
      *
      * \return a QString containing a cool code name
@@ -67,12 +109,9 @@ public:
      */
     UTILS_API static QString getApplicationName();
 
-    /*!
-     * Returns a user-friendly version string.
-     *
-     * \return a QString containing a user-friendly version value
-     */
-    UTILS_API static QString toString();
+
+private:
+    VersionPrivate *d;
 };
 
 #endif // VERSION_H
