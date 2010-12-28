@@ -81,13 +81,7 @@ bool XmlScreenieFilePathModelDao::readSpecific()
     /*!\todo Check file path existence */
     QXmlStreamReader *streamReader = getStreamReader();
     streamReader->readNextStartElement();
-#ifdef DEBUG
-    qDebug("XmlScreenieFilePathModelDao::readSpecific: name: %s", qPrintable(streamReader->name().toString()));
-#endif
     QString filePath = streamReader->readElementText();
-#ifdef DEBUG
-    qDebug("XmlScreenieFilePathModelDao::readSpecific: filePath: %s", qPrintable(filePath));
-#endif
     d->readModel->setFilePath(filePath);
     return result;
 }

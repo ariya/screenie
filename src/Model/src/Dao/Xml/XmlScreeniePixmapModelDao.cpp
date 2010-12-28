@@ -94,11 +94,8 @@ bool XmlScreeniePixmapModelDao::readSpecific()
     bool result = true;
     QXmlStreamReader *streamReader = getStreamReader();
     streamReader->readNextStartElement();
-#ifdef DEBUG
-    qDebug("XmlScreeniePixmapModelDao::readSpecific: name: %s", qPrintable(streamReader->name().toString()));
-#endif
-    QString data = streamReader->readElementText();
 
+    QString data = streamReader->readElementText();
     if (!data.isEmpty()) {
         QByteArray str;
         str.append(data);
@@ -106,9 +103,6 @@ bool XmlScreeniePixmapModelDao::readSpecific()
 
         QPixmap pixmap;
         result = pixmap.loadFromData(png, "PNG");
-#ifdef DEBUG
-        qDebug("Trying to read: %d data: %s", result, qPrintable(QString(str).left(20)));
-#endif
         if (result && !pixmap.isNull()) {
             d->readModel->setPixmap(pixmap);
         } else {

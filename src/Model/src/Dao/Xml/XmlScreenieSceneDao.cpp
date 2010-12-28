@@ -149,6 +149,11 @@ bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene
         } else if (screenieModel->inherits(ScreeniePixmapModel::staticMetaObject.className())) {
             result = writePixmapModel(dynamic_cast<ScreeniePixmapModel &>(*screenieModel));
         }
+#ifdef DEBUG
+        else {
+            qDebug("XmlScreenieSceneDao::writeScreenieModels: UNSUPPORTED: %s", screenieModel->metaObject()->className());
+        }
+#endif
     }
     return result;
 }
@@ -186,7 +191,8 @@ bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePi
 ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
 {
     ScreenieScene *result = new ScreenieScene();
-    while (d->streamReader->readNextStartElement() ) {
+    bool ok = true;
+    while (ok && d->streamReader->readNextStartElement()) {
 
         if (d->streamReader->name() == "background") {
             QXmlStreamAttributes backgroundAttributes = d->streamReader->attributes();
@@ -197,17 +203,31 @@ ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
             d->streamReader->skipCurrentElement();
         } else if (d->streamReader->name() == "filepathmodel") {
             ScreenieFilePathModel *filePathModel = readFilePathModel();
-            result->addModel(filePathModel);
+            if (filePathModel != 0) {
+                result->addModel(filePathModel);
+            } else {
+                ok = false;
+            }
         } else if (d->streamReader->name() == "pixmapmodel") {
-            ScreeniePixmapModel *pixmapPathModel = readPixmapModel();
-            result->addModel(pixmapPathModel);
+            ScreeniePixmapModel *pixmapModel = readPixmapModel();
+            if (pixmapModel != 0) {
+                result->addModel(pixmapModel);
+            } else {
+                ok = false;
+            }
         } else {
             d->streamReader->skipCurrentElement();
         }
+
     }
+    ok = ok && d->streamReader->error() == QXmlStreamReader::NoError;
 #ifdef DEBUG
-        qDebug("XmlScreenieSceneDao::readScreenieScene: error: %d", d->streamReader->error());
+        qDebug("XmlScreenieSceneDao::readScreenieScene: streamReader error: %d, ok: %d", d->streamReader->error(), ok);
 #endif
+    if (!ok) {
+        delete result;
+        result = 0;
+    }
     return result;
 }
 
