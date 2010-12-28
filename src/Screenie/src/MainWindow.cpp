@@ -281,7 +281,7 @@ void MainWindow::on_addImageAction_triggered()
 
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
-    if (isFullScreen()) {
+    if (!isFullScreen()) {
         /*!\todo Settings which control what becomes invisible in fullscreen mode */
         ui->toolBar->setVisible(false);
         ui->sidePanel->setVisible(false);
