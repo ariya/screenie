@@ -25,6 +25,7 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtGui/QColor>
 
+#include "../../../Utils/src/Version.h"
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
 #include "../../ScreenieFilePathModel.h"
@@ -43,7 +44,6 @@ class XmlScreenieSceneDaoPrivate
 public:
     XmlScreenieSceneDaoPrivate(const QString &filePath)
         : file(filePath),
-          version("1.0"),
           streamWriter(0),
           streamReader(0),
           screenieFilePathModelDao(0),
@@ -52,7 +52,7 @@ public:
     {}
 
     QFile file;
-    QString version;
+    Version version;
     QXmlStreamWriter *streamWriter;
     QXmlStreamReader *streamReader;
     ScreenieFilePathModelDao *screenieFilePathModelDao;
@@ -98,11 +98,13 @@ ScreenieScene *XmlScreenieSceneDao::read() const
         while ((tokenType = d->streamReader->readNext()) != QXmlStreamReader::EndDocument) {
             if (tokenType == QXmlStreamReader::StartElement) {
                 if (d->streamReader->name() == "screeniescene") {
-    #ifdef DEBUG
-                    qDebug("XmlScreenieSceneDao::read: version: %s", qPrintable(d->streamReader->attributes().value("version").toString()));
-    #endif
-                    if (d->streamReader->attributes().value("version") != d->version) {
+                    QString versionString = d->streamReader->attributes().value("version").toString();
+                    Version documentVersion(versionString);
+                    if (documentVersion < d->version) {
                         /*!\todo Convert file to current version */
+#ifdef DEBUG
+                qDebug("XmlScreenieSceneDao::read: CONVERSION NEEDED, document version: %s, app version: %s", qPrintable(documentVersion.toString()), qPrintable(d->version.toString()));
+#endif
                     }
                     result = readScreenieScene();
                 } else {
@@ -125,7 +127,7 @@ bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
     bool result = true;
     d->streamWriter->writeDTD("<!DOCTYPE screenie>");
     d->streamWriter->writeStartElement("screeniescene");
-    d->streamWriter->writeAttribute("version", d->version);
+    d->streamWriter->writeAttribute("version", d->version.toString());
     {
         d->streamWriter->writeStartElement("background");
         {
