@@ -6,5 +6,6 @@
         <file>img/document-save-as.png</file>
         <file>img/document-save.png</file>
         <file>img/document-open.png</file>
+        <file>img/view-fullscreen.png</file>
     </qresource>
 </RCC>

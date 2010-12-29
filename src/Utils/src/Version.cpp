@@ -19,39 +19,121 @@
  */
 
 #include <QtCore/QString>
+#include <QtCore/QRegExp>
 #include "Version.h"
 
 class VersionPrivate
 {
 public:
+    VersionPrivate()
+        : major(Major), minor(Minor), subminor(Subminor)
+    {}
+
+    VersionPrivate(int theMajor, int theMinor, int theSubMinor)
+        : major(theMajor), minor(theMinor), subminor(theSubMinor)
+    {}
+
+    int major;
+    int minor;
+    int subminor;
+
     static const int Major;
     static const int Minor;
-    static const int SubMinor;
+    static const int Subminor;
     static const QString CodeName;
     static const QString ApplicationTitle;
 };
 
+// Application version
 const int VersionPrivate::Major = 0;
 const int VersionPrivate::Minor = 1;
-const int VersionPrivate::SubMinor = 0;
-const QString VersionPrivate::CodeName = QString ("Anarchic Amoeba");
-const QString VersionPrivate::ApplicationTitle = "Screenie";
+const int VersionPrivate::Subminor = 0;
+const QString VersionPrivate::CodeName = QString("Anarchic Amoeba");
+const QString VersionPrivate::ApplicationTitle = "Screenie"; // note: no translation here (i18n)
 
 // public
 
+Version::Version()
+    : d(new VersionPrivate())
+{
+
+}
+
+Version::Version(int major, int minor, int subminor)
+    : d(new VersionPrivate(major, minor, subminor))
+{
+
+}
+
+Version::Version(const QString &version)
+    : d(new VersionPrivate())
+{
+    QRegExp versionRegExp("^(\\d+)\\.(\\d+)\\.(\\d+)$");
+    if (versionRegExp.indexIn(version) != -1) {
+        d->major = versionRegExp.cap(1).toInt();
+        d->minor = versionRegExp.cap(2).toInt();
+        d->subminor = versionRegExp.cap(3).toInt();
+    }
+}
+
+Version::~Version()
+{
+    delete d;
+}
+
 int Version::getMajor()
 {
-    return VersionPrivate::Major;
+    return d->major;
 }
 
 int Version::getMinor()
 {
-    return VersionPrivate::Minor;
+    return d->minor;
 }
 
-int Version::getSubMinor()
+int Version::getSubminor()
 {
-    return VersionPrivate::SubMinor;
+    return d->subminor;
+}
+
+QString Version::toString()
+{
+    return QString("%1.%2.%3").arg(d->major).arg(d->minor).arg(d->subminor);
+}
+
+bool Version::operator==(const Version &other)
+{
+    bool result;
+    result = d->major == other.d->major && d->minor == other.d->minor && d->subminor == other.d->subminor;
+    return result;
+}
+
+bool Version::operator>=(const Version &other)
+{
+    bool result;
+    if (d->major > other.d->major) {
+        result = true;
+    } else if (d->major < other.d->major) {
+        result = false;
+    } else {
+        if (d->minor > other.d->minor) {
+            result = true;
+        } else if (d->minor < other.d->minor) {
+            result = false;
+        } else {
+            if (d->subminor >= other.d->subminor) {
+                result = true;
+            } else {
+                result = false;
+            }
+        }
+    }
+    return result;
+}
+
+bool Version::operator<(const Version &other)
+{
+    return !(*this >= other);
 }
 
 QString Version::getCodeName()
@@ -62,9 +144,4 @@ QString Version::getCodeName()
 QString Version::getApplicationName()
 {
     return VersionPrivate::ApplicationTitle;
-}
-
-QString Version::toString()
-{
-    return QString("%1.%2.%3").arg(VersionPrivate::Major).arg(VersionPrivate::Minor).arg(VersionPrivate::SubMinor);
 }

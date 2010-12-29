@@ -21,14 +21,18 @@
 #include <QtCore/QPoint>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
+#include <QtCore/QEvent>
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QPainter>
 
-#include "../../../Utils/src/PaintTools.h"
-#include "../../../Model/src/ScreenieModelInterface.h"
-#include "../../../Kernel/src/Reflection.h"
+
+#include "../../Utils/src/PaintTools.h"
+#include "../../Model/src/ScreenieModelInterface.h"
+#include "Clipboard/MimeHelper.h"
+#include "Reflection.h"
 #include "ScreenieControl.h"
 #include "ScreeniePixmapItem.h"
 
@@ -37,10 +41,12 @@ const int ScreeniePixmapItem::ScreeniePixmapType = QGraphicsItem::UserType + 1;
 // public
 
 ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection)
-    : m_screenieModel(screenieModel),
+    : QGraphicsPixmapItem(),
+      m_screenieModel(screenieModel),
       m_screenieControl(screenieControl),
       m_reflection(reflection),
-      m_transformPixmap(true)
+      m_transformPixmap(true),
+      m_ignoreUpdates(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -102,13 +108,34 @@ void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void ScreeniePixmapItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    event->setAccepted(event->mimeData()->hasUrls() || event->mimeData()->hasImage());
+    bool accept = MimeHelper::accept(event->mimeData(), MimeHelper::Strict);
+    event->setAccepted(accept);
 }
 
 void ScreeniePixmapItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    m_screenieControl.updateData(event->mimeData(), m_screenieModel);
+    m_screenieControl.updateModel(event->mimeData(), m_screenieModel);
     event->accept();
+}
+
+QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemPositionChange) {
+        QPointF position = value.toPointF();
+        m_screenieModel.setPosition(position);
+    } else if (change == ItemSelectedChange) {
+        QGraphicsPixmapItem::itemChange(change, value);
+        // See comment below in #transformPixmap
+        m_ignoreUpdates = true;
+        m_screenieModel.setSelected(value.toBool());
+    }
+    return QGraphicsPixmapItem::itemChange(change, value);
+}
+
+void ScreeniePixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    // painter->setCompositionMode(QPainter::RasterOp_SourceAndDestination);
+    QGraphicsPixmapItem::paint(painter, option, widget);
 }
 
 // private
@@ -117,6 +144,8 @@ void ScreeniePixmapItem::frenchConnection()
 {
     connect(&m_screenieModel, SIGNAL(changed()),
             this, SLOT(updateItem()));
+    connect(&m_screenieModel, SIGNAL(positionChanged()),
+            this, SLOT(updatePosition()));
     connect(&m_screenieModel, SIGNAL(distanceChanged()),
             this, SLOT(updateItem()));
     connect(&m_screenieModel, SIGNAL(reflectionChanged()),
@@ -125,6 +154,8 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updatePixmap(const QPixmap &)));
     connect(&m_screenieModel, SIGNAL(filePathChanged(const QString &)),
             this, SLOT(updatePixmap()));
+    connect(&m_screenieModel, SIGNAL(selectionChanged()),
+            this, SLOT(updateSelection()));
 }
 
 void ScreeniePixmapItem::moveTo(QPointF scenePosition)
@@ -174,13 +205,20 @@ void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
         break;
 
     case Qt::LeftButton:
-        moveTo(event->scenePos());
+        // Welcome to the Exception To The Rule "Modify model via Controller"!
+        // moving items requires quite some logic, and we re-use that logic
+        // (the Qt implementation of handling move events, to be specific)
+        // So first we update the View, and THEN we update the Model.
+        // (see #itemChange above)
+        // As we get a signal by the model nevertheless we ignore it my raising
+        // a flag, because we already updated the View ourselves
+        m_ignoreUpdates = true;
+        selectExclusive();
         QGraphicsPixmapItem::mouseMoveEvent(event);
-        event->accept();
         break;
 
      default:
-        QGraphicsPixmapItem::mouseMoveEvent(event);
+        event->ignore();
         break;
     }
 }
@@ -288,4 +326,22 @@ void ScreeniePixmapItem::updateItem()
     translateBack.translate(-dx, -dy);
     transform = translateBack * scale * transform;
     setTransform(transform, false);
+}
+
+void ScreeniePixmapItem::updatePosition()
+{
+    // see comment in #transformPixmap
+    if (!m_ignoreUpdates) {
+        setPos(m_screenieModel.getPosition());
+    }
+    m_ignoreUpdates = false;
+}
+
+void ScreeniePixmapItem::updateSelection()
+{
+    // see comment in #transformPixmap
+    if (!m_ignoreUpdates) {
+        setSelected(m_screenieModel.isSelected());
+    }
+    m_ignoreUpdates = false;
 }

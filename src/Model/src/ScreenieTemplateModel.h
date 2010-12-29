@@ -18,55 +18,68 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIEFILEPATHMODEL_H
-#define SCREENIEFILEPATHMODEL_H
+#ifndef SCREENIETEMPLATEMODEL_H
+#define SCREENIETEMPLATEMODEL_H
 
-#include <QtCore/QObject>
-#include <QtCore/QSize>
-#include <QtGui/QPixmap>
-
-class QString;
+class QSize;
 
 #include "AbstractScreenieModel.h"
 #include "ModelLib.h"
 
 class SizeFitter;
-class ScreenieFilePathModelPrivate;
+
+class ScreenieTemplateModelPrivate;
 
 /*!
+ * The template model acts as a placeholder for the actual pixmap to
+ * be added to the ScreenieScene. The templates have an \em order
+ * which defines the order in which they are replaced by actual image
+ * data. Ordering starts at 0 (highest order) and grows up to n-1,
+ * where n is the number of templates in the ScreenieScene. By default
+ * ScreenieTemplateModel has an \em order of \c Unordered.
+ *
  * Implementation note: we need do export the whole class here, since
  * we also need to export the QObject::staticMetaObject methods from
  * the QObject base class.
  */
-class MODEL_API ScreenieFilePathModel : public AbstractScreenieModel
+class MODEL_API ScreenieTemplateModel : public AbstractScreenieModel
 {
     Q_OBJECT
 public:
     /*!
-     * Creates this ScreenieFilePathModel. Call #readPixmap() after creation.
+     * No \em order has yet been defined.
      *
-     * \param filePath
-     *        the file path to the pixmap to be read
-     * \param sizeFitter
-     *        if given the pixmap is scaled with the \p sizeFitter; may be 0; ownership
-     *        remains with the caller
-     *
-     * \sa #readPixmap()
+     * \sa #getOrder
      */
-    explicit ScreenieFilePathModel(const QString &filePath = QString(), const SizeFitter *sizeFitter = 0);
-    explicit ScreenieFilePathModel(const ScreenieFilePathModel &other);
-    virtual ~ScreenieFilePathModel();
+    static const int Unordered;
+
+    explicit ScreenieTemplateModel(const QSize &size);
+    explicit ScreenieTemplateModel(const ScreenieTemplateModel &other);
+    virtual ~ScreenieTemplateModel();
 
     virtual const QPixmap &readPixmap() const;
-    virtual QSize getSize() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
 
-    virtual QString getFilePath() const;
-    virtual void setFilePath(const QString &filePath);
+    const SizeFitter &getSizeFitter() const;
+
+    /*!
+     * Returns the requested size.
+     *
+     * \sa ScreenieTemplateModel(const QSize &)
+     */
+    virtual QSize getSize() const;
+
+    /*!
+     * \return the order of this ScreenieTemplateModel.
+     */
+    int getOrder() const;
+    void setOrder(int order);
 
 private:
-    ScreenieFilePathModelPrivate *d;
+    ScreenieTemplateModelPrivate *d;
+
+    void frenchConnection();
 };
 
-#endif // SCREENIEFILEPATHMODEL_H
+#endif // SCREENIETEMPLATEMODEL_H

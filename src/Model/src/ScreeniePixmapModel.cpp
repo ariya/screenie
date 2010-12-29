@@ -28,18 +28,23 @@
 class ScreeniePixmapModelPrivate
 {
 public:
-    ScreeniePixmapModelPrivate()
-        : valid(false) {}
+    ScreeniePixmapModelPrivate() {}
+    ScreeniePixmapModelPrivate(const ScreeniePixmapModelPrivate &other)
+        : pixmap(other.pixmap) {}
 
     QPixmap pixmap;
-    bool valid;
-    QSize size;    
 };
 
 ScreeniePixmapModel::ScreeniePixmapModel(QPixmap pixmap)
     : d(new ScreeniePixmapModelPrivate())
 {
     d->pixmap = fitToMaximumSize(pixmap);
+}
+
+ScreeniePixmapModel::ScreeniePixmapModel(const ScreeniePixmapModel &other)
+    : AbstractScreenieModel(other),
+      d(new ScreeniePixmapModelPrivate(*other.d))
+{
 }
 
 ScreeniePixmapModel::~ScreeniePixmapModel()
@@ -50,7 +55,7 @@ ScreeniePixmapModel::~ScreeniePixmapModel()
 #endif
 }
 
-QPixmap ScreeniePixmapModel::readPixmap()
+const QPixmap &ScreeniePixmapModel::readPixmap() const
 {
     return d->pixmap;
 }
@@ -60,21 +65,22 @@ QSize ScreeniePixmapModel::getSize() const
     return d->pixmap.size();
 }
 
-bool ScreeniePixmapModel::isValid() const
+ScreenieModelInterface *ScreeniePixmapModel::copy() const
 {
-    return d->valid;
+    ScreeniePixmapModel *result = new ScreeniePixmapModel(*this);
+    return result;
 }
 
-void ScreeniePixmapModel::convert(ScreenieModelInterface &source)
+bool ScreeniePixmapModel::isTemplate() const
 {
-    AbstractScreenieModel::convert(source);
+    return false;
 }
 
 void ScreeniePixmapModel::setPixmap(QPixmap pixmap)
 {
     if (d->pixmap.cacheKey() != pixmap.cacheKey()) {
-        d->pixmap = pixmap;
-        emit pixmapChanged(pixmap);
+        d->pixmap = fitToMaximumSize(pixmap);
+        emit pixmapChanged(d->pixmap);
     }
 }
 

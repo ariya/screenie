@@ -35,7 +35,7 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="sidePanel" native="true">
       <property name="minimumSize">
        <size>
         <width>200</width>
@@ -236,19 +236,17 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="addImageAction"/>
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
     <addaction name="exportAction"/>
-    <addaction name="exportPDFAction"/>
     <addaction name="separator"/>
     <addaction name="quitAction"/>
    </widget>
@@ -258,7 +256,34 @@
     </property>
     <addaction name="aboutQtAction"/>
    </widget>
+   <widget class="QMenu" name="menu_Insert">
+    <property name="title">
+     <string>&amp;Insert</string>
+    </property>
+    <addaction name="addImageAction"/>
+    <addaction name="addTemplateAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="toggleFullScreenAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="cutAction"/>
+    <addaction name="copyAction"/>
+    <addaction name="pasteAction"/>
+    <addaction name="deleteAction"/>
+    <addaction name="separator"/>
+    <addaction name="selectAllAction"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menu_Insert"/>
+   <addaction name="menu_View"/>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -292,7 +317,7 @@
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
-    <string>Add Image</string>
+    <string>Image</string>
    </property>
    <property name="toolTip">
     <string>Add Image</string>
@@ -347,9 +372,74 @@
     <string>About &amp;Qt</string>
    </property>
   </action>
-  <action name="exportPDFAction">
+  <action name="addTemplateAction">
+   <property name="icon">
+    <iconset resource="../../../Resources/Resources.qrc">
+     <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
+   </property>
    <property name="text">
-    <string>Export &amp;PDF</string>
+    <string>Template</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Template</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="toggleFullScreenAction">
+   <property name="icon">
+    <iconset resource="../../../Resources/Resources.qrc">
+     <normaloff>:/img/view-fullscreen.png</normaloff>:/img/view-fullscreen.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Fullscreen</string>
+   </property>
+   <property name="toolTip">
+    <string>View Fullscreen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
+   </property>
+  </action>
+  <action name="selectAllAction">
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="cutAction">
+   <property name="text">
+    <string>Cu&amp;t</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="copyAction">
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="pasteAction">
+   <property name="text">
+    <string>&amp;Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="deleteAction">
+   <property name="text">
+    <string>&amp;Delete Selected Items</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

@@ -22,6 +22,7 @@
 #include <QtCore/QPointF>
 #include <QtCore/QSizeF>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsItem>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
@@ -36,18 +37,67 @@ ExportImage::ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &gra
 {
 }
 
-void ExportImage::exportImage(const QString &filePath)
+void ExportImage::exportImage(const QString &filePath, Selection selection) const
 {
     /*!\todo Specify some margin etc. */
-    QRectF targetRect =  m_graphicsScene.itemsBoundingRect();
-    QImage image(qRound(targetRect.width()), qRound(targetRect.height()), QImage::Format_ARGB32_Premultiplied);
-    image.fill(0);
-    QPainter painter(&image);
+
+    QImage image = exportImage(selection);
+    image.save(filePath, "PNG");
+}
+
+QImage ExportImage::exportImage(Selection selection) const
+{
+    QRectF sourceRect;
+    QBrush oldBackgroundBrush;
+    QList<QGraphicsItem *> selectedItems = m_graphicsScene.selectedItems();
+    QList<QGraphicsItem *> items = m_graphicsScene.items();
+    QList<QGraphicsItem *> invisibleItems;
+
+    switch (selection) {
+    case Scene:
+        sourceRect =  m_graphicsScene.itemsBoundingRect();
+        break;
+    case Selected:
+        foreach(QGraphicsItem *current, items) {
+            if (current->isSelected()) {
+                sourceRect = sourceRect.united(current->sceneBoundingRect());
+            } else if (current->isVisible()) {
+                invisibleItems.append(current);
+                current->setVisible(false);
+            }
+        }
+        break;
+    default:
+#ifdef DEBUG
+        qWarning("ExportImage::exportImage: unsupported Selection: %d", selection);
+#endif
+        sourceRect = m_graphicsScene.itemsBoundingRect();
+        break;
+    }
+    QImage result(qRound(sourceRect.width()), qRound(sourceRect.height()), QImage::Format_ARGB32);
+    result.fill(0);
+    QPainter painter(&result);
     painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing, true);
     if (m_screenieScene.isBackgroundEnabled()) {
-        painter.fillRect(0, 0, image.width(), image.height(), m_screenieScene.getBackgroundColor());
+        painter.fillRect(0, 0, result.width(), result.height(), m_screenieScene.getBackgroundColor());
+    } else {
+        QBrush transparent(QColor(0, 0, 0, 0));
+        oldBackgroundBrush = m_graphicsScene.backgroundBrush();
+        m_graphicsScene.setBackgroundBrush(transparent);
     }
     m_graphicsScene.clearSelection();
-    m_graphicsScene.render(&painter, QRectF(), targetRect);
-    image.save(filePath, "PNG");
+    m_graphicsScene.render(&painter, QRectF(), sourceRect);
+    // restore selection
+    foreach(QGraphicsItem *current, selectedItems) {
+        current->setSelected(true);
+    }
+    // restore visibility
+    foreach(QGraphicsItem *current, invisibleItems) {
+        current->setVisible(true);
+    }
+    // restore background
+    if (oldBackgroundBrush != Qt::NoBrush) {
+        m_graphicsScene.setBackgroundBrush(oldBackgroundBrush);
+    }
+    return result;
 }

@@ -34,10 +34,15 @@ class AbstractScreenieModel : public ScreenieModelInterface
 
 public:
     AbstractScreenieModel();
+    /*!
+     * Copy c'tor.
+     */
+    explicit AbstractScreenieModel(const AbstractScreenieModel &other);
     virtual ~AbstractScreenieModel();
 
     virtual QPointF getPosition() const;
     virtual void setPosition(QPointF position);
+    virtual void translate(qreal dx, qreal dy);
 
     virtual qreal getDistance() const;
     virtual void setDistance(qreal distance);
@@ -57,11 +62,13 @@ public:
     virtual int getReflectionOpacity() const;
     virtual void setReflectionOpacity(int reflectionOpacity);
     virtual void addReflectionOpacity(int reflectionOpacity);
+    virtual void setSelected(bool enable);
+    virtual bool isSelected() const;
 
     virtual void convert(ScreenieModelInterface &source);
 
 protected:
-    QPixmap fitToMaximumSize(QPixmap pixmap);
+    QPixmap fitToMaximumSize(const QPixmap &pixmap) const;
 
 private:
     AbstractScreenieModelPrivate *d;

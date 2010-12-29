@@ -18,26 +18,48 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef EXPORTPDF_H
-#define EXPORTPDF_H
+#ifndef CLIPBOARD_H
+#define CLIPBOARD_H
+
+#include <QtCore/QObject>
 
 class QGraphicsScene;
-class QString;
 
-#include "KernelLib.h"
+#include "../KernelLib.h"
 
-class ScreenieScene;
+class ScreenieControl;
+class ClipboardPrivate;
 
-class ExportPDF
+/*!
+ * Support for cut/copy/paste operations.
+ */
+class Clipboard : public QObject
 {
+    Q_OBJECT
 public:
-    KERNEL_API ExportPDF(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
+    KERNEL_API explicit Clipboard(ScreenieControl &screenieControl, QObject *parent = 0);
+    KERNEL_API virtual ~Clipboard();
 
-    KERNEL_API void exportPDF(const QString &filePath);
+    /*!
+     * \return \c true if this Clipboard has valid MIME data to paste; \c false else
+     */
+    KERNEL_API bool hasData() const;
+
+signals:
+    /*!
+     * Connected to the underlying QClipboard::dataChanged() signal.
+     */
+    void dataChanged();
+
+public slots:
+    KERNEL_API void cut();
+    KERNEL_API void copy();
+    KERNEL_API void paste();
 
 private:
-    const ScreenieScene &m_screenieScene;
-    QGraphicsScene &m_graphicsScene;
+    ClipboardPrivate *d;
+
+    void frenchConnection();
 };
 
-#endif // EXPORTPDF_H
+#endif // CLIPBOARD_H

@@ -57,8 +57,8 @@ public:
 };
 
 XmlScreenieSceneDao::XmlScreenieSceneDao(const QString &filePath)
+    : d(new XmlScreenieSceneDaoPrivate(filePath))
 {
-    d = new XmlScreenieSceneDaoPrivate(filePath);
 }
 
 XmlScreenieSceneDao::~XmlScreenieSceneDao()

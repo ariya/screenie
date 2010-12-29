@@ -37,7 +37,20 @@ public:
           rotation(DefaultScreenieModel::Rotation),
           reflectionEnabled(DefaultScreenieModel::ReflectionEnabled),
           reflectionOffset(DefaultScreenieModel::ReflectionOffset),
-          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity) {}
+          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity),
+          selected(false)
+
+    {}
+
+    AbstractScreenieModelPrivate(const AbstractScreenieModelPrivate &other)
+        : position(other.position),
+          distance(other.distance),
+          rotation(other.rotation),
+          reflectionEnabled(other.reflectionEnabled),
+          reflectionOffset(other.reflectionOffset),
+          reflectionOpacity(other.reflectionOpacity),
+          selected(other.selected)
+    {}
 
     QPointF position;
     qreal distance;
@@ -45,6 +58,8 @@ public:
     int reflectionEnabled;
     int reflectionOffset;
     int reflectionOpacity;
+    bool selected;
+
     static const qreal Epsilon;
 };
 
@@ -54,6 +69,12 @@ const qreal AbstractScreenieModelPrivate::Epsilon = 0.001;
 
 AbstractScreenieModel::AbstractScreenieModel()
     : d(new AbstractScreenieModelPrivate())
+{
+}
+
+AbstractScreenieModel::AbstractScreenieModel(const AbstractScreenieModel &other)
+    : ScreenieModelInterface(),
+      d(new AbstractScreenieModelPrivate(*other.d))
 {
 }
 
@@ -73,8 +94,14 @@ void AbstractScreenieModel::setPosition(QPointF position)
 {
     if (d->position != position) {
         d->position = position;
-        emit changed();
+        emit positionChanged();
     }
+}
+
+void AbstractScreenieModel::translate(qreal dx, qreal dy)
+{
+    QPointF newPosition = QPointF(d->position.x() + dx, d->position.y() + dy);
+    setPosition(newPosition);
 }
 
 qreal AbstractScreenieModel::getDistance() const
@@ -199,6 +226,19 @@ void AbstractScreenieModel::addReflectionOpacity(int reflectionOpacity)
     }
 }
 
+void AbstractScreenieModel::setSelected(bool enable)
+{
+    if (d->selected != enable) {
+        d->selected = enable;
+        emit selectionChanged();
+    }
+}
+
+bool AbstractScreenieModel::isSelected() const
+{
+    return d->selected;
+}
+
 void AbstractScreenieModel::convert(ScreenieModelInterface &source)
 {
     d->position = source.getPosition();
@@ -211,7 +251,7 @@ void AbstractScreenieModel::convert(ScreenieModelInterface &source)
 
 // protected
 
-QPixmap AbstractScreenieModel::fitToMaximumSize(QPixmap pixmap)
+QPixmap AbstractScreenieModel::fitToMaximumSize(const QPixmap &pixmap) const
 {
     QPixmap result;
     QSize maximumImageSize = Settings::getInstance().getMaximumImageSize();

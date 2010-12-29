@@ -47,11 +47,11 @@ ScreenieScene::ScreenieScene(QObject *parent)
 
 ScreenieScene::~ScreenieScene()
 {
+#ifdef DEBUG
+    qDebug("ScreenieScene d'tor called, now deleting %d items...", d->screenieModels.count());
+#endif
     qDeleteAll(d->screenieModels);
     delete d;
-#ifdef DEBUG
-    qDebug("ScreenieScene d'tor called.");
-#endif
 }
 
 void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
@@ -63,10 +63,14 @@ void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
             this, SIGNAL(distanceChanged()));
     connect(screenieModel, SIGNAL(distanceChanged()),
             this, SIGNAL(changed()));
-    connect(screenieModel, SIGNAL(changed()),
+    connect(screenieModel, SIGNAL(positionChanged()),
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(reflectionChanged()),
             this, SIGNAL(changed()));
+    connect(screenieModel, SIGNAL(changed()),
+            this, SIGNAL(changed()));
+    connect(screenieModel, SIGNAL(selectionChanged()),
+            this, SIGNAL(selectionChanged()));
     emit modelAdded(*screenieModel);
 }
 
@@ -96,6 +100,25 @@ ScreenieModelInterface *ScreenieScene::getModel(int index) const
     return result;
 }
 
+const QList<ScreenieModelInterface *> ScreenieScene::getModels() const
+{
+    return d->screenieModels;
+}
+
+const QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
+{
+    QList<ScreenieModelInterface *> result;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (screenieModel->isSelected()) {
+            result.append(screenieModel);
+        }
+    }
+#ifdef DEBUG
+    qDebug(" ScreenieScene::getSelectedModels: count: %d", result.count());
+#endif
+    return result;
+}
+
 int ScreenieScene::count() const
 {
     return d->screenieModels.count();
@@ -122,5 +145,17 @@ void ScreenieScene::setBackgroundColor(QColor color) {
         d->backgroundColor = color;
         emit backgroundChanged();
     }
+}
+
+bool ScreenieScene::hasTemplates() const
+{
+    bool result = false;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (screenieModel->isTemplate()) {
+            result = true;
+            break;
+        }
+    }
+    return result;
 }
 

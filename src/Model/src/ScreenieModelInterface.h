@@ -44,26 +44,30 @@ public:
      *
      * \sa #setFilePath(const QString &)
      */
-    virtual QPixmap readPixmap() = 0;
+    virtual const QPixmap &readPixmap() const = 0;
 
     /*!
-     * Returns \c true if #readPixmap() returned a valid QPixmap. Call #readPixmap() first.
+     * Returns the size of the image.
      *
-     * \sa #readPixmap()
-     */
-    virtual bool isValid() const = 0;
-
-    /*!
-     * Returns the \em original size of the image, as loaded from \p filePath. Call #readPixmap() first.
+     * Implementation note: if #readPixmap has not yet been called the image is currently
+     * read from disk first, so it might be potentially expensive, but only for the first
+     * time (the image is stored in memory).
      *
-     * \return the \em original QSize of the image; an \em invalid QSize if this ScreenieModel is \em invalid
+     * \return the QSize of the image
      * \sa #readPixmap()
-     * \sa #isValid()
      */
     virtual QSize getSize() const = 0;
 
     virtual QPointF getPosition() const = 0;
+    /*!
+     * \sa #positionChanged()
+     */
     virtual void setPosition(QPointF position) = 0;
+
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void translate(qreal dx, qreal dy) = 0;
 
     virtual qreal getDistance() const = 0;
     virtual void setDistance(qreal distance) = 0;
@@ -112,12 +116,30 @@ public:
 
     virtual void convert(ScreenieModelInterface &source) = 0;
 
+    /*!
+     * Creates a copy of this instance and all its associated data. The caller
+     * is the owner.
+     *
+     * \return a copy of this instance; must be \c deleted by the caller
+     */
+    virtual ScreenieModelInterface *copy() const = 0;
+
+    /*!
+     * \sa #selectionChanged()
+     */
+    virtual void setSelected(bool enable) = 0;
+    virtual bool isSelected() const = 0;
+
+    virtual bool isTemplate() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();
+    void positionChanged();
     void changed();
     void pixmapChanged(const QPixmap &pixmap);
     void filePathChanged(const QString &filePath);
+    void selectionChanged();
 };
 
 #endif // SCREENIEMODELINTERFACE_H

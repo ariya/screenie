@@ -30,20 +30,22 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QSlider>
 #include <QtGui/QMessageBox>
+#include <QtGui/QShortcut>
+#include <QtGui/QKeySequence>
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
-#include "../../../Utils/src/Settings.h"
-#include "../../../Model/src/ScreenieScene.h"
-#include "../../../Model/src/ScreenieModelInterface.h"
-#include "../../../Model/src/ScreenieFilePathModel.h"
-#include "../../../Model/src/Dao/ScreenieSceneDao.h"
-#include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
-#include "../../../Kernel/src/ExportImage.h"
-#include "../../../Kernel/src/ExportPDF.h"
-#include "ScreenieControl.h"
-#include "ScreeniePixmapItem.h"
-#include "ScreenieGraphicsScene.h"
+#include "../../Utils/src/Settings.h"
+#include "../../Model/src/ScreenieScene.h"
+#include "../../Model/src/ScreenieModelInterface.h"
+#include "../../Model/src/ScreenieFilePathModel.h"
+#include "../../Model/src/Dao/ScreenieSceneDao.h"
+#include "../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
+#include "../../Kernel/src/ExportImage.h"
+#include "../../Kernel/src/Clipboard/Clipboard.h"
+#include "../../Kernel/src/ScreenieControl.h"
+#include "../../Kernel/src/ScreenieGraphicsScene.h"
+#include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -57,14 +59,35 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
+    /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
+             as provided by Qt: http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
+#ifdef Q_OS_MAC
+    // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
+    // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
+    // For Mac there does not seem to be a common shortcut for fullscreen
+    // (unlike F11 for other platforms), but iTunes uses Meta + F
+    // Note: by default on Mac Qt swaps CTRL and META
+    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
+#endif
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
+    connect(shortcut, SIGNAL(activated()),
+            ui->deleteAction, SIGNAL(triggered()));
+
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     ui->graphicsView->setAcceptDrops(true);
+
+    // Gesture support
+    ui->graphicsView->viewport()->grabGesture(Qt::PinchGesture);
+    ui->graphicsView->viewport()->grabGesture(Qt::PanGesture);
+
     // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     createScene();
+    m_clipboard = new Clipboard(*m_screenieControl, this);
+
     initializeUi();
     updateUi();
     setUnifiedTitleAndToolBarOnMac(true);
@@ -90,6 +113,8 @@ void MainWindow::frenchConnection()
     connect(m_screenieGraphicsScene, SIGNAL(selectionChanged()),
             this, SLOT(updateUi()));
     connect(m_screenieScene, SIGNAL(changed()),
+            this, SLOT(updateUi()));
+    connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
 }
 
@@ -182,6 +207,17 @@ void MainWindow::updateColorUi()
     ui->blueSlider->blockSignals(false);
 }
 
+void MainWindow::updateEditActions()
+{
+    bool hasItems = m_screenieGraphicsScene->items().size() > 0;
+    bool hasSelection = m_screenieGraphicsScene->selectedItems().size() > 0;
+    ui->cutAction->setEnabled(hasSelection);
+    ui->copyAction->setEnabled(hasSelection);
+    ui->pasteAction->setEnabled(m_clipboard->hasData());
+    ui->deleteAction->setEnabled(hasSelection);
+    ui->selectAllAction->setEnabled(hasItems);
+}
+
 void MainWindow::initializeUi()
 {
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -235,6 +271,45 @@ void MainWindow::on_saveAsAction_triggered()
     }
 }
 
+void MainWindow::on_exportAction_triggered()
+{
+    Settings &settings = Settings::getInstance();
+    QString lastExportDirectoryPath = settings.getLastExportDirectoryPath();
+    QString filter = tr("Portable Network Graphics (*.png)");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
+    if (!filePath.isNull()) {
+        ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
+        exportImage.exportImage(filePath);
+        lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
+        settings.setLastExportDirectoryPath(lastExportDirectoryPath);
+    }
+}
+
+void MainWindow::on_cutAction_triggered()
+{
+    m_clipboard->cut();
+}
+
+void MainWindow::on_copyAction_triggered()
+{
+    m_clipboard->copy();
+}
+
+void MainWindow::on_pasteAction_triggered()
+{
+    m_clipboard->paste();
+}
+
+void MainWindow::on_deleteAction_triggered()
+{
+    m_screenieControl->removeAll();
+}
+
+void MainWindow::on_selectAllAction_triggered()
+{
+    m_screenieControl->selectAll();
+}
+
 void MainWindow::on_addImageAction_triggered()
 {
     Settings &settings = Settings::getInstance();
@@ -247,24 +322,31 @@ void MainWindow::on_addImageAction_triggered()
     }
 }
 
-void MainWindow::on_exportAction_triggered()
+void MainWindow::on_toggleFullScreenAction_triggered()
 {
-    QString filter = tr("Portable Network Graphics (*.png)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
-    if (!filePath.isNull()) {
-        ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
-        exportImage.exportImage(filePath);
+    if (!isFullScreen()) {
+        /*!\todo Settings which control what becomes invisible in fullscreen mode */
+        ui->toolBar->setVisible(false);
+        ui->sidePanel->setVisible(false);
+        ui->statusbar->setVisible(false);
+        // Note: Qt crashes when we don't disable the unified toolbar before going
+        // fullscreen (when we switch back to normal view, that is)!
+        // But since for now we hide it anyway that does not make any visible difference.
+        // The Qt documentation recommends anyway to do so.
+        setUnifiedTitleAndToolBarOnMac(false);
+        showFullScreen();
+    } else {
+        showNormal();
+        ui->toolBar->setVisible(true);
+        ui->sidePanel->setVisible(true);
+        ui->statusbar->setVisible(true);
+        setUnifiedTitleAndToolBarOnMac(true);
     }
 }
 
-void MainWindow::on_exportPDFAction_triggered()
+void MainWindow::on_addTemplateAction_triggered()
 {
-    QString filter = tr("Portable Document Format (*.pdf)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save"), QString(), filter);
-    if (!filePath.isNull()) {
-        ExportPDF exportPDF(*m_screenieScene, *m_screenieGraphicsScene);
-        exportPDF.exportPDF(filePath);
-    }
+    m_screenieControl->addTemplate(QPointF(0.0, 0.0));
 }
 
 void MainWindow::on_rotationSlider_valueChanged(int value)
@@ -348,6 +430,7 @@ void MainWindow::updateUi()
         updateTransformationUi();
         updateReflectionUi();
         updateColorUi();
+        updateEditActions();
     }
     updateDefaultValues();
 }

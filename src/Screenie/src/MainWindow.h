@@ -32,6 +32,7 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreeniePixmapItem;
 class ScreenieControl;
+class Clipboard;
 class ScreenieGraphicsScene;
 
 namespace Ui {
@@ -52,6 +53,7 @@ private:
     ScreenieScene *m_screenieScene;
     ScreenieControl *m_screenieControl;
     bool m_ignoreUpdateSignals;
+    Clipboard *m_clipboard;
 
     void frenchConnection();
 
@@ -61,17 +63,31 @@ private:
     void updateTransformationUi();
     void updateReflectionUi();
     void updateColorUi();
+    void updateEditActions();
     void initializeUi();
 
     void createScene();
     void updateScene(ScreenieScene *screenieScene);
 
 private slots:
+    // File
     void on_openAction_triggered();
     void on_saveAsAction_triggered();
-    void on_addImageAction_triggered();
     void on_exportAction_triggered();
-    void on_exportPDFAction_triggered();
+
+    // Edit
+    void on_cutAction_triggered();
+    void on_copyAction_triggered();
+    void on_pasteAction_triggered();
+    void on_deleteAction_triggered();
+    void on_selectAllAction_triggered();
+
+    // Insert
+    void on_addImageAction_triggered();
+    void on_addTemplateAction_triggered();
+
+    // View
+    void on_toggleFullScreenAction_triggered();
 
     void on_rotationSlider_valueChanged(int value);
     void on_distanceSlider_valueChanged(int value);
