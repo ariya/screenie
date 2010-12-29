@@ -25,7 +25,7 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtGui/QColor>
 
-#include "../../../Utils/src/Version.h"
+#include "../../../../Utils/src/Version.h"
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
 #include "../../ScreenieFilePathModel.h"
@@ -103,7 +103,7 @@ ScreenieScene *XmlScreenieSceneDao::read() const
                     if (documentVersion < d->version) {
                         /*!\todo Convert file to current version */
 #ifdef DEBUG
-                qDebug("XmlScreenieSceneDao::read: CONVERSION NEEDED, document version: %s, app version: %s", qPrintable(documentVersion.toString()), qPrintable(d->version.toString()));
+                        qDebug("XmlScreenieSceneDao::read: CONVERSION NEEDED, document version: %s, app version: %s", qPrintable(documentVersion.toString()), qPrintable(d->version.toString()));
 #endif
                     }
                     result = readScreenieScene();
