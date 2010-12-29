@@ -18,34 +18,37 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef EXPORTIMAGE_H
-#define EXPORTIMAGE_H
+#ifndef XMLSCREENIETEMPLATEMODELDAO_H
+#define XMLSCREENIETEMPLATEMODELDAO_H
 
-#include <QtGui/QImage>
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
-class QGraphicsScene;
-class QString;
+#include "../ScreenieTemplateModelDao.h"
+#include "AbstractXmlScreenieModelDao.h"
 
-#include "KernelLib.h"
+class ScreenieTemplateModel;
+class XmlScreenieTemplateModelDaoPrivate;
 
-class ScreenieScene;
-
-class ExportImage
+/*!
+ * Internal class.
+ */
+class XmlScreenieTemplateModelDao : public AbstractXmlScreenieModelDao, public ScreenieTemplateModelDao
 {
 public:
-    enum Selection {
-        Scene,
-        Selected
-    };
+    explicit XmlScreenieTemplateModelDao(QXmlStreamWriter *xmlStreamWriter);
+    explicit XmlScreenieTemplateModelDao(QXmlStreamReader *xmlStreamReader);
+    virtual ~XmlScreenieTemplateModelDao();
 
-    KERNEL_API ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
+    virtual bool write(const ScreenieTemplateModel &screenieTemplateModel);
+    virtual ScreenieTemplateModel *read();
 
-    KERNEL_API bool exportImage(const QString &filePath, Selection selection = Scene) const;
-    KERNEL_API QImage exportImage(Selection selection) const;
+protected:
+    virtual bool writeSpecific();
+    virtual bool readSpecific();
 
 private:
-    const ScreenieScene &m_screenieScene;
-    mutable QGraphicsScene &m_graphicsScene;
+    XmlScreenieTemplateModelDaoPrivate *d;
 };
 
-#endif // EXPORTIMAGE_H
+#endif // XMLSCREENIETEMPLATEMODELDAO_H

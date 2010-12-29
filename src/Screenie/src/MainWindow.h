@@ -22,11 +22,11 @@
 #define MAINWINDOW_H
 
 #include <QtCore/QList>
+#include <QtCore/QString>
 #include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 
 class QWidget;
-class QString;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -54,6 +54,7 @@ private:
     ScreenieControl *m_screenieControl;
     bool m_ignoreUpdateSignals;
     Clipboard *m_clipboard;
+    QString m_documentFilePath;
 
     void frenchConnection();
 
@@ -64,6 +65,7 @@ private:
     void updateReflectionUi();
     void updateColorUi();
     void updateEditActions();
+    void updateTitle();
     void initializeUi();
 
     void createScene();
@@ -72,6 +74,7 @@ private:
 private slots:
     // File
     void on_openAction_triggered();
+    void on_saveAction_triggered();
     void on_saveAsAction_triggered();
     void on_exportAction_triggered();
 

@@ -35,10 +35,12 @@ public:
     static const QSize DefaultMaximumImageSize;
     static const QString DefaultLastImageDirectoryPath;
     static const QString DefaultLastExportDirectoryPath;
+    static const QString DefaultLastDocumentDirectoryPath;
 
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
     QString lastExportDirectoryPath;
+    QString lastDocumentFilePath;
     Version version;
 
     QSettings *settings;
@@ -63,6 +65,7 @@ Settings *SettingsPrivate::instance = 0;
 const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
 const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
 const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
+const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
 
 // public
 
@@ -121,6 +124,20 @@ void Settings::setLastExportDirectoryPath(const QString &lastExportDirectoryPath
     }
 }
 
+const QString &Settings::getLastDocumentFilePath() const
+{
+    return d->lastDocumentFilePath;
+}
+
+void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentFilePath)
+{
+    QString qtPath = QDir::fromNativeSeparators(lastDocumentFilePath);
+    if (d->lastDocumentFilePath != qtPath) {
+        d->lastDocumentFilePath = qtPath;
+        emit changed();
+    }
+}
+
 // public slots
 
 void Settings::store()
@@ -129,6 +146,7 @@ void Settings::store()
     d->settings->setValue("Scene/MaximumImageSize", d->maximumImageSize);
     d->settings->setValue("Paths/LastImageDirectoryPath", d->lastImageDirectoryPath);
     d->settings->setValue("Paths/LastExportDirectoryPath", d->lastExportDirectoryPath);
+    d->settings->setValue("Paths/LastDocumentDirectoryPath", d->lastDocumentFilePath);
 }
 
 void Settings::restore()
@@ -147,6 +165,7 @@ void Settings::restore()
     d->maximumImageSize = d->settings->value("Scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
     d->lastImageDirectoryPath = d->settings->value("Paths/LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
     d->lastExportDirectoryPath = d->settings->value("Paths/LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
+    d->lastDocumentFilePath = d->settings->value("Paths/LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
 }
 
 // protected

@@ -53,6 +53,7 @@ public:
      */
     static const int Unordered;
 
+    ScreenieTemplateModel();
     explicit ScreenieTemplateModel(const QSize &size);
     explicit ScreenieTemplateModel(const ScreenieTemplateModel &other);
     virtual ~ScreenieTemplateModel();

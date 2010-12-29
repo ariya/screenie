@@ -34,7 +34,6 @@ public:
           streamReader(xmlStreamReader)
     {}
 
-    // owned by this AbstractXmlScreenieModelDaoPrivate
     QXmlStreamWriter *streamWriter;
     QXmlStreamReader *streamReader;
 };
@@ -53,6 +52,9 @@ AbstractXmlScreenieModelDao::AbstractXmlScreenieModelDao(QXmlStreamReader *xmlSt
 
 AbstractXmlScreenieModelDao::~AbstractXmlScreenieModelDao()
 {
+#ifdef DEBUG
+    qDebug("AbstractXmlScreenieModelDao::~AbstractXmlScreenieModelDao: called.");
+#endif
     delete d;
 }
 
@@ -96,9 +98,6 @@ bool AbstractXmlScreenieModelDao::read(AbstractScreenieModel &abstractScreenieMo
     readSpecific();
 
     while (streamReader->readNextStartElement()) {
-#ifdef DEBUG
-        qDebug("AbstractXmlScreenieModelDao::read; name: %s", qPrintable(streamReader->name().toString()));
-#endif
         if (streamReader->name() == "position") {
             QXmlStreamAttributes positionAttributes = streamReader->attributes();
             qreal x = positionAttributes.value("x").toString().toFloat(&ok);

@@ -36,6 +36,7 @@
 #include <QtOpenGL/QGLFormat>
 
 #include "../../Utils/src/Settings.h"
+#include "../../Utils/src/Version.h"
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieFilePathModel.h"
@@ -218,6 +219,16 @@ void MainWindow::updateEditActions()
     ui->selectAllAction->setEnabled(hasItems);
 }
 
+void MainWindow::updateTitle()
+{
+    QString title;
+    if (!m_documentFilePath.isNull()) {
+        title = QFileInfo(m_documentFilePath).fileName() + " - ";
+    }
+    title.append(Version::getApplicationName());
+    setWindowTitle(title);
+}
+
 void MainWindow::initializeUi()
 {
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -251,23 +262,51 @@ void MainWindow::updateScene(ScreenieScene *screenieScene)
 
 void MainWindow::on_openAction_triggered()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), QString(), tr("*.xsc"));
+    Settings &settings = Settings::getInstance();
+    QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
     if (!filePath.isNull()) {
         bool ok = read(filePath);
+        if (ok) {
+            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            m_documentFilePath = filePath;
+            updateTitle();
+        }
 #ifdef DEBUG
         qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
 #endif
     }
 }
 
+void MainWindow::on_saveAction_triggered()
+{
+    if (!m_documentFilePath.isNull()) {
+        bool ok = write(m_documentFilePath);
+#ifdef DEBUG
+        qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
+#endif
+    } else {
+        on_saveAsAction_triggered();
+    }
+}
+
 void MainWindow::on_saveAsAction_triggered()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), tr("*.xsc"));
+    Settings &settings = Settings::getInstance();
+    QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, tr("*.xsc"));
     if (!filePath.isNull()) {
         bool ok = write(filePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
 #endif
+        if (ok) {
+            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            m_documentFilePath = filePath;
+            updateTitle();
+        }
     }
 }
 
@@ -279,9 +318,11 @@ void MainWindow::on_exportAction_triggered()
     QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
-        exportImage.exportImage(filePath);
-        lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
-        settings.setLastExportDirectoryPath(lastExportDirectoryPath);
+        bool ok = exportImage.exportImage(filePath);
+        if (ok) {
+            lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
+            settings.setLastExportDirectoryPath(lastExportDirectoryPath);
+        }
     }
 }
 
@@ -433,6 +474,7 @@ void MainWindow::updateUi()
         updateEditActions();
     }
     updateDefaultValues();
+    updateTitle();
 }
 
 void MainWindow::updateDefaultValues()

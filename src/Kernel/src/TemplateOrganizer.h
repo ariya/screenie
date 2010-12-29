@@ -9,6 +9,13 @@ class ScreenieModelInterface;
 class ScreenieTemplateModel;
 class TemplateOrganizerPrivate;
 
+/*!
+ * Organizes the ScreenieTemplateModel instances by ordering them according
+ * to their \em order.
+ *
+ * \todo Implement re-ordering (much like changing Tab order in Qt Creator)
+ * \sa ScreenieTemplateModel#getOrder
+ */
 class TemplateOrganizer : public QObject
 {
     Q_OBJECT

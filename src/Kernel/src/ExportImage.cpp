@@ -37,12 +37,12 @@ ExportImage::ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &gra
 {
 }
 
-void ExportImage::exportImage(const QString &filePath, Selection selection) const
+bool ExportImage::exportImage(const QString &filePath, Selection selection) const
 {
     /*!\todo Specify some margin etc. */
 
     QImage image = exportImage(selection);
-    image.save(filePath, "PNG");
+    return image.save(filePath, "PNG");
 }
 
 QImage ExportImage::exportImage(Selection selection) const

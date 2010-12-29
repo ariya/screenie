@@ -18,34 +18,33 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIESCENEDAO_H
-#define SCREENIESCENEDAO_H
+#ifndef SCREENIETEMPLATEMODELDAO_H
+#define SCREENIETEMPLATEMODELDAO_H
 
-class ScreenieScene;
+class ScreenieTemplateModel;
 
-class ScreenieSceneDao
+class ScreenieTemplateModelDao
 {
 public:
-
-    virtual ~ScreenieSceneDao() {}
+    virtual ~ScreenieTemplateModelDao() {}
 
     /*!
-     * Writes the \p screenieScene.
+     * Writes the \p screeniePixmapModel.
      *
-     * \param screenieScene
-     *        the ScreenieScene to be written
+     * \param screeniePixmapModel
+     *        the ScreeniePixmapModel to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
-    virtual bool write(const ScreenieScene &screenieScene) = 0;
+    virtual bool write(const ScreenieTemplateModel &screenieTemplateModel) = 0;
 
     /*!
-     * Creates and reads the \em current ScreenieScene. The caller is then the owner
+     * Creates and reads the \em current ScreenieTemplateModel. The caller is then the owner
      * of the returned instance.
      *
-     * \return the ScreenieScene read from the \em current position in the persistence stream;
+     * \return the ScreenieTemplateModel read from the \em current position in the persistence stream;
      *         must be \c deleted by the caller; may be 0 on error
      */
-    virtual ScreenieScene *read() const = 0;
+    virtual ScreenieTemplateModel *read() = 0;
 };
 
-#endif // SCREENIESCENEDAO_H
+#endif // SCREENIETEMPLATEMODELDAO_H

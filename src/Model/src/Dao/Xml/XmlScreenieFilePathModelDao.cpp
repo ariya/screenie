@@ -45,7 +45,11 @@ XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamReader *xmlSt
 {
 }
 
-XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao(){
+XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao()
+{
+#ifdef DEBUG
+    qDebug("XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao: called.");
+#endif
     delete d;
 }
 

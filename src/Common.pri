@@ -1,17 +1,17 @@
 APP_NAME = Screenie
 
-LANGUAGE       = C++
-CONFIG        += qt warn_on thread
+LANGUAGE = C++
+CONFIG += qt warn_on thread
 
 # On Mac we build 64bit Intel only
 macx {
-  CONFIG      += x86_64
-  CONFIG      -= x86 ppc
+  CONFIG += x86_64
+  CONFIG -= x86 ppc
 }
 
-DEFINES       += QT_NO_COMPAT
+DEFINES += QT_NO_COMPAT
 
-debug {
+CONFIG(debug, debug|release) {
     OBJECTS_DIR    = obj/debug
     MOC_DIR        = GeneratedFiles/debug
     UI_DIR         = GeneratedFiles/debug

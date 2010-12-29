@@ -49,7 +49,11 @@ XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamReader *xmlStream
 {
 }
 
-XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao(){
+XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao()
+{
+#ifdef DEBUG
+    qDebug("XmlScreeniePixmapModelDao::~XmlScreeniePixmapModelDao: called.");
+#endif
     delete d;
 }
 

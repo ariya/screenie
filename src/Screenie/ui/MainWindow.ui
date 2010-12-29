@@ -236,7 +236,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -301,7 +301,7 @@
   </widget>
   <action name="quitAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/application-exit.png</normaloff>:/img/application-exit.png</iconset>
    </property>
    <property name="text">
@@ -313,7 +313,7 @@
   </action>
   <action name="addImageAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
@@ -328,7 +328,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-open.png</normaloff>:/img/document-open.png</iconset>
    </property>
    <property name="text">
@@ -340,7 +340,7 @@
   </action>
   <action name="saveAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-save.png</normaloff>:/img/document-save.png</iconset>
    </property>
    <property name="text">
@@ -352,11 +352,14 @@
   </action>
   <action name="saveAsAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-save-as.png</normaloff>:/img/document-save-as.png</iconset>
    </property>
    <property name="text">
     <string>Save &amp;As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="exportAction">
@@ -374,7 +377,7 @@
   </action>
   <action name="addTemplateAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
@@ -389,7 +392,7 @@
   </action>
   <action name="toggleFullScreenAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/view-fullscreen.png</normaloff>:/img/view-fullscreen.png</iconset>
    </property>
    <property name="text">
@@ -436,7 +439,7 @@
   </action>
   <action name="deleteAction">
    <property name="text">
-    <string>&amp;Delete Selected Items</string>
+    <string>&amp;Delete</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -444,7 +447,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../../../Resources/Resources.qrc"/>
+  <include location="../../Resources/Resources.qrc"/>
  </resources>
  <connections>
   <connection>

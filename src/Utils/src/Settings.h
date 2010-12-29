@@ -71,6 +71,13 @@ public:
      */
     UTILS_API void setLastExportDirectoryPath(const QString &lastExportDirectoryPath);
 
+    UTILS_API const QString &getLastDocumentFilePath() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setLastDocumentDirectoryPath(const QString &lastDocumentDirectoryPath);
+
 public slots:
     /*!
      * Stores these Settings to a user configuration file.
