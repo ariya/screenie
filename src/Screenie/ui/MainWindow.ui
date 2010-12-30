@@ -236,7 +236,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -414,6 +414,10 @@
    </property>
   </action>
   <action name="cutAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-cut.png</normaloff>:/img/edit-cut.png</iconset>
+   </property>
    <property name="text">
     <string>Cu&amp;t</string>
    </property>
@@ -422,6 +426,10 @@
    </property>
   </action>
   <action name="copyAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-copy.png</normaloff>:/img/edit-copy.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -430,6 +438,10 @@
    </property>
   </action>
   <action name="pasteAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-paste.png</normaloff>:/img/edit-paste.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -438,6 +450,10 @@
    </property>
   </action>
   <action name="deleteAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-delete.png</normaloff>:/img/edit-delete.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Delete</string>
    </property>

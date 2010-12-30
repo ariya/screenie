@@ -23,3 +23,7 @@ bin
 .DS_Store
 *.app
 *.dylib
+
+# Windows
+Thumbs.db
+
