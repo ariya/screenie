@@ -54,8 +54,6 @@ public:
 
     KERNEL_API ScreenieModelInterface &getScreenieModel() const;
 
-    KERNEL_API void debugSetPaintMode(int paintMode);
-
 protected:
     virtual int type() const;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -64,7 +62,6 @@ protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
     ScreenieModelInterface &m_screenieModel;
@@ -72,7 +69,6 @@ private:
     Reflection &m_reflection;
     bool m_transformPixmap;
     bool m_ignoreUpdates;
-    int m_debugPaintMode;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);

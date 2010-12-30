@@ -73,11 +73,6 @@ ScreenieModelInterface &ScreeniePixmapItem::getScreenieModel() const
     return m_screenieModel;
 }
 
-void ScreeniePixmapItem::debugSetPaintMode(int paintMode)
-{
-    m_debugPaintMode = paintMode;
-}
-
 // protected
 
 int ScreeniePixmapItem::type() const
@@ -135,12 +130,6 @@ QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVarian
         m_screenieModel.setSelected(value.toBool());
     }
     return QGraphicsPixmapItem::itemChange(change, value);
-}
-
-void ScreeniePixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    painter->setCompositionMode(static_cast<QPainter::CompositionMode>(m_debugPaintMode));
-    QGraphicsPixmapItem::paint(painter, option, widget);
 }
 
 // private

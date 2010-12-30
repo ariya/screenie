@@ -525,17 +525,5 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
-void MainWindow::on_paintModeAction_triggered()
-{
-    static int paintMode = 0;
-    foreach(QGraphicsItem *current, m_screenieGraphicsScene->items()) {
-        static_cast<ScreeniePixmapItem *>(current)->debugSetPaintMode(paintMode);
-    }
-    qDebug("Paint mode: %d", paintMode);
-    paintMode = (paintMode + 1) % (QPainter::RasterOp_SourceAndNotDestination +1);
-    this->update();
-}
-
-
 
 

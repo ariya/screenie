@@ -111,10 +111,6 @@ private slots:
     void handleGraphicsSceneChanged();
     void updateUi();
     void updateDefaultValues();
-
-
-
-    void on_paintModeAction_triggered();
 };
 
 #endif // MAINWINDOW_H
