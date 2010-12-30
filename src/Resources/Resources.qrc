@@ -7,5 +7,9 @@
         <file>img/document-save.png</file>
         <file>img/document-open.png</file>
         <file>img/view-fullscreen.png</file>
+        <file>img/edit-paste.png</file>
+        <file>img/edit-copy.png</file>
+        <file>img/edit-cut.png</file>
+        <file>img/edit-delete.png</file>
     </qresource>
 </RCC>

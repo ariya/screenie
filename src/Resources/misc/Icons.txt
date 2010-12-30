@@ -1,0 +1,4 @@
+Icons
+=====
+
+oxygen-icons-4.5.85: http://www.oxygen-icons.org/
