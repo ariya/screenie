@@ -71,7 +71,7 @@ XmlScreenieSceneDao::~XmlScreenieSceneDao()
     delete d;
 }
 
-bool XmlScreenieSceneDao::write(const ScreenieScene &screenieScene)
+bool XmlScreenieSceneDao::write(ScreenieScene &screenieScene)
 {
     bool result;
     if (d->file.open(QIODevice::WriteOnly)) {
@@ -122,7 +122,7 @@ ScreenieScene *XmlScreenieSceneDao::read() const
 
 // private
 
-bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
+bool XmlScreenieSceneDao::writeScreenieScene(ScreenieScene &screenieScene)
 {
     bool result = true;
     d->streamWriter->writeDTD("<!DOCTYPE screenie>");
@@ -140,6 +140,9 @@ bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene)
         result = writeScreenieModels(screenieScene);
     }
     d->streamWriter->writeEndElement();
+    if (result) {
+        screenieScene.setModified(false);
+    }
     return result;
 }
 
@@ -255,7 +258,9 @@ ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
 #ifdef DEBUG
         qDebug("XmlScreenieSceneDao::readScreenieScene: streamReader error: %d, ok: %d", d->streamReader->error(), ok);
 #endif
-    if (!ok) {
+    if (ok) {
+        result->setModified(false);
+    } else {
         delete result;
         result = 0;
     }

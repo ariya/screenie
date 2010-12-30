@@ -32,6 +32,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
+#include <QtGui/QCloseEvent>
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
@@ -49,6 +50,8 @@
 #include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+
+#include "../../Kernel/src/ScreeniePixmapItem.h"
 
 // public
 
@@ -105,6 +108,34 @@ MainWindow::~MainWindow()
     Settings::destroyInstance();
 }
 
+// protected
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (m_screenieScene->isModified()) {
+
+        switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
+                                      tr("The scene has been modified! Save now?"),
+                                      QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape))
+        {
+        case QMessageBox::Yes:
+            this->on_saveAction_triggered();
+            event->accept();
+            break;
+        case QMessageBox::Cancel:
+            event->ignore();
+            break;
+        case QMessageBox::No:
+            event->accept();
+            break;
+        default:
+            break;
+        }
+    } else {
+        event->accept();
+    }
+}
+
 // private
 
 void MainWindow::frenchConnection()
@@ -126,6 +157,7 @@ bool MainWindow::read(const QString &filePath)
     ScreenieScene *screenieScene = screenieSceneDao->read();
     if (screenieScene != 0) {
         updateScene(screenieScene);
+        updateTitle();
         result = true;
     } else {
         result = false;
@@ -135,8 +167,13 @@ bool MainWindow::read(const QString &filePath)
 
 bool MainWindow::write(const QString &filePath)
 {
+    bool result;
     ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    return screenieSceneDao->write(*m_screenieScene);
+    result = screenieSceneDao->write(*m_screenieScene);
+    if (result) {
+        updateTitle();
+    }
+    return result;
 }
 
 void MainWindow::updateTransformationUi()
@@ -226,6 +263,9 @@ void MainWindow::updateTitle()
         title = QFileInfo(m_documentFilePath).fileName() + " - ";
     }
     title.append(Version::getApplicationName());
+    if (m_screenieScene->isModified()) {
+        title.append("*");
+    }
     setWindowTitle(title);
 }
 
@@ -271,7 +311,6 @@ void MainWindow::on_openAction_triggered()
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
             m_documentFilePath = filePath;
-            updateTitle();
         }
 #ifdef DEBUG
         qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
@@ -305,7 +344,6 @@ void MainWindow::on_saveAsAction_triggered()
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
             m_documentFilePath = filePath;
-            updateTitle();
         }
     }
 }
@@ -487,7 +525,16 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
-
+void MainWindow::on_paintModeAction_triggered()
+{
+    static int paintMode = 0;
+    foreach(QGraphicsItem *current, m_screenieGraphicsScene->items()) {
+        static_cast<ScreeniePixmapItem *>(current)->debugSetPaintMode(paintMode);
+    }
+    qDebug("Paint mode: %d", paintMode);
+    paintMode = (paintMode + 1) % (QPainter::RasterOp_SourceAndNotDestination +1);
+    this->update();
+}
 
 
 

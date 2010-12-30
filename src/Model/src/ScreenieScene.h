@@ -97,6 +97,25 @@ public:
      */
     MODEL_API bool hasTemplates() const;
 
+    /*!
+     * Returns whether this ScreenieScene has been modified since creation or the last save.
+     *
+     * \ return \c true if this ScreenieScene has unsaved changes; \c false else
+     */
+    MODEL_API bool isModified() const;
+
+    /*!
+     * Sets this ScreenieScene as \p modified.
+     *
+     * Implementation note: this method is only to be called by this ScreenieScene itself and
+     * the corresponding DAO classes in the same module, hence not exported.
+     *
+     * \param modified
+     *        set to \c true if modified; \c false else
+     * \sa ScreenieSceneDao#write(const ScreenieScene &)
+     */
+    void setModified(bool modified);
+
 signals:
     /*!
      * Emitted whenever this ScreenieScene or one of the instances of the ScreenieModelInterface has changed.
@@ -133,6 +152,11 @@ signals:
 
 private:
     ScreenieScenePrivate *d;
+
+    void frenchConnection();
+
+private slots:
+    void handleChanged();
 };
 
 #endif // SCREENIESCENE_H

@@ -54,6 +54,8 @@ public:
 
     KERNEL_API ScreenieModelInterface &getScreenieModel() const;
 
+    KERNEL_API void debugSetPaintMode(int paintMode);
+
 protected:
     virtual int type() const;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -70,6 +72,7 @@ private:
     Reflection &m_reflection;
     bool m_transformPixmap;
     bool m_ignoreUpdates;
+    int m_debugPaintMode;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);

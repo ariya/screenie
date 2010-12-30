@@ -278,7 +278,9 @@
     <addaction name="pasteAction"/>
     <addaction name="deleteAction"/>
     <addaction name="separator"/>
+    <addaction name="paintModeAction"/>
     <addaction name="selectAllAction"/>
+    <addaction name="actionPaint"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -443,6 +445,19 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="paintModeAction">
+   <property name="text">
+    <string>Paint Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
+   </property>
+  </action>
+  <action name="actionPaint">
+   <property name="text">
+    <string>Paint</string>
    </property>
   </action>
  </widget>

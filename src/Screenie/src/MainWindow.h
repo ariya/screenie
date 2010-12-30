@@ -27,6 +27,7 @@
 #include <QtGui/QMainWindow>
 
 class QWidget;
+class QCloseEvent;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -46,6 +47,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -107,6 +111,10 @@ private slots:
     void handleGraphicsSceneChanged();
     void updateUi();
     void updateDefaultValues();
+
+
+
+    void on_paintModeAction_triggered();
 };
 
 #endif // MAINWINDOW_H

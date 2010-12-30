@@ -30,12 +30,14 @@ class ScreenieScenePrivate
 public:
     ScreenieScenePrivate()
         : backgroundEnabled(true),
-          backgroundColor(QColor(255, 255, 255))
+          backgroundColor(QColor(255, 255, 255)),
+          modified(false)
     {}
 
     bool backgroundEnabled;
     QColor backgroundColor;
     QList<ScreenieModelInterface *> screenieModels;
+    bool modified;
 };
 
 // public
@@ -43,6 +45,7 @@ public:
 ScreenieScene::ScreenieScene(QObject *parent)
     : QObject(parent), d(new ScreenieScenePrivate())
 {
+    frenchConnection();
 }
 
 ScreenieScene::~ScreenieScene()
@@ -159,3 +162,33 @@ bool ScreenieScene::hasTemplates() const
     return result;
 }
 
+bool ScreenieScene::isModified() const
+{
+    return d->modified;
+}
+
+void ScreenieScene::setModified(bool modified)
+{
+    d->modified = modified;
+}
+
+// private
+
+void ScreenieScene::frenchConnection()
+{
+    connect(this, SIGNAL(backgroundChanged()),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(modelAdded(ScreenieModelInterface&)),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(modelRemoved(ScreenieModelInterface&)),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(changed()),
+            this, SLOT(handleChanged()));
+}
+
+// private slots
+
+void ScreenieScene::handleChanged()
+{
+    setModified(true);
+}

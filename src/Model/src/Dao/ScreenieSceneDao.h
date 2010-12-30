@@ -30,17 +30,17 @@ public:
     virtual ~ScreenieSceneDao() {}
 
     /*!
-     * Writes the \p screenieScene.
+     * Writes the \p screenieScene. Sets the \em modified flag to \c false.
      *
      * \param screenieScene
      *        the ScreenieScene to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
-    virtual bool write(const ScreenieScene &screenieScene) = 0;
+    virtual bool write(ScreenieScene &screenieScene) = 0;
 
     /*!
      * Creates and reads the \em current ScreenieScene. The caller is then the owner
-     * of the returned instance.
+     * of the returned instance. The result has the \em modified flag set to \c false.
      *
      * \return the ScreenieScene read from the \em current position in the persistence stream;
      *         must be \c deleted by the caller; may be 0 on error
