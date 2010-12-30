@@ -116,7 +116,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
         switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
                                       tr("The scene has been modified! Save now?"),
-                                      QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape))
+                                      QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
         {
         case QMessageBox::Yes:
             this->on_saveAction_triggered();
@@ -140,8 +140,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::frenchConnection()
 {
-    connect(m_screenieGraphicsScene, SIGNAL(changed(QList<QRectF>)),
-            this, SLOT(handleGraphicsSceneChanged()));
     connect(m_screenieGraphicsScene, SIGNAL(selectionChanged()),
             this, SLOT(updateUi()));
     connect(m_screenieScene, SIGNAL(changed()),
@@ -260,12 +258,16 @@ void MainWindow::updateTitle()
 {
     QString title;
     if (!m_documentFilePath.isNull()) {
-        title = QFileInfo(m_documentFilePath).fileName() + " - ";
+        title = QFileInfo(m_documentFilePath).fileName();
+    } else {
+        title = tr("New", "The document name for an unsaved document.");
+    }
+    if (m_screenieScene->isModified()) {
+        title.append("* - ");
+    } else {
+        title.append(" - ");
     }
     title.append(Version::getApplicationName());
-    if (m_screenieScene->isModified()) {
-        title.append("*");
-    }
     setWindowTitle(title);
 }
 
@@ -493,14 +495,6 @@ void MainWindow::on_blueSlider_valueChanged(int value)
 
 void MainWindow::on_aboutQtAction_triggered() {
     QMessageBox::aboutQt(this);
-}
-
-void MainWindow::handleGraphicsSceneChanged()
-{
-    if (m_screenieGraphicsScene->selectedItems().count() > 0) {
-        QGraphicsItem *selected = m_screenieGraphicsScene->selectedItems().first();
-        ui->statusbar->showMessage(QString("Object x/y: %1 / %2").arg(selected->scenePos().x()).arg(selected->scenePos().y()), 3000);
-    }
 }
 
 void MainWindow::updateUi()

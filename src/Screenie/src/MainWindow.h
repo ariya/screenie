@@ -108,7 +108,6 @@ private slots:
 
     void on_aboutQtAction_triggered();
 
-    void handleGraphicsSceneChanged();
     void updateUi();
     void updateDefaultValues();
 };
