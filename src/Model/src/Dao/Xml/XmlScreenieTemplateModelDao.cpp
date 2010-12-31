@@ -19,8 +19,11 @@
  */
 
 #include <QtCore/QString>
+#include <QtCore/QBitArray>
 #include <QtCore/QXmlStreamWriter>
+#include <QtCore/QSize>
 
+#include "../../../../Utils/src/SizeFitter.h"
 #include "../../ScreenieTemplateModel.h"
 #include "XmlScreenieTemplateModelDao.h"
 
@@ -74,13 +77,14 @@ ScreenieTemplateModel *XmlScreenieTemplateModelDao::read()
 bool XmlScreenieTemplateModelDao::writeSpecific()
 {
     bool result = true;
-    /*!\todo Size fitter settings */
     QXmlStreamWriter *streamWriter = getStreamWriter();
     streamWriter->writeStartElement("template");
     {
         QXmlStreamAttributes templateAttributes;
         templateAttributes.append("order", QString::number(d->writeModel->getOrder()));
         streamWriter->writeAttributes(templateAttributes);
+
+        result = writeSizeFitter(d->writeModel->getSizeFitter());
     }
     streamWriter->writeEndElement();
     return result;
@@ -89,18 +93,79 @@ bool XmlScreenieTemplateModelDao::writeSpecific()
 bool XmlScreenieTemplateModelDao::readSpecific()
 {
     bool result = true;
-    bool ok;
-    /*!\todo Size fitter settings */
     QXmlStreamReader *streamReader = getStreamReader();
     streamReader->readNextStartElement();
     QXmlStreamAttributes templateAttributes = streamReader->attributes();
-    int order = templateAttributes.value("order").toString().toInt(&ok);
-    if (ok) {
+    int order = templateAttributes.value("order").toString().toInt(&result);
+    if (result) {
         d->readModel->setOrder(order);
-    } else {
-        result = false;
+        result = readSizeFitter(d->readModel->getSizeFitter());
     }
     streamReader->skipCurrentElement();
+    return result;
+}
+
+// private
+
+bool XmlScreenieTemplateModelDao::writeSizeFitter(const SizeFitter &sizeFitter)
+{
+    bool result = true;
+    QXmlStreamWriter *streamWriter = getStreamWriter();
+    streamWriter->writeStartElement("sizefitter");
+    {
+        QXmlStreamAttributes sizeFitterAttributes;
+        sizeFitterAttributes.append("mode", QString::number(sizeFitter.getFitMode()));
+        QBitArray fitOptions = d->writeModel->getSizeFitter().getFitOptions();
+        QString bitOptionString = serializeBitArray(fitOptions);
+        sizeFitterAttributes.append("options", bitOptionString);
+        sizeFitterAttributes.append("width", QString::number(d->writeModel->getSizeFitter().getTargetSize().width()));
+        sizeFitterAttributes.append("height", QString::number(d->writeModel->getSizeFitter().getTargetSize().height()));
+        streamWriter->writeAttributes(sizeFitterAttributes);
+    }
+    streamWriter->writeEndElement();
+    return result;
+}
+
+bool XmlScreenieTemplateModelDao::readSizeFitter(SizeFitter &sizeFitter)
+{
+    bool result = true;
+    QXmlStreamReader *streamReader = getStreamReader();
+    streamReader->readNextStartElement();
+    QXmlStreamAttributes sizeFitterAttributes = streamReader->attributes();
+    int mode = sizeFitterAttributes.value("mode").toString().toInt(&result);
+    if (result) {
+        sizeFitter.setFitMode(static_cast<SizeFitter::FitMode>(mode));
+        QString bitArrayString = sizeFitterAttributes.value("options").toString();
+        QBitArray fitOptions = deserializeBitArray(bitArrayString);
+        sizeFitter.setFitOptions(fitOptions);
+        int width = sizeFitterAttributes.value("width").toString().toInt(&result);
+        if (result) {
+            int height = sizeFitterAttributes.value("width").toString().toInt(&result);
+            sizeFitter.setTargetSize(QSize(width, height));
+        }
+    }
+    streamReader->skipCurrentElement();
+    return result;
+}
+
+QString XmlScreenieTemplateModelDao::serializeBitArray(const QBitArray &bitArray)
+{
+    QString result;
+    int n = bitArray.count();
+    for (int i = 0; i < n; ++i) {
+        result.append(bitArray.at(i) == true ? "1" : "0");
+    }
+    return result;
+}
+
+QBitArray XmlScreenieTemplateModelDao::deserializeBitArray(const QString &bitArrayString)
+{
+    int n = bitArrayString.length();
+    QBitArray result(n);
+    for (int i = 0; i < n; ++i) {
+        QChar ch = bitArrayString.at(i);
+        result.setBit(i, ch == '1' ? true : false);
+    }
     return result;
 }
 

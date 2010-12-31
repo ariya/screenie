@@ -62,7 +62,7 @@ public:
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
 
-    const SizeFitter &getSizeFitter() const;
+    SizeFitter &getSizeFitter() const;
 
     /*!
      * Returns the requested size.

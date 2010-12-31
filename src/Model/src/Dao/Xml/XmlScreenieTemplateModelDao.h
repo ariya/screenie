@@ -21,6 +21,9 @@
 #ifndef XMLSCREENIETEMPLATEMODELDAO_H
 #define XMLSCREENIETEMPLATEMODELDAO_H
 
+#include <QtCore/QString>
+#include <QtCore/QBitArray>
+
 class QXmlStreamWriter;
 class QXmlStreamReader;
 
@@ -28,6 +31,7 @@ class QXmlStreamReader;
 #include "AbstractXmlScreenieModelDao.h"
 
 class ScreenieTemplateModel;
+class SizeFitter;
 class XmlScreenieTemplateModelDaoPrivate;
 
 /*!
@@ -49,6 +53,12 @@ protected:
 
 private:
     XmlScreenieTemplateModelDaoPrivate *d;
+
+    bool writeSizeFitter(const SizeFitter &sizeFitter);
+    bool readSizeFitter(SizeFitter &sizeFitter);
+
+    static QString serializeBitArray(const QBitArray &bitArray);
+    static QBitArray deserializeBitArray(const QString &bitArrayString);
 };
 
 #endif // XMLSCREENIETEMPLATEMODELDAO_H

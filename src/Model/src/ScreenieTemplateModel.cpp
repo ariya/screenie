@@ -92,7 +92,7 @@ bool ScreenieTemplateModel::isTemplate() const
     return true;
 }
 
-const SizeFitter &ScreenieTemplateModel::getSizeFitter() const
+SizeFitter &ScreenieTemplateModel::getSizeFitter() const
 {
     return d->sizeFitter;
 }
