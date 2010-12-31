@@ -236,13 +236,14 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="newAction"/>
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
@@ -298,6 +299,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="addImageAction"/>
+   <addaction name="addTemplateAction"/>
+   <addaction name="separator"/>
+   <addaction name="toggleFullScreenAction"/>
   </widget>
   <action name="quitAction">
    <property name="icon">
@@ -378,7 +382,7 @@
   <action name="addTemplateAction">
    <property name="icon">
     <iconset resource="../../Resources/Resources.qrc">
-     <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
+     <normaloff>:/img/insert-template.png</normaloff>:/img/insert-template.png</iconset>
    </property>
    <property name="text">
     <string>Template</string>
@@ -396,10 +400,10 @@
      <normaloff>:/img/view-fullscreen.png</normaloff>:/img/view-fullscreen.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Fullscreen</string>
+    <string>&amp;Full Screen</string>
    </property>
    <property name="toolTip">
-    <string>View Fullscreen</string>
+    <string>View Full Screen</string>
    </property>
    <property name="shortcut">
     <string>F11</string>
@@ -459,6 +463,18 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="newAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/document-new.png</normaloff>:/img/document-new.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

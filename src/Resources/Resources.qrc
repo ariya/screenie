@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/ApplicationIcon.png</file>
         <file>img/insert-image.png</file>
         <file>img/application-exit.png</file>
         <file>img/document-save-as.png</file>
@@ -11,5 +10,8 @@
         <file>img/edit-copy.png</file>
         <file>img/edit-cut.png</file>
         <file>img/edit-delete.png</file>
+        <file>img/application-icon.png</file>
+        <file>img/insert-template.png</file>
+        <file>img/document-new.png</file>
     </qresource>
 </RCC>

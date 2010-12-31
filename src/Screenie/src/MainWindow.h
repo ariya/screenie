@@ -62,6 +62,7 @@ private:
 
     void frenchConnection();
 
+    void newScene(ScreenieScene &screenieScene);
     bool read(const QString &filePath);
     bool write(const QString &filePath);
 
@@ -73,10 +74,13 @@ private:
     void initializeUi();
 
     void createScene();
-    void updateScene(ScreenieScene *screenieScene);
+    void updateScene(ScreenieScene &screenieScene);
+
+    bool proceedWithModifiedScene();
 
 private slots:
     // File
+    void on_newAction_triggered();
     void on_openAction_triggered();
     void on_saveAction_triggered();
     void on_saveAsAction_triggered();

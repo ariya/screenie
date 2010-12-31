@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ignoreUpdateSignals(false)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
     /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
@@ -112,27 +113,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (m_screenieScene->isModified()) {
-
-        switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
-                                      tr("The scene has been modified! Save now?"),
-                                      QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
-        {
-        case QMessageBox::Yes:
-            this->on_saveAction_triggered();
-            event->accept();
-            break;
-        case QMessageBox::Cancel:
-            event->ignore();
-            break;
-        case QMessageBox::No:
-            event->accept();
-            break;
-        default:
-            break;
-        }
-    } else {
+    if (proceedWithModifiedScene()) {
         event->accept();
+    } else {
+        event->ignore();
     }
 }
 
@@ -148,14 +132,19 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
 }
 
+void MainWindow::newScene(ScreenieScene &screenieScene)
+{
+    updateScene(screenieScene);
+    updateTitle();
+}
+
 bool MainWindow::read(const QString &filePath)
 {
     bool result;
     ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
     ScreenieScene *screenieScene = screenieSceneDao->read();
     if (screenieScene != 0) {
-        updateScene(screenieScene);
-        updateTitle();
+        newScene(*screenieScene);
         result = true;
     } else {
         result = false;
@@ -287,11 +276,12 @@ void MainWindow::createScene()
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
 }
 
-void MainWindow::updateScene(ScreenieScene *screenieScene)
+void MainWindow::updateScene(ScreenieScene &screenieScene)
 {
+    // delete previous instances
     delete m_screenieScene;
     delete m_screenieControl;
-    m_screenieScene = screenieScene;
+    m_screenieScene = &screenieScene;
 
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
     m_screenieControl->updateScene();
@@ -300,23 +290,62 @@ void MainWindow::updateScene(ScreenieScene *screenieScene)
             this, SLOT(updateUi()));
 }
 
+bool MainWindow::proceedWithModifiedScene()
+{
+    bool result;
+    if (m_screenieScene->isModified()) {
+        switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
+                                      tr("The scene has been modified! Save now?"),
+                                      QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
+        {
+        case QMessageBox::Save:
+            on_saveAction_triggered();
+            result = true;
+            break;
+        case QMessageBox::Cancel:
+            result = false;
+            break;
+        case QMessageBox::Discard:
+            result = true;
+            break;
+        default:
+            result = false;
+            break;
+        }
+    } else {
+        result = true;
+    }
+    return result;
+}
+
 // private slots
+
+void MainWindow::on_newAction_triggered()
+{
+    if (proceedWithModifiedScene()) {
+        m_documentFilePath = QString();
+        ScreenieScene *screenieScene = new ScreenieScene();
+        newScene(*screenieScene);
+    }
+}
 
 void MainWindow::on_openAction_triggered()
 {
-    Settings &settings = Settings::getInstance();
-    QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
-    if (!filePath.isNull()) {
-        bool ok = read(filePath);
-        if (ok) {
-            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            m_documentFilePath = filePath;
-        }
+    if (proceedWithModifiedScene()) {
+        Settings &settings = Settings::getInstance();
+        QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
+        if (!filePath.isNull()) {
+            bool ok = read(filePath);
+            if (ok) {
+                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+                m_documentFilePath = filePath;
+            }
 #ifdef DEBUG
-        qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
+            qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
 #endif
+        }
     }
 }
 
