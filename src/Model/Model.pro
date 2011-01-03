@@ -1,5 +1,4 @@
 include(../CommonLibrary.pri)
-include(../Platforms.pri)
 include(../External.pri)
 include(Sources.pri)
 
@@ -9,6 +8,3 @@ DEFINES += MODEL_EXPORT
 LIBS += -L$${DESTDIR} \
         -lUtils
 
-HEADERS +=
-
-SOURCES +=
