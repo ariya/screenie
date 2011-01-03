@@ -18,6 +18,8 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <limits>
+
 #include <QtCore/QSize>
 
 #include "../../Utils/src/SizeFitter.h"
@@ -27,30 +29,48 @@
 class ScreenieTemplateModelPrivate
 {
 public:
-    ScreenieTemplateModelPrivate(const QSize &theSize)
-        : sizeFitter(theSize) {
-        sizeFitter.setFitMode(SizeFitter::Fit);
-        sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+    ScreenieTemplateModelPrivate(const QSize &theSize, int theOrder)
+        : sizeFitter(theSize),
+          order(theOrder)
+    {
+          sizeFitter.setFitMode(SizeFitter::Fit);
+          sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
     }
+
+    ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
+        : pixmap(other.pixmap),
+          sizeFitter(other.sizeFitter),
+          order(other.order)
+    {}
+
     QPixmap pixmap;
     SizeFitter sizeFitter;
+    int order;
 };
+
+const int ScreenieTemplateModel::Unordered = std::numeric_limits<int>::max();
 
 // public
 
+ScreenieTemplateModel::ScreenieTemplateModel()
+    : d(new ScreenieTemplateModelPrivate(QSize(640, 640), ScreenieTemplateModel::Unordered))
+{
+}
+
 ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
-    : d(new ScreenieTemplateModelPrivate(size))
+    : d(new ScreenieTemplateModelPrivate(size, ScreenieTemplateModel::Unordered))
+{
+}
+
+ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
+    : AbstractScreenieModel(other),
+      d(new ScreenieTemplateModelPrivate(*other.d))
 {
 }
 
 ScreenieTemplateModel::~ScreenieTemplateModel()
 {
     delete d;
-}
-
-const SizeFitter &ScreenieTemplateModel::getSizeFitter() const
-{
-    return d->sizeFitter;
 }
 
 const QPixmap &ScreenieTemplateModel::readPixmap() const
@@ -61,9 +81,38 @@ const QPixmap &ScreenieTemplateModel::readPixmap() const
     return d->pixmap;
 }
 
+ScreenieModelInterface *ScreenieTemplateModel::copy() const
+{
+    ScreenieTemplateModel *result = new ScreenieTemplateModel(*this);
+    return result;
+}
+
+bool ScreenieTemplateModel::isTemplate() const
+{
+    return true;
+}
+
+SizeFitter &ScreenieTemplateModel::getSizeFitter() const
+{
+    return d->sizeFitter;
+}
+
 QSize ScreenieTemplateModel::getSize() const
 {
     return d->sizeFitter.getTargetSize();
+}
+
+int ScreenieTemplateModel::getOrder() const
+{
+    return d->order;
+}
+
+void ScreenieTemplateModel::setOrder(int order)
+{
+    if (d->order != order) {
+        d->order = order;
+        emit changed();
+    }
 }
 
 // private

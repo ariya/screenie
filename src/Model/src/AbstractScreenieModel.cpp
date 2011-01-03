@@ -18,6 +18,8 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <cstdlib>
+
 #include <QtCore/QPointF>
 #include <QtGui/QPixmap>
 
@@ -35,20 +37,44 @@ public:
           rotation(DefaultScreenieModel::Rotation),
           reflectionEnabled(DefaultScreenieModel::ReflectionEnabled),
           reflectionOffset(DefaultScreenieModel::ReflectionOffset),
-          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity) {}
+          reflectionOpacity(DefaultScreenieModel::ReflectionOpacity),
+          selected(false)
+
+    {}
+
+    AbstractScreenieModelPrivate(const AbstractScreenieModelPrivate &other)
+        : position(other.position),
+          distance(other.distance),
+          rotation(other.rotation),
+          reflectionEnabled(other.reflectionEnabled),
+          reflectionOffset(other.reflectionOffset),
+          reflectionOpacity(other.reflectionOpacity),
+          selected(other.selected)
+    {}
 
     QPointF position;
-    int distance;
+    qreal distance;
     int rotation;
     int reflectionEnabled;
     int reflectionOffset;
-    int reflectionOpacity;    
+    int reflectionOpacity;
+    bool selected;
+
+    static const qreal Epsilon;
 };
+
+const qreal AbstractScreenieModelPrivate::Epsilon = 0.001;
 
 // public
 
 AbstractScreenieModel::AbstractScreenieModel()
     : d(new AbstractScreenieModelPrivate())
+{
+}
+
+AbstractScreenieModel::AbstractScreenieModel(const AbstractScreenieModel &other)
+    : ScreenieModelInterface(),
+      d(new AbstractScreenieModelPrivate(*other.d))
 {
 }
 
@@ -78,30 +104,30 @@ void AbstractScreenieModel::translate(qreal dx, qreal dy)
     setPosition(newPosition);
 }
 
-int AbstractScreenieModel::getDistance() const
+qreal AbstractScreenieModel::getDistance() const
 {
     return d->distance;
 }
 
-void AbstractScreenieModel::setDistance(int distance)
+void AbstractScreenieModel::setDistance(qreal distance)
 {
-    if (d->distance != distance && 0 <= distance && distance <= MaxDistance) {
+    if (::abs(d->distance - distance) > AbstractScreenieModelPrivate::Epsilon && 0 <= distance && distance <= MaxDistance) {
         d->distance = distance;
         emit distanceChanged();
     }
 }
 
-void AbstractScreenieModel::addDistance(int distance)
+void AbstractScreenieModel::addDistance(qreal distance)
 {
-    if (distance != 0) {
+    if (::abs(distance) > AbstractScreenieModelPrivate::Epsilon) {
         int oldDistance = d->distance;
         d->distance += distance;
-        if (d->distance < 0) {
-            d->distance = 0;
+        if (d->distance < 0.0) {
+            d->distance = 0.0;
         } else if (d->distance > MaxDistance) {
             d->distance = MaxDistance;
         }
-        if (d->distance != oldDistance) {
+        if (::abs(d->distance - oldDistance) > AbstractScreenieModelPrivate::Epsilon) {
             emit distanceChanged();
         }
     }
@@ -198,6 +224,19 @@ void AbstractScreenieModel::addReflectionOpacity(int reflectionOpacity)
             emit reflectionChanged();
         }
     }
+}
+
+void AbstractScreenieModel::setSelected(bool enable)
+{
+    if (d->selected != enable) {
+        d->selected = enable;
+        emit selectionChanged();
+    }
+}
+
+bool AbstractScreenieModel::isSelected() const
+{
+    return d->selected;
 }
 
 void AbstractScreenieModel::convert(ScreenieModelInterface &source)

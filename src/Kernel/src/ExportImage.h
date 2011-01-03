@@ -21,6 +21,8 @@
 #ifndef EXPORTIMAGE_H
 #define EXPORTIMAGE_H
 
+#include <QtGui/QImage>
+
 class QGraphicsScene;
 class QString;
 
@@ -31,13 +33,19 @@ class ScreenieScene;
 class ExportImage
 {
 public:
+    enum Selection {
+        Scene,
+        Selected
+    };
+
     KERNEL_API ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
 
-    KERNEL_API void exportImage(const QString &filePath);
+    KERNEL_API bool exportImage(const QString &filePath, Selection selection = Scene) const;
+    KERNEL_API QImage exportImage(Selection selection) const;
 
 private:
     const ScreenieScene &m_screenieScene;
-    QGraphicsScene &m_graphicsScene;
+    mutable QGraphicsScene &m_graphicsScene;
 };
 
 #endif // EXPORTIMAGE_H

@@ -25,7 +25,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QIcon>
 
-#include "../UserInterface/src/MainWindow.h"
+#include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
 #ifdef Q_OS_MAC
+    // Mac apps prefer not to have icons in menus
     QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
@@ -74,7 +75,6 @@ int main(int argc, char *argv[])
     app.installTranslator(&qtTranslator);
     MainWindow mainWindow;
 
-    mainWindow.setWindowIcon(QIcon(":/img/ApplicationIcon.png"));
     mainWindow.show();
     return app.exec();
 }

@@ -22,6 +22,7 @@
 #define XMLSCREENIEFILEPATHMODELDAO_H
 
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 #include "../ScreenieFilePathModelDao.h"
 #include "AbstractXmlScreenieModelDao.h"
@@ -35,7 +36,8 @@ class XmlScreenieFilePathModelDaoPrivate;
 class XmlScreenieFilePathModelDao : public AbstractXmlScreenieModelDao, public ScreenieFilePathModelDao
 {
 public:
-    explicit XmlScreenieFilePathModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit XmlScreenieFilePathModelDao(QXmlStreamWriter *xmlStreamWriter);
+    explicit XmlScreenieFilePathModelDao(QXmlStreamReader *xmlStreamReader);
     virtual ~XmlScreenieFilePathModelDao();
 
     virtual bool write(const ScreenieFilePathModel &screenieFilePathModel);

@@ -26,20 +26,20 @@ class DefaultScreenieModelPrivate
 {
 public:
     DefaultScreenieModelPrivate()
-        : distance(0),
+        : distance(0.0),
           rotation(0),
           reflectionEnabled(true),
           reflectionOffset(40),
           reflectionOpacity(50)
     {}
-    int distance;
+    qreal distance;
     int rotation;
     bool reflectionEnabled;
     int reflectionOffset;
     int reflectionOpacity;
 };
 
-const int DefaultScreenieModel::Distance = 0;
+const qreal DefaultScreenieModel::Distance = 0.0;
 const int DefaultScreenieModel::Rotation = 0;
 const bool DefaultScreenieModel::ReflectionEnabled = true;
 const int DefaultScreenieModel::ReflectionOffset = 40;
@@ -57,12 +57,12 @@ DefaultScreenieModel::~DefaultScreenieModel()
     delete d;
 }
 
-int DefaultScreenieModel::getDistance() const
+qreal DefaultScreenieModel::getDistance() const
 {
     return d->distance;
 }
 
-void DefaultScreenieModel::setDistance(int distance)
+void DefaultScreenieModel::setDistance(qreal distance)
 {
     d->distance = distance;
 }

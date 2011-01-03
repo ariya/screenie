@@ -42,7 +42,7 @@ public:
      * of the returned instance.
      *
      * \return the ScreenieFilePathModel read from the \em current position in the persistence stream;
-     *         must be \c deleted by the caller; may be 0
+     *         must be \c deleted by the caller; may be 0 on error
      */
     virtual ScreenieFilePathModel *read() = 0;
 };

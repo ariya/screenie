@@ -29,6 +29,7 @@ class QString;
 class ScreenieScene;
 class ScreenieFilePathModel;
 class ScreeniePixmapModel;
+class ScreenieTemplateModel;
 class XmlScreenieSceneDaoPrivate;
 
 /*!
@@ -39,20 +40,28 @@ class XmlScreenieSceneDaoPrivate;
 class XmlScreenieSceneDao : public ScreenieSceneDao
 {
 public:
+    /*!\todo Use a QIODevice instead of filePath, so we can also serialise into a QBuffer/QByteArray for copy/paste across applications */
     MODEL_API explicit XmlScreenieSceneDao(const QString &filePath);
     MODEL_API virtual ~XmlScreenieSceneDao();
 
-    MODEL_API virtual bool write(const ScreenieScene &screenieScene);
-    MODEL_API virtual ScreenieScene *read();
+    MODEL_API virtual bool write(ScreenieScene &screenieScene);
+    MODEL_API virtual ScreenieScene *read() const;
 
 private:
     XmlScreenieSceneDaoPrivate *d;
 
-    bool writeScreenieScene(const ScreenieScene &screenieScene);
+    bool writeScreenieScene(ScreenieScene &screenieScene);
     bool writeScreenieModels(const ScreenieScene &screenieScene);
     bool writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel);
     bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
-    void cleanUp();
+    bool writeTemplateModel(const ScreenieTemplateModel &screenieTemplateModel);
+
+    ScreenieScene *readScreenieScene() const;
+    ScreenieFilePathModel *readFilePathModel() const;
+    ScreeniePixmapModel *readPixmapModel() const;
+    ScreenieTemplateModel *readTemplateModel() const;
+
+    void cleanUp() const;
 };
 
 #endif // XMLSCREENIESCENEDAO_H

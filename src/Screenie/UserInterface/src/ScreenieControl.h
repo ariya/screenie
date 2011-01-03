@@ -38,13 +38,12 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreenieGraphicsScene;
 class ScreeniePixmapItem;
-class ScreenieTemplateModel;
 class Reflection;
 
 #include "../../../Model/src/DefaultScreenieModel.h"
 
 /*!
- * This is the controller of the ScreenieScene (model): it modifies the <em>selected</em> ScreenieModelInterface.
+ * This is the controller of the ScreenieScene (model): it modifies the \em selected ScreenieModelInterface.
  */
 class ScreenieControl : public QObject
 {
@@ -67,18 +66,22 @@ public:
 
     DefaultScreenieModel &getDefaultScreenieModel();
 
-    void updateModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+    void updateData(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
+
+    /*!
+     * Updates the QGraphicsView with the ScreenieScene. The QGraphicsView is first cleared.
+     */
+    void updateScene();
 
 public slots:
-    void addImage(QString filePath, QPointF centerPosition);
-    void addImages(QStringList filePaths, QPointF centerPosition);
-    void addImage(QPixmap pixmap, QPointF centerPosition);
-    void addImages(QList<QPixmap> pixmaps, QPointF centerPosition);
-    void addTemplate(QPointF centerPosition);
+    void addImage(QString filePath, QPointF position);
+    void addImages(QStringList filePaths, QPointF position);
+    void addImage(QPixmap pixmap, QPointF position);
+    void addImages(QList<QPixmap> pixmaps, QPointF position);
 
-    void translate(qreal dx, qreal dy);
     void setRotation(int angle);
     void rotate(int angle);    
+    void setPosition(QPointF position);
     void setDistance(int distance);
     void addDistance(int distance);
 
@@ -107,13 +110,6 @@ private:
     QList<ScreeniePixmapItem *> getScreeniePixmapItems() const;
     void setRenderQuality(RenderQuality renderQuality);
     void applyDefaultValues(ScreenieModelInterface &screenieModelInterface);
-    /*!\todo Put these methods in some Kernel "Geometry" class or somewhere */
-    QPointF calculateItemPosition(const ScreenieModelInterface &screenieModel, const QPointF &centerPosition);
-    QPixmap scaleToTemplate(const ScreenieTemplateModel &templateModel, const QPixmap &pixmap);
-    QPointF calculateItemPosition(const QPointF &sourcePosition, const QSize &sourceSize, const QSize &targetSize);
-
-    void updatePixmapModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
-    void updateFilePathModel(const QMimeData *mimeData, ScreenieModelInterface &screenieModel);
 
 private slots:
     void handleDistanceChanged();

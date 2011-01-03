@@ -30,21 +30,28 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QSlider>
 #include <QtGui/QMessageBox>
+#include <QtGui/QShortcut>
+#include <QtGui/QKeySequence>
+#include <QtGui/QCloseEvent>
 #include <QtOpenGL/QGLWidget>
 #include <QtOpenGL/QGLFormat>
 
-#include "../../../Utils/src/Settings.h"
-#include "../../../Model/src/ScreenieScene.h"
-#include "../../../Model/src/ScreenieModelInterface.h"
-#include "../../../Model/src/ScreenieFilePathModel.h"
-#include "../../../Model/src/Dao/ScreenieSceneDao.h"
-#include "../../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
-#include "../../../Kernel/src/ExportImage.h"
-#include "ScreenieControl.h"
-#include "ScreeniePixmapItem.h"
-#include "ScreenieGraphicsScene.h"
+#include "../../Utils/src/Settings.h"
+#include "../../Utils/src/Version.h"
+#include "../../Model/src/ScreenieScene.h"
+#include "../../Model/src/ScreenieModelInterface.h"
+#include "../../Model/src/ScreenieFilePathModel.h"
+#include "../../Model/src/Dao/ScreenieSceneDao.h"
+#include "../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
+#include "../../Kernel/src/ExportImage.h"
+#include "../../Kernel/src/Clipboard/Clipboard.h"
+#include "../../Kernel/src/ScreenieControl.h"
+#include "../../Kernel/src/ScreenieGraphicsScene.h"
+#include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+
+#include "../../Kernel/src/ScreeniePixmapItem.h"
 
 // public
 
@@ -54,15 +61,22 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ignoreUpdateSignals(false)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
+    /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
+             as provided by Qt: http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
 #ifdef Q_OS_MAC
     // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
+    // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
     // For Mac there does not seem to be a common shortcut for fullscreen
     // (unlike F11 for other platforms), but iTunes uses Meta + F
     // Note: by default on Mac Qt swaps CTRL and META
-    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F | Qt::CTRL));
+    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 #endif
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
+    connect(shortcut, SIGNAL(activated()),
+            ui->deleteAction, SIGNAL(triggered()));
 
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
@@ -76,8 +90,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
-    m_screenieScene = new ScreenieScene();
-    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    createScene();
+    m_clipboard = new Clipboard(*m_screenieControl, this);
+
     initializeUi();
     updateUi();
     setUnifiedTitleAndToolBarOnMac(true);
@@ -94,22 +109,58 @@ MainWindow::~MainWindow()
     Settings::destroyInstance();
 }
 
+// protected
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (proceedWithModifiedScene()) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
+
 // private
 
 void MainWindow::frenchConnection()
 {
-    connect(m_screenieGraphicsScene, SIGNAL(changed(QList<QRectF>)),
-            this, SLOT(handleGraphicsSceneChanged()));
     connect(m_screenieGraphicsScene, SIGNAL(selectionChanged()),
             this, SLOT(updateUi()));
     connect(m_screenieScene, SIGNAL(changed()),
             this, SLOT(updateUi()));
+    connect(m_clipboard, SIGNAL(dataChanged()),
+            this, SLOT(updateUi()));
 }
 
-bool MainWindow::save(const QString &filePath)
+void MainWindow::newScene(ScreenieScene &screenieScene)
 {
+    updateScene(screenieScene);
+    updateTitle();
+}
+
+bool MainWindow::read(const QString &filePath)
+{
+    bool result;
     ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    return screenieSceneDao->write(*m_screenieScene);
+    ScreenieScene *screenieScene = screenieSceneDao->read();
+    if (screenieScene != 0) {
+        newScene(*screenieScene);
+        result = true;
+    } else {
+        result = false;
+    }
+    return result;
+}
+
+bool MainWindow::write(const QString &filePath)
+{
+    bool result;
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
+    result = screenieSceneDao->write(*m_screenieScene);
+    if (result) {
+        updateTitle();
+    }
+    return result;
 }
 
 void MainWindow::updateTransformationUi()
@@ -181,6 +232,34 @@ void MainWindow::updateColorUi()
     ui->blueSlider->blockSignals(false);
 }
 
+void MainWindow::updateEditActions()
+{
+    bool hasItems = m_screenieGraphicsScene->items().size() > 0;
+    bool hasSelection = m_screenieGraphicsScene->selectedItems().size() > 0;
+    ui->cutAction->setEnabled(hasSelection);
+    ui->copyAction->setEnabled(hasSelection);
+    ui->pasteAction->setEnabled(m_clipboard->hasData());
+    ui->deleteAction->setEnabled(hasSelection);
+    ui->selectAllAction->setEnabled(hasItems);
+}
+
+void MainWindow::updateTitle()
+{
+    QString title;
+    if (!m_documentFilePath.isNull()) {
+        title = QFileInfo(m_documentFilePath).fileName();
+    } else {
+        title = tr("New", "The document name for an unsaved document.");
+    }
+    if (m_screenieScene->isModified()) {
+        title.append("* - ");
+    } else {
+        title.append(" - ");
+    }
+    title.append(Version::getApplicationName());
+    setWindowTitle(title);
+}
+
 void MainWindow::initializeUi()
 {
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -191,27 +270,154 @@ void MainWindow::initializeUi()
     ui->reflectionOpacitySlider->setValue(defaultScreenieModel.getReflectionOpacity());
 }
 
+void MainWindow::createScene()
+{
+    m_screenieScene = new ScreenieScene();
+    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+}
+
+void MainWindow::updateScene(ScreenieScene &screenieScene)
+{
+    // delete previous instances
+    delete m_screenieScene;
+    delete m_screenieControl;
+    m_screenieScene = &screenieScene;
+
+    m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    m_screenieControl->updateScene();
+    updateUi();
+    connect(m_screenieScene, SIGNAL(changed()),
+            this, SLOT(updateUi()));
+}
+
+bool MainWindow::proceedWithModifiedScene()
+{
+    bool result;
+    if (m_screenieScene->isModified()) {
+        switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
+                                      tr("The scene has been modified! Save now?"),
+                                      QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
+        {
+        case QMessageBox::Save:
+            on_saveAction_triggered();
+            result = true;
+            break;
+        case QMessageBox::Cancel:
+            result = false;
+            break;
+        case QMessageBox::Discard:
+            result = true;
+            break;
+        default:
+            result = false;
+            break;
+        }
+    } else {
+        result = true;
+    }
+    return result;
+}
+
 // private slots
+
+void MainWindow::on_newAction_triggered()
+{
+    if (proceedWithModifiedScene()) {
+        m_documentFilePath = QString();
+        ScreenieScene *screenieScene = new ScreenieScene();
+        newScene(*screenieScene);
+    }
+}
+
+void MainWindow::on_openAction_triggered()
+{
+    if (proceedWithModifiedScene()) {
+        Settings &settings = Settings::getInstance();
+        QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
+        if (!filePath.isNull()) {
+            bool ok = read(filePath);
+            if (ok) {
+                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+                m_documentFilePath = filePath;
+            }
+#ifdef DEBUG
+            qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
+#endif
+        }
+    }
+}
+
+void MainWindow::on_saveAction_triggered()
+{
+    if (!m_documentFilePath.isNull()) {
+        bool ok = write(m_documentFilePath);
+#ifdef DEBUG
+        qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
+#endif
+    } else {
+        on_saveAsAction_triggered();
+    }
+}
 
 void MainWindow::on_saveAsAction_triggered()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), QString(), "*.xsc");
+    Settings &settings = Settings::getInstance();
+    QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, tr("*.xsc"));
     if (!filePath.isNull()) {
-        bool ok = save(filePath);
+        bool ok = write(filePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
 #endif
+        if (ok) {
+            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            m_documentFilePath = filePath;
+        }
     }
 }
 
 void MainWindow::on_exportAction_triggered()
 {
+    Settings &settings = Settings::getInstance();
+    QString lastExportDirectoryPath = settings.getLastExportDirectoryPath();
     QString filter = tr("Portable Network Graphics (*.png)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), QString(), filter);
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
-        exportImage.exportImage(filePath);
+        bool ok = exportImage.exportImage(filePath);
+        if (ok) {
+            lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
+            settings.setLastExportDirectoryPath(lastExportDirectoryPath);
+        }
     }
+}
+
+void MainWindow::on_cutAction_triggered()
+{
+    m_clipboard->cut();
+}
+
+void MainWindow::on_copyAction_triggered()
+{
+    m_clipboard->copy();
+}
+
+void MainWindow::on_pasteAction_triggered()
+{
+    m_clipboard->paste();
+}
+
+void MainWindow::on_deleteAction_triggered()
+{
+    m_screenieControl->removeAll();
+}
+
+void MainWindow::on_selectAllAction_triggered()
+{
+    m_screenieControl->selectAll();
 }
 
 void MainWindow::on_addImageAction_triggered()
@@ -228,7 +434,7 @@ void MainWindow::on_addImageAction_triggered()
 
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
-    if (!this->isFullScreen()) {
+    if (!isFullScreen()) {
         /*!\todo Settings which control what becomes invisible in fullscreen mode */
         ui->toolBar->setVisible(false);
         ui->sidePanel->setVisible(false);
@@ -239,10 +445,8 @@ void MainWindow::on_toggleFullScreenAction_triggered()
         // The Qt documentation recommends anyway to do so.
         setUnifiedTitleAndToolBarOnMac(false);
         showFullScreen();
-
     } else {
         showNormal();
-
         ui->toolBar->setVisible(true);
         ui->sidePanel->setVisible(true);
         ui->statusbar->setVisible(true);
@@ -322,22 +526,16 @@ void MainWindow::on_aboutQtAction_triggered() {
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::handleGraphicsSceneChanged()
-{
-    if (m_screenieGraphicsScene->selectedItems().count() > 0) {
-        QGraphicsItem *selected = m_screenieGraphicsScene->selectedItems().first();
-        ui->statusbar->showMessage(QString("Object x/y: %1 / %2").arg(selected->scenePos().x()).arg(selected->scenePos().y()), 3000);
-    }
-}
-
 void MainWindow::updateUi()
 {
     if (!m_ignoreUpdateSignals) {
         updateTransformationUi();
         updateReflectionUi();
         updateColorUi();
+        updateEditActions();
     }
     updateDefaultValues();
+    updateTitle();
 }
 
 void MainWindow::updateDefaultValues()
@@ -349,9 +547,6 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOffset(ui->reflectionOffsetSlider->value());
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
-
-
-
 
 
 

@@ -236,13 +236,14 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="newAction"/>
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
@@ -269,7 +270,19 @@
     </property>
     <addaction name="toggleFullScreenAction"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="cutAction"/>
+    <addaction name="copyAction"/>
+    <addaction name="pasteAction"/>
+    <addaction name="deleteAction"/>
+    <addaction name="separator"/>
+    <addaction name="selectAllAction"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
    <addaction name="menu_Insert"/>
    <addaction name="menu_View"/>
    <addaction name="menu_About"/>
@@ -286,10 +299,13 @@
     <bool>false</bool>
    </attribute>
    <addaction name="addImageAction"/>
+   <addaction name="addTemplateAction"/>
+   <addaction name="separator"/>
+   <addaction name="toggleFullScreenAction"/>
   </widget>
   <action name="quitAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/application-exit.png</normaloff>:/img/application-exit.png</iconset>
    </property>
    <property name="text">
@@ -301,7 +317,7 @@
   </action>
   <action name="addImageAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
@@ -316,7 +332,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-open.png</normaloff>:/img/document-open.png</iconset>
    </property>
    <property name="text">
@@ -328,7 +344,7 @@
   </action>
   <action name="saveAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-save.png</normaloff>:/img/document-save.png</iconset>
    </property>
    <property name="text">
@@ -340,11 +356,14 @@
   </action>
   <action name="saveAsAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/document-save-as.png</normaloff>:/img/document-save-as.png</iconset>
    </property>
    <property name="text">
     <string>Save &amp;As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="exportAction">
@@ -362,8 +381,8 @@
   </action>
   <action name="addTemplateAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
-     <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/insert-template.png</normaloff>:/img/insert-template.png</iconset>
    </property>
    <property name="text">
     <string>Template</string>
@@ -377,22 +396,90 @@
   </action>
   <action name="toggleFullScreenAction">
    <property name="icon">
-    <iconset resource="../../../Resources/Resources.qrc">
+    <iconset resource="../../Resources/Resources.qrc">
      <normaloff>:/img/view-fullscreen.png</normaloff>:/img/view-fullscreen.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Fullscreen</string>
+    <string>&amp;Full Screen</string>
    </property>
    <property name="toolTip">
-    <string>View Fullscreen</string>
+    <string>View Full Screen</string>
    </property>
    <property name="shortcut">
     <string>F11</string>
    </property>
   </action>
+  <action name="selectAllAction">
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="cutAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-cut.png</normaloff>:/img/edit-cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cu&amp;t</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="copyAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-copy.png</normaloff>:/img/edit-copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="pasteAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-paste.png</normaloff>:/img/edit-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="deleteAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/edit-delete.png</normaloff>:/img/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="newAction">
+   <property name="icon">
+    <iconset resource="../../Resources/Resources.qrc">
+     <normaloff>:/img/document-new.png</normaloff>:/img/document-new.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="../../../Resources/Resources.qrc"/>
+  <include location="../../Resources/Resources.qrc"/>
  </resources>
  <connections>
   <connection>

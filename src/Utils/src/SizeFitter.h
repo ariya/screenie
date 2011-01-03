@@ -19,8 +19,7 @@ public:
 
     UTILS_API static const int InvalidSize;
 
-    enum FitMode
-    {
+    enum FitMode {
         NoFit       = 0,
         Fit         = 1,
         FitToWidth  = 2,
@@ -28,14 +27,17 @@ public:
         ExactFit    = 4
     };
 
-    enum FitOption
-    {
+    enum FitOption {
         RespectOrientation = 0,
         Enlarge            = 1,
         NofFitOptions
     };
 
     UTILS_API SizeFitter(QSize targetSize, FitMode fitMode = Fit);
+
+    /*!
+     * Copy c'tor.
+     */
     UTILS_API SizeFitter(const SizeFitter &other);
     UTILS_API SizeFitter();
     UTILS_API virtual ~SizeFitter();
@@ -51,6 +53,8 @@ public:
 
     UTILS_API void setFitOptionEnabled(FitOption fitOption, bool enable);
     UTILS_API bool isFitOptionEnabled(FitOption fitOption) const;
+    UTILS_API QBitArray getFitOptions() const;
+    UTILS_API void setFitOptions(const QBitArray &fitOptions);
 
     /*!
      * \param size
@@ -73,7 +77,7 @@ signals:
 private:
     QSize     m_targetSize;
     FitMode   m_fitMode;
-    QBitArray m_fitOptionArray;
+    QBitArray m_fitOptions;
 
     void setDefaultFitOptions();
     // returns the oriented target size, that is with the same orientation as the 'size' (portrait or landscape),

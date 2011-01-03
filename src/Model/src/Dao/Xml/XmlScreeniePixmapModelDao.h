@@ -21,6 +21,9 @@
 #ifndef XMLSCREENIEPIXMAPMODELDAO_H
 #define XMLSCREENIEPIXMAPMODELDAO_H
 
+class QXmlStreamWriter;
+class QXmlStreamReader;
+
 #include "../ScreeniePixmapModelDao.h"
 #include "AbstractXmlScreenieModelDao.h"
 
@@ -33,7 +36,8 @@ class XmlScreeniePixmapModelDaoPrivate;
 class XmlScreeniePixmapModelDao : public AbstractXmlScreenieModelDao, public ScreeniePixmapModelDao
 {
 public:
-    explicit XmlScreeniePixmapModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit XmlScreeniePixmapModelDao(QXmlStreamWriter *xmlStreamWriter);
+    explicit XmlScreeniePixmapModelDao(QXmlStreamReader *xmlStreamReader);
     virtual ~XmlScreeniePixmapModelDao();
 
     virtual bool write(const ScreeniePixmapModel &screeniePixmapModel);

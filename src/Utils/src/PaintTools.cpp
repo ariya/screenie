@@ -22,6 +22,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QLinearGradient>
 #include <QtGui/QPainter>
+#include <QtGui/QBrush>
 
 #include "PaintTools.h"
 
@@ -49,6 +50,24 @@ QPixmap PaintTools::upperHalf(const QPixmap &pixmap)
 {
     return pixmap.copy(0, 0, pixmap.width(), pixmap.height() / 2);
 }
+
+QBrush PaintTools::createCheckerPattern()
+{
+    QBrush result;
+
+    QImage checker(16, 16, QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&checker);
+    // Inspired by The GIMP ;)
+    painter.fillRect(checker.rect(), QColor(153, 153, 153));
+    painter.fillRect(0, 0, 8, 8, QColor(102, 102, 102));
+    painter.fillRect(8, 8, 8, 8, QColor(102, 102, 102));
+    painter.end();
+    result.setTextureImage(checker);
+
+    return result;
+}
+
+// private
 
 void PaintTools::drawBackground(QPainter &painter, QPixmap &pixmap)
 {

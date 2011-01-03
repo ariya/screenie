@@ -4,21 +4,16 @@ DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/../Model/src/Dao \
               $$PWD/../Model/src/Dao/Xml \
               $$PWD/../Kernel/src \
+              $$PWD/../Kernel/src/Clipboard \
               $$PWD/UserInterface/src \
               $$PWD/GeneratedFiles \
               $$PWD/src
 
 HEADERS += $$PWD/src/Main.h \
-           $$PWD/UserInterface/src/MainWindow.h \
-           $$PWD/UserInterface/src/ScreenieControl.h \
-           $$PWD/UserInterface/src/ScreenieGraphicsScene.h \
-           $$PWD/UserInterface/src/ScreeniePixmapItem.h
+           $$PWD/src/MainWindow.h
 
 SOURCES += $$PWD/src/Main.cpp \
-           $$PWD/UserInterface/src/MainWindow.cpp \
-           $$PWD/UserInterface/src/ScreenieControl.cpp \
-           $$PWD/UserInterface/src/ScreenieGraphicsScene.cpp \
-           $$PWD/UserInterface/src/ScreeniePixmapItem.cpp
+           $$PWD/src/MainWindow.cpp
 
-FORMS += $$PWD/UserInterface/ui/MainWindow.ui
+FORMS += $$PWD/ui/MainWindow.ui
 

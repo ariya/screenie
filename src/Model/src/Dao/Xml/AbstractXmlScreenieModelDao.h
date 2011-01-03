@@ -22,6 +22,7 @@
 #define ABSTRACTXMLSCREENIEMODELDAO_H
 
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 class AbstractScreenieModel;
 class AbstractXmlScreenieModelDaoPrivate;
@@ -32,15 +33,16 @@ class AbstractXmlScreenieModelDaoPrivate;
 class AbstractXmlScreenieModelDao
 {
 public:
-    explicit AbstractXmlScreenieModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit AbstractXmlScreenieModelDao(QXmlStreamWriter *xmlStreamWriter);
+    explicit AbstractXmlScreenieModelDao(QXmlStreamReader *xmlStreamReader);
     virtual ~AbstractXmlScreenieModelDao();
 
-    virtual bool writeCommon(const AbstractScreenieModel &screenieModel);
-
-    virtual bool readCommon(AbstractScreenieModel &screenieModel);
+    bool write(const AbstractScreenieModel &screenieModel);
+    bool read(AbstractScreenieModel &screenieModel);
 
 protected:
-    QXmlStreamWriter &getStreamWriter() const;
+    QXmlStreamWriter *getStreamWriter() const;
+    QXmlStreamReader *getStreamReader() const;
 
     virtual bool writeSpecific() = 0;
     virtual bool readSpecific() = 0;

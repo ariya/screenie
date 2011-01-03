@@ -32,7 +32,11 @@ class ScreenieTemplateModelPrivate;
 
 /*!
  * The template model acts as a placeholder for the actual pixmap to
- * be added to the ScreenieScene.
+ * be added to the ScreenieScene. The templates have an \em order
+ * which defines the order in which they are replaced by actual image
+ * data. Ordering starts at 0 (highest order) and grows up to n-1,
+ * where n is the number of templates in the ScreenieScene. By default
+ * ScreenieTemplateModel has an \em order of \c Unordered.
  *
  * Implementation note: we need do export the whole class here, since
  * we also need to export the QObject::staticMetaObject methods from
@@ -42,19 +46,36 @@ class MODEL_API ScreenieTemplateModel : public AbstractScreenieModel
 {
     Q_OBJECT
 public:
-    ScreenieTemplateModel(const QSize &size);
+    /*!
+     * No \em order has yet been defined.
+     *
+     * \sa #getOrder
+     */
+    static const int Unordered;
+
+    ScreenieTemplateModel();
+    explicit ScreenieTemplateModel(const QSize &size);
+    explicit ScreenieTemplateModel(const ScreenieTemplateModel &other);
     virtual ~ScreenieTemplateModel();
 
-    const SizeFitter &getSizeFitter() const;
-
     virtual const QPixmap &readPixmap() const;
+    virtual ScreenieModelInterface *copy() const;
+    virtual bool isTemplate() const;
+
+    SizeFitter &getSizeFitter() const;
 
     /*!
-     * Returns the requested \c size.
+     * Returns the requested size.
      *
      * \sa ScreenieTemplateModel(const QSize &)
      */
     virtual QSize getSize() const;
+
+    /*!
+     * \return the order of this ScreenieTemplateModel.
+     */
+    int getOrder() const;
+    void setOrder(int order);
 
 private:
     ScreenieTemplateModelPrivate *d;

@@ -29,6 +29,8 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QGraphicsSceneDragDropEvent;
 
+#include "KernelLib.h"
+
 class ScreenieModelInterface;
 class ScreenieControl;
 class Reflection;
@@ -45,12 +47,12 @@ public:
     /*!
      * The type of this graphics item.
      */
-    static const int ScreeniePixmapType;
+    KERNEL_API static const int ScreeniePixmapType;
 
-    ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection);
-    ~ScreeniePixmapItem();
+    KERNEL_API ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection);
+    KERNEL_API virtual ~ScreeniePixmapItem();
 
-    ScreenieModelInterface &getScreenieModel() const;
+    KERNEL_API ScreenieModelInterface &getScreenieModel() const;
 
 protected:
     virtual int type() const;
@@ -66,7 +68,7 @@ private:
     ScreenieControl &m_screenieControl;
     Reflection &m_reflection;
     bool m_transformPixmap;
-    bool m_ignorePositionChange;
+    bool m_ignoreUpdates;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);
@@ -85,6 +87,7 @@ private slots:
     void updatePixmap();
     void updateItem();
     void updatePosition();
+    void updateSelection();
 };
 
 #endif // SCREENIEPIXMAPITEM_H

@@ -16,7 +16,7 @@ macx {
 }
 
 macx {
-    debug {
+    CONFIG(debug, debug|release) {
         DESTDIR = $$PWD/../bin/debug/$${APP_NAME}.app/Contents/Frameworks
         message(Building $$TARGET in debug mode)
     } else {
@@ -24,7 +24,7 @@ macx {
         message(Building $$TARGET in release mode)
     }
 } else {
-    debug {
+    CONFIG(debug, debug|release) {
         DESTDIR = $$PWD/../bin/debug
         message(Building $$TARGET in debug mode)
     } else {

@@ -35,7 +35,7 @@ class ScreenieModelInterface : public QObject
 
 public:
 
-    MODEL_API static const int MaxDistance;
+    MODEL_API static const qreal MaxDistance;
 
     virtual ~ScreenieModelInterface() {}
 
@@ -69,9 +69,9 @@ public:
      */
     virtual void translate(qreal dx, qreal dy) = 0;
 
-    virtual int getDistance() const = 0;
-    virtual void setDistance(int distance) = 0;
-    virtual void addDistance(int distance) = 0;
+    virtual qreal getDistance() const = 0;
+    virtual void setDistance(qreal distance) = 0;
+    virtual void addDistance(qreal distance) = 0;
 
     virtual int getRotation() const = 0;
 
@@ -116,6 +116,22 @@ public:
 
     virtual void convert(ScreenieModelInterface &source) = 0;
 
+    /*!
+     * Creates a copy of this instance and all its associated data. The caller
+     * is the owner.
+     *
+     * \return a copy of this instance; must be \c deleted by the caller
+     */
+    virtual ScreenieModelInterface *copy() const = 0;
+
+    /*!
+     * \sa #selectionChanged()
+     */
+    virtual void setSelected(bool enable) = 0;
+    virtual bool isSelected() const = 0;
+
+    virtual bool isTemplate() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();
@@ -123,6 +139,7 @@ signals:
     void changed();
     void pixmapChanged(const QPixmap &pixmap);
     void filePathChanged(const QString &filePath);
+    void selectionChanged();
 };
 
 #endif // SCREENIEMODELINTERFACE_H

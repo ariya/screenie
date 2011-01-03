@@ -45,12 +45,17 @@ public:
      * \sa #readPixmap()
      */
     explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
+
+    /*!
+     * Copy c'tor.
+     */
+    explicit ScreeniePixmapModel(const ScreeniePixmapModel &other);
     virtual ~ScreeniePixmapModel();
 
     virtual const QPixmap &readPixmap() const;
     virtual QSize getSize() const;
-
-    virtual void convert(ScreenieModelInterface &source);
+    virtual ScreenieModelInterface *copy() const;
+    virtual bool isTemplate() const;
 
     QPixmap getPixmap() const;
     void setPixmap(QPixmap pixmap);

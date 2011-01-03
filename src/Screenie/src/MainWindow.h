@@ -22,16 +22,18 @@
 #define MAINWINDOW_H
 
 #include <QtCore/QList>
+#include <QtCore/QString>
 #include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 
 class QWidget;
-class QString;
+class QCloseEvent;
 
 class ScreenieModelInterface;
 class ScreenieScene;
 class ScreeniePixmapItem;
 class ScreenieControl;
+class Clipboard;
 class ScreenieGraphicsScene;
 
 namespace Ui {
@@ -46,29 +48,56 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private:
     Ui::MainWindow *ui;
     ScreenieGraphicsScene *m_screenieGraphicsScene;
     ScreenieScene *m_screenieScene;
     ScreenieControl *m_screenieControl;
     bool m_ignoreUpdateSignals;
+    Clipboard *m_clipboard;
+    QString m_documentFilePath;
 
     void frenchConnection();
 
-    bool save(const QString &filePath);
+    void newScene(ScreenieScene &screenieScene);
+    bool read(const QString &filePath);
+    bool write(const QString &filePath);
 
     void updateTransformationUi();
     void updateReflectionUi();
     void updateColorUi();
+    void updateEditActions();
+    void updateTitle();
     void initializeUi();
 
+    void createScene();
+    void updateScene(ScreenieScene &screenieScene);
+
+    bool proceedWithModifiedScene();
+
 private slots:
+    // File
+    void on_newAction_triggered();
+    void on_openAction_triggered();
+    void on_saveAction_triggered();
     void on_saveAsAction_triggered();
     void on_exportAction_triggered();
 
+    // Edit
+    void on_cutAction_triggered();
+    void on_copyAction_triggered();
+    void on_pasteAction_triggered();
+    void on_deleteAction_triggered();
+    void on_selectAllAction_triggered();
+
+    // Insert
     void on_addImageAction_triggered();
     void on_addTemplateAction_triggered();
 
+    // View
     void on_toggleFullScreenAction_triggered();
 
     void on_rotationSlider_valueChanged(int value);
@@ -83,7 +112,6 @@ private slots:
 
     void on_aboutQtAction_triggered();
 
-    void handleGraphicsSceneChanged();
     void updateUi();
     void updateDefaultValues();
 };

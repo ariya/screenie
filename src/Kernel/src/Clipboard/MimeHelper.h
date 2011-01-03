@@ -23,15 +23,13 @@
 
 class QMimeData;
 
-#include "UtilsLib.h"
-
 /*!
  * Operations on MIME data.
  */
 class MimeHelper
 {
 public:
-    UTILS_API MimeHelper();
+    MimeHelper();
 
     /*!
      * The accept mode for mime data which defines when a given
@@ -52,13 +50,13 @@ public:
      *
      * \param mimeData
      *        the QMimeData to be validated
-     * \parm mode
-     *       in case of Urls defines whether at least one or all Urls
-     *       must be valid
+     * \param mode
+     *        in case of Urls defines whether at least one or all Urls
+     *        must be valid
      * \return \c true, if the \p mimeData contains either an image or
      *          valid Urls according to \p mode
      */
-    UTILS_API static bool accept(const QMimeData *mimeData, Mode mode);
+    static bool accept(const QMimeData *mimeData, Mode mode);
 };
 
 #endif // MIMEHELPER_H

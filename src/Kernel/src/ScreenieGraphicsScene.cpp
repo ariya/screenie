@@ -32,7 +32,7 @@
 #include <QtGui/QPinchGesture>
 #include <QtGui/QGraphicsView>
 
-#include "../../../Utils/src/MimeHelper.h"
+#include "Clipboard/MimeHelper.h"
 #include "ScreenieGraphicsScene.h"
 
 // public
@@ -94,28 +94,14 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
             }
         }
         if (pixmaps.size() > 0) {
-            emit pixmapsAdded(pixmaps, event->scenePos());
+            emit pixmapsDropped(pixmaps, event->scenePos());
         }
         if (filePaths.size() > 0) {
-            emit filePathsAdded(filePaths, event->scenePos());
+            emit filePathsDropped(filePaths, event->scenePos());
         }
         event->accept();
     } else {
         QGraphicsScene::dropEvent(event);
-    }
-}
-
-void ScreenieGraphicsScene::keyReleaseEvent(QKeyEvent *event)
-{
-    switch (event->key()) {
-    case Qt::Key_Backspace: // fall-thru intended
-    case Qt::Key_Delete:
-        emit removeItems();
-        event->accept();
-        break;
-    default:
-        event->ignore();
-        break;
     }
 }
 

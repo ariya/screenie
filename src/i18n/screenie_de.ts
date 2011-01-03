@@ -4,156 +4,236 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="14"/>
         <source>Screenie</source>
-        <translation>Screenie</translation>
+        <translation type="unfinished">Screenie</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="57"/>
         <source>Rotation</source>
-        <translation>Rotation</translation>
+        <translation type="unfinished">Rotation</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="64"/>
         <source>Distance</source>
-        <translation>Distanz</translation>
+        <translation type="unfinished">Distanz</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="99"/>
         <source>Reflection</source>
-        <translation>Reflektion</translation>
+        <translation type="unfinished">Reflektion</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="108"/>
         <source>Offset</source>
-        <translation>Versatz</translation>
+        <translation type="unfinished">Versatz</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="128"/>
         <source>Opacity</source>
-        <translation>Transparenz</translation>
+        <translation type="unfinished">Transparenz</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="151"/>
         <source>Background</source>
-        <translation>Hintergrund</translation>
+        <translation type="unfinished">Hintergrund</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="162"/>
         <source>Red</source>
-        <translation>Rot</translation>
+        <translation type="unfinished">Rot</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="179"/>
         <source>Green</source>
-        <translation>Grün</translation>
+        <translation type="unfinished">Grün</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="196"/>
         <source>Blue</source>
-        <translation>Blau</translation>
+        <translation type="unfinished">Blau</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="244"/>
         <source>&amp;File</source>
-        <translation>&amp;Datei</translation>
+        <translation type="unfinished">&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="257"/>
         <source>&amp;About</source>
-        <translation>&amp;Info</translation>
+        <translation type="unfinished">&amp;Info</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="267"/>
         <source>toolBar</source>
-        <translation>Werkzeugleiste</translation>
+        <translation type="unfinished">Werkzeugleiste</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="279"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Beenden</translation>
+        <translation type="unfinished">&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="282"/>
-        <source>Ctrl+Q</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="291"/>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="294"/>
         <source>Add Image</source>
-        <translation>Bild hinzufügen</translation>
+        <translation type="unfinished">Bild hinzufügen</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="297"/>
-        <source>Ctrl+I</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="302"/>
         <source>&amp;Open</source>
-        <translation>&amp;Öffnen</translation>
+        <translation type="unfinished">&amp;Öffnen</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="305"/>
-        <source>Ctrl+O</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="310"/>
         <source>&amp;Save</source>
-        <translation>&amp;Speichern</translation>
+        <translation type="unfinished">&amp;Speichern</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="313"/>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="318"/>
         <source>Save &amp;As</source>
-        <translation>Speichern &amp;als</translation>
+        <translation type="unfinished">Speichern &amp;als</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="323"/>
         <source>&amp;Export Image</source>
-        <translation>Bild &amp;exportieren</translation>
+        <translation type="unfinished">Bild &amp;exportieren</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="326"/>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="331"/>
         <source>About &amp;Qt</source>
-        <translation>&amp;Qt Info</translation>
+        <translation type="unfinished">&amp;Qt Info</translation>
     </message>
     <message>
-        <location filename="../UserInterface/ui/MainWindow.ui" line="336"/>
         <source>Export &amp;PDF</source>
-        <translation>&amp;PDF exportieren</translation>
+        <translation type="obsolete">&amp;PDF exportieren</translation>
     </message>
     <message>
-        <location filename="../UserInterface/src/MainWindow.cpp" line="172"/>
         <source>Open Image</source>
-        <translation>Öffne Bild</translation>
+        <translation type="obsolete">Öffne Bild</translation>
     </message>
     <message>
-        <location filename="../UserInterface/src/MainWindow.cpp" line="180"/>
         <source>Portable Network Graphics (*.png)</source>
-        <translation>Portable Netzwerk Grafik (*.png)</translation>
+        <translation type="unfinished">Portable Netzwerk Grafik (*.png)</translation>
     </message>
     <message>
-        <location filename="../UserInterface/src/MainWindow.cpp" line="181"/>
-        <location filename="../UserInterface/src/MainWindow.cpp" line="191"/>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="obsolete">Speichern</translation>
     </message>
     <message>
-        <location filename="../UserInterface/src/MainWindow.cpp" line="190"/>
         <source>Portable Document Format (*.pdf)</source>
-        <translation>Portables Dokument Format (*.pdf)</translation>
+        <translation type="obsolete">Portables Dokument Format (*.pdf)</translation>
+    </message>
+    <message>
+        <source>&amp;Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F11</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backspace</source>
+        <comment>Edit|Delete</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>*.xsc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenieControl</name>
+    <message>
+        <source>Translate me</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

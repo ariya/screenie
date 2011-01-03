@@ -30,12 +30,14 @@ class ScreenieScenePrivate
 public:
     ScreenieScenePrivate()
         : backgroundEnabled(true),
-          backgroundColor(QColor(255, 255, 255))
+          backgroundColor(QColor(255, 255, 255)),
+          modified(false)
     {}
 
     bool backgroundEnabled;
     QColor backgroundColor;
     QList<ScreenieModelInterface *> screenieModels;
+    bool modified;
 };
 
 // public
@@ -43,15 +45,16 @@ public:
 ScreenieScene::ScreenieScene(QObject *parent)
     : QObject(parent), d(new ScreenieScenePrivate())
 {
+    frenchConnection();
 }
 
 ScreenieScene::~ScreenieScene()
 {
+#ifdef DEBUG
+    qDebug("ScreenieScene d'tor called, now deleting %d items...", d->screenieModels.count());
+#endif
     qDeleteAll(d->screenieModels);
     delete d;
-#ifdef DEBUG
-    qDebug("ScreenieScene d'tor called.");
-#endif
 }
 
 void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
@@ -68,7 +71,9 @@ void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
     connect(screenieModel, SIGNAL(reflectionChanged()),
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(changed()),
-            this, SIGNAL(changed()));    
+            this, SIGNAL(changed()));
+    connect(screenieModel, SIGNAL(selectionChanged()),
+            this, SIGNAL(selectionChanged()));
     emit modelAdded(*screenieModel);
 }
 
@@ -98,6 +103,25 @@ ScreenieModelInterface *ScreenieScene::getModel(int index) const
     return result;
 }
 
+const QList<ScreenieModelInterface *> ScreenieScene::getModels() const
+{
+    return d->screenieModels;
+}
+
+const QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
+{
+    QList<ScreenieModelInterface *> result;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (screenieModel->isSelected()) {
+            result.append(screenieModel);
+        }
+    }
+#ifdef DEBUG
+    qDebug(" ScreenieScene::getSelectedModels: count: %d", result.count());
+#endif
+    return result;
+}
+
 int ScreenieScene::count() const
 {
     return d->screenieModels.count();
@@ -116,7 +140,7 @@ void ScreenieScene::setBackgroundEnabled(bool enable) {
 }
 
 QColor ScreenieScene::getBackgroundColor() const {
-    return d->backgroundColor;
+     return d->backgroundColor;
 }
 
 void ScreenieScene::setBackgroundColor(QColor color) {
@@ -126,3 +150,45 @@ void ScreenieScene::setBackgroundColor(QColor color) {
     }
 }
 
+bool ScreenieScene::hasTemplates() const
+{
+    bool result = false;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (screenieModel->isTemplate()) {
+            result = true;
+            break;
+        }
+    }
+    return result;
+}
+
+bool ScreenieScene::isModified() const
+{
+    return d->modified;
+}
+
+void ScreenieScene::setModified(bool modified)
+{
+    d->modified = modified;
+}
+
+// private
+
+void ScreenieScene::frenchConnection()
+{
+    connect(this, SIGNAL(backgroundChanged()),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(modelAdded(ScreenieModelInterface&)),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(modelRemoved(ScreenieModelInterface&)),
+            this, SIGNAL(changed()));
+    connect(this, SIGNAL(changed()),
+            this, SLOT(handleChanged()));
+}
+
+// private slots
+
+void ScreenieScene::handleChanged()
+{
+    setModified(true);
+}

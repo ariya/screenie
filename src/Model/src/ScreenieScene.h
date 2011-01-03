@@ -70,6 +70,8 @@ public:
      * \sa #count()
      */
     MODEL_API ScreenieModelInterface *getModel(int index) const;
+    MODEL_API const QList<ScreenieModelInterface *> getModels() const;
+    MODEL_API const QList<ScreenieModelInterface *> getSelectedModels() const;
     MODEL_API int count() const;
 
     MODEL_API bool isBackgroundEnabled() const;
@@ -87,6 +89,32 @@ public:
      * \sa #changed()
      */
     MODEL_API void setBackgroundColor(QColor colour);
+
+    /*!
+     * Returns whether this ScreenieScene has any template models.
+     *
+     * \sa ScreenieModelInterface#isTemplate
+     */
+    MODEL_API bool hasTemplates() const;
+
+    /*!
+     * Returns whether this ScreenieScene has been modified since creation or the last save.
+     *
+     * \ return \c true if this ScreenieScene has unsaved changes; \c false else
+     */
+    MODEL_API bool isModified() const;
+
+    /*!
+     * Sets this ScreenieScene as \p modified.
+     *
+     * Implementation note: this method is only to be called by this ScreenieScene itself and
+     * the corresponding DAO classes in the same module, hence not exported.
+     *
+     * \param modified
+     *        set to \c true if modified; \c false else
+     * \sa ScreenieSceneDao#write(const ScreenieScene &)
+     */
+    void setModified(bool modified);
 
 signals:
     /*!
@@ -113,15 +141,22 @@ signals:
      * \c deleted right after the signal has been emitted, so don't store and re-use the reference later on.
      *
      * This signal is emitted <em>in addition</em> to the #changed() signal.
+     *
      * Connect to this signal in order to remove the corresponding view items from the view, which refer to this
      * \p screenieModel, for example.
      */
-    void modelRemoved(const ScreenieModelInterface &screenieModel);
+    void modelRemoved(ScreenieModelInterface &screenieModel);
     void backgroundChanged();
     void distanceChanged();
+    void selectionChanged();
 
 private:
     ScreenieScenePrivate *d;
+
+    void frenchConnection();
+
+private slots:
+    void handleChanged();
 };
 
 #endif // SCREENIESCENE_H

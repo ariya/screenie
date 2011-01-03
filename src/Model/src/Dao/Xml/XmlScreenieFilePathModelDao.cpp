@@ -19,7 +19,7 @@
  */
 
 #include <QtCore/QString>
-#include <QtXml/QXmlStreamWriter>
+#include <QtCore/QXmlStreamWriter>
 
 #include "../../ScreenieFilePathModel.h"
 #include "XmlScreenieFilePathModelDao.h"
@@ -27,32 +27,45 @@
 class XmlScreenieFilePathModelDaoPrivate
 {
 public:
-    const ScreenieFilePathModel *screenieFilePathModel;
+    const ScreenieFilePathModel *writeModel;
+    ScreenieFilePathModel *readModel;
 };
 
 //  public
 
-XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter &streamWriter)
-    : AbstractXmlScreenieModelDao(streamWriter),
+XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter *xmlStreamWriter)
+    : AbstractXmlScreenieModelDao(xmlStreamWriter),
       d(new XmlScreenieFilePathModelDaoPrivate())
-{    
+{
 }
 
-XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao(){
+XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamReader *xmlStreamReader)
+    : AbstractXmlScreenieModelDao(xmlStreamReader),
+      d(new XmlScreenieFilePathModelDaoPrivate())
+{
+}
+
+XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao()
+{
+#ifdef DEBUG
+    qDebug("XmlScreenieFilePathModelDao::~XmlScreenieFilePathModelDao: called.");
+#endif
     delete d;
 }
 
 bool XmlScreenieFilePathModelDao::write(const ScreenieFilePathModel &screenieFilePathModel)
 {
     bool result;
-    d->screenieFilePathModel = &screenieFilePathModel;
-    result = AbstractXmlScreenieModelDao::writeCommon(screenieFilePathModel);
+    d->writeModel = &screenieFilePathModel;
+    result = AbstractXmlScreenieModelDao::write(screenieFilePathModel);
     return result;
 }
 
 ScreenieFilePathModel *XmlScreenieFilePathModelDao::read()
 {
-    ScreenieFilePathModel *result = 0;
+    ScreenieFilePathModel *result = new ScreenieFilePathModel();
+    d->readModel = result;
+    AbstractXmlScreenieModelDao::read(*result);
     return result;
 }
 
@@ -61,14 +74,19 @@ ScreenieFilePathModel *XmlScreenieFilePathModelDao::read()
 bool XmlScreenieFilePathModelDao::writeSpecific()
 {
     bool result = true;
-    getStreamWriter().writeAttribute("path", d->screenieFilePathModel->getFilePath());
+    QXmlStreamWriter *streamWriter = getStreamWriter();
+    streamWriter->writeTextElement("path", d->writeModel->getFilePath());
     return result;
 }
 
 bool XmlScreenieFilePathModelDao::readSpecific()
 {
-    bool result;
-    result = false;
+    bool result = true;
+    /*!\todo Check file path existence */
+    QXmlStreamReader *streamReader = getStreamReader();
+    streamReader->readNextStartElement();
+    QString filePath = streamReader->readElementText();
+    d->readModel->setFilePath(filePath);
     return result;
 }
 

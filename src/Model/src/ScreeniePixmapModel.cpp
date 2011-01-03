@@ -28,6 +28,10 @@
 class ScreeniePixmapModelPrivate
 {
 public:
+    ScreeniePixmapModelPrivate() {}
+    ScreeniePixmapModelPrivate(const ScreeniePixmapModelPrivate &other)
+        : pixmap(other.pixmap) {}
+
     QPixmap pixmap;
 };
 
@@ -35,6 +39,12 @@ ScreeniePixmapModel::ScreeniePixmapModel(QPixmap pixmap)
     : d(new ScreeniePixmapModelPrivate())
 {
     d->pixmap = fitToMaximumSize(pixmap);
+}
+
+ScreeniePixmapModel::ScreeniePixmapModel(const ScreeniePixmapModel &other)
+    : AbstractScreenieModel(other),
+      d(new ScreeniePixmapModelPrivate(*other.d))
+{
 }
 
 ScreeniePixmapModel::~ScreeniePixmapModel()
@@ -55,9 +65,15 @@ QSize ScreeniePixmapModel::getSize() const
     return d->pixmap.size();
 }
 
-void ScreeniePixmapModel::convert(ScreenieModelInterface &source)
+ScreenieModelInterface *ScreeniePixmapModel::copy() const
 {
-    AbstractScreenieModel::convert(source);
+    ScreeniePixmapModel *result = new ScreeniePixmapModel(*this);
+    return result;
+}
+
+bool ScreeniePixmapModel::isTemplate() const
+{
+    return false;
 }
 
 void ScreeniePixmapModel::setPixmap(QPixmap pixmap)

@@ -34,7 +34,7 @@ class Reflection
 {
 public:
     KERNEL_API Reflection();
-    KERNEL_API virtual ~Reflection();
+    KERNEL_API ~Reflection();
 
     /*!
      * Creates a reflected version of the \p pixmap, along with gradient translucency

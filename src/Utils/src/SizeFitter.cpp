@@ -14,14 +14,14 @@ SizeFitter::SizeFitter(QSize targetSize, FitMode fitMode)
     : m_targetSize(targetSize),
     m_fitMode(fitMode)
 {
-    this->setDefaultFitOptions();
+    setDefaultFitOptions();
 }
 
 SizeFitter::SizeFitter()
     : m_targetSize(QSize(640, 480)),
     m_fitMode(ExactFit)
 {
-    this->setDefaultFitOptions();
+    setDefaultFitOptions();
 }
 
 SizeFitter::SizeFitter(const SizeFitter &other)
@@ -77,15 +77,28 @@ SizeFitter::FitMode SizeFitter::getFitMode() const
 
 void SizeFitter::setFitOptionEnabled(FitOption fitOption, bool enable)
 {
-    if (m_fitOptionArray.testBit(fitOption) != enable) {
-        m_fitOptionArray.setBit(fitOption, enable);
+    if (m_fitOptions.testBit(fitOption) != enable) {
+        m_fitOptions.setBit(fitOption, enable);
         emit changed();
     }
 }
 
 bool SizeFitter::isFitOptionEnabled(FitOption fitOption) const
 {
-    return m_fitOptionArray.testBit(fitOption);
+    return m_fitOptions.testBit(fitOption);
+}
+
+QBitArray SizeFitter::getFitOptions() const
+{
+    return m_fitOptions;
+}
+
+void SizeFitter::setFitOptions(const QBitArray &fitOptions)
+{
+    if (m_fitOptions != fitOptions) {
+        m_fitOptions = fitOptions;
+        emit changed();
+    }
 }
 
 bool SizeFitter::fit(QSize size, QSize &fittedSize, QRect *clippedArea) const
@@ -135,9 +148,9 @@ SizeFitter SizeFitter::operator=(const SizeFitter &other)
 
 void SizeFitter::setDefaultFitOptions()
 {
-    m_fitOptionArray.resize(NofFitOptions),
-    m_fitOptionArray.setBit(RespectOrientation, true);
-    m_fitOptionArray.setBit(Enlarge, false);
+    m_fitOptions.resize(NofFitOptions),
+    m_fitOptions.setBit(RespectOrientation, true);
+    m_fitOptions.setBit(Enlarge, false);
 }
 
 QSize SizeFitter::getOrientedTargetSize(const QSize &size) const
@@ -356,6 +369,6 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) con
 void SizeFitter::copy(const SizeFitter &other)
 {
     m_fitMode = other.m_fitMode;
-    m_fitOptionArray = other.m_fitOptionArray;
+    m_fitOptions = other.m_fitOptions;
     m_targetSize = other.m_targetSize;
 }
