@@ -8,7 +8,7 @@ Exec=Screenie %U
 TryExec=Screenie
 Icon=screenie
 Terminal=false
-Categories=Graphics;2DGraphics;RasterGraphics;Qt;
+Categories=Graphics;2DGraphics;RasterGraphics;Qt
 StartupNotify=true
 MimeType=application/x-xsc
 
