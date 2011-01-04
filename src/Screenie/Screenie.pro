@@ -28,6 +28,7 @@ LIBS += -lUtils \
 
 macx {
    ICON = res/ApplicationIcon.icns
+   QMAKE_INFO_PLIST = Info.plist
 }
 
 win32 {

@@ -18,14 +18,9 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <QtCore/QTranslator>
-#include <QtCore/QString>
-#include <QtCore/QLocale>
-#include <QtCore/QLibraryInfo>
-#include <QtGui/QApplication>
-#include <QtGui/QIcon>
+#include <QtCore/QtGlobal>
 
-#include "MainWindow.h"
+#include "ScreenieApplication.h"
 
 int main(int argc, char *argv[])
 {
@@ -52,36 +47,9 @@ int main(int argc, char *argv[])
     // there either, selection is hopefully fine).
     QApplication::setGraphicsSystem("raster");
 #endif
-    QApplication app(argc, argv);
+    ScreenieApplication app(argc, argv);
+    app.show();
 
-#ifdef Q_OS_MAC
-    // Mac apps prefer not to have icons in menus
-    QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
-#endif
-
-    // Load translation try from /usr/share/screenie, then ./l10n/screenie then ./
-    /*!\todo Move i18n stuff into separate Babelfish class */
-    QString locale = QLocale::system().name();
-    QTranslator translator;
-    if (translator.load(QString("screenie_") + locale, "/usr/share/screenie/") == false) {
-      if (translator.load(QString("l10n/screenie_") + locale) == false) {
-        translator.load(QString("screenie_") + locale);
-      }
-    }
-    app.installTranslator(&translator);
-
-    // Load the system translator to get the Save dialog translated
-    QTranslator qtTranslator;
-    qtTranslator.load(QString("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
-
-    MainWindow mainWindow;
-    // simplistic command line parsing: first arg is assumed to be a file path
-    if (argc > 1) {
-        mainWindow.read(argv[1]);
-    }
-
-    mainWindow.show();
     return app.exec();
 }
 

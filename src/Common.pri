@@ -1,5 +1,8 @@
 APP_NAME = Screenie
 
+# This should match with Utils/src/Version
+VERSION = 0.1.0
+
 LANGUAGE = C++
 CONFIG += qt warn_on thread
 
