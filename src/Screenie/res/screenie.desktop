@@ -1,7 +1,14 @@
 [Desktop Entry]
-Name=Screenie
-Comment=A fancy screenshot composer
-Exec=/usr/bin/screenie
-Icon=screenie
+Version=0.1.0
 Type=Application
-Categories=Graphics;3DGraphics;
+Name=Screenie
+GenericName=Screenshot composer
+Comment=Create fancy screenshots
+Exec=Screenie %U
+TryExec=Screenie
+Icon=screenie
+Terminal=false
+Categories=Graphics;2DGraphics;RasterGraphics;Qt;
+StartupNotify=true
+MimeType=application/x-xsc
+
