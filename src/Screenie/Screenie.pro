@@ -1,5 +1,4 @@
 include(../Common.pri)
-include(../Platforms.pri)
 include(../External.pri)
 include(Sources.pri)
 

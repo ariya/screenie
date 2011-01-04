@@ -18,13 +18,25 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieSceneIO.h"
+#ifndef XMLSCREENIESCENESERIALIZER_H
+#define XMLSCREENIESCENESERIALIZER_H
 
-// public
+#include "../../ModelLib.h"
+#include "../ScreenieSceneSerializer.h"
 
-ScreenieSceneIO::ScreenieSceneIO(ScreenieScene &screenieScene)
+class XmlScreenieSceneSerializerPrivate;
+
+class XmlScreenieSceneSerializer : public ScreenieSceneSerializer
 {
-    d = new ScreenieScenePrivate();
-}
+public:
+    MODEL_API XmlScreenieSceneSerializer();
+    MODEL_API virtual ~XmlScreenieSceneSerializer();
 
+    MODEL_API virtual QByteArray serialize(const ScreenieScene &screenieScene, Mode mode);
+    MODEL_API virtual ScreenieScene *deserialize(QByteArray &data) const;
 
+private:
+    XmlScreenieSceneSerializerPrivate *d;
+};
+
+#endif // XMLSCREENIESCENESERIALIZER_H

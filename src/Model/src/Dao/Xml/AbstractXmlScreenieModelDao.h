@@ -23,6 +23,7 @@
 
 class QXmlStreamWriter;
 class QXmlStreamReader;
+class QIODevice;
 
 class AbstractScreenieModel;
 class AbstractXmlScreenieModelDaoPrivate;
@@ -33,15 +34,27 @@ class AbstractXmlScreenieModelDaoPrivate;
 class AbstractXmlScreenieModelDao
 {
 public:
-    explicit AbstractXmlScreenieModelDao(QXmlStreamWriter *xmlStreamWriter);
-    explicit AbstractXmlScreenieModelDao(QXmlStreamReader *xmlStreamReader);
+    explicit AbstractXmlScreenieModelDao(QIODevice &device);
+    explicit AbstractXmlScreenieModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit AbstractXmlScreenieModelDao(QXmlStreamReader &xmlStreamReader);
     virtual ~AbstractXmlScreenieModelDao();
 
     bool write(const AbstractScreenieModel &screenieModel);
     bool read(AbstractScreenieModel &screenieModel);
 
 protected:
+    /*!
+     * \return the QXmlStreamWriter; may be 0 if a \c device has been given in the
+     *         c'tor (device cannot be opened)
+     * \sa AbstractXmlScreenieModelDao(QIODevice &)
+     */
     QXmlStreamWriter *getStreamWriter() const;
+
+    /*!
+     * \return the QXmlStreamReader; may be 0 if a \c device has been given in the
+     *         c'tor (device cannot be opened)
+     * \sa AbstractXmlScreenieModelDao(QIODevice &)
+     */
     QXmlStreamReader *getStreamReader() const;
 
     virtual bool writeSpecific() = 0;
@@ -49,6 +62,8 @@ protected:
 
 private:
     AbstractXmlScreenieModelDaoPrivate *d;
+
+    void cleanUp();
 };
 
 #endif // ABSTRACTXMLSCREENIEMODELDAO_H

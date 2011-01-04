@@ -48,6 +48,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
+    bool read(const QString &filePath);
+
 protected:
     void closeEvent(QCloseEvent *event);
     void showFullScreen();
@@ -65,7 +67,6 @@ private:
     void frenchConnection();
 
     void newScene(ScreenieScene &screenieScene);
-    bool read(const QString &filePath);
     bool write(const QString &filePath);
 
     void updateTransformationUi();

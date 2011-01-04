@@ -19,6 +19,7 @@
  */
 
 #include <QtCore/QString>
+#include <QtCore/QIODevice>
 #include <QtCore/QBitArray>
 #include <QtCore/QXmlStreamWriter>
 #include <QtCore/QSize>
@@ -36,14 +37,20 @@ public:
 
 //  public
 
-XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamWriter *xmlStreamWriter)
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamWriter &xmlStreamWriter)
     : AbstractXmlScreenieModelDao(xmlStreamWriter),
       d(new XmlScreenieTemplateModelDaoPrivate())
 {
 }
 
-XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamReader *xmlStreamReader)
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamReader &xmlStreamReader)
     : AbstractXmlScreenieModelDao(xmlStreamReader),
+      d(new XmlScreenieTemplateModelDaoPrivate())
+{
+}
+
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QIODevice &device)
+    : AbstractXmlScreenieModelDao(device),
       d(new XmlScreenieTemplateModelDaoPrivate())
 {
 }

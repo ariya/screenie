@@ -16,12 +16,13 @@ HEADERS += $$PWD/src/ModelLib.h \
            $$PWD/src/Dao/ScreenieFilePathModelDao.h \
            $$PWD/src/Dao/ScreeniePixmapModelDao.h \
            $$PWD/src/Dao/ScreenieTemplateModelDao.h \
+           $$PWD/src/Dao/ScreenieSceneSerializer.h \
            $$PWD/src/Dao/Xml/XmlScreenieSceneDao.h \           
            $$PWD/src/Dao/Xml/XmlScreenieFilePathModelDao.h \
            $$PWD/src/Dao/Xml/XmlScreenieTemplateModelDao.h \
            $$PWD/src/Dao/Xml/AbstractXmlScreenieModelDao.h \
-           $$PWD/src/Dao/Xml/XmlScreeniePixmapModelDao.h
-
+           $$PWD/src/Dao/Xml/XmlScreeniePixmapModelDao.h \
+           $$PWD/src/Dao/Xml/XmlScreenieSceneSerializer.h
 
 SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/DefaultScreenieModel.cpp \
@@ -34,4 +35,5 @@ SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/Dao/Xml/XmlScreenieFilePathModelDao.cpp \
            $$PWD/src/Dao/Xml/XmlScreenieTemplateModelDao.cpp \
            $$PWD/src/Dao/Xml/AbstractXmlScreenieModelDao.cpp \
-           $$PWD/src/Dao/Xml/XmlScreeniePixmapModelDao.cpp
+           $$PWD/src/Dao/Xml/XmlScreeniePixmapModelDao.cpp \
+           $$PWD/src/Dao/Xml/XmlScreenieSceneSerializer.cpp

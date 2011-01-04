@@ -20,6 +20,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QPointF>
+#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
@@ -64,8 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
-    /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
-             as provided by Qt: http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
+    /*!\todo Move shortcut assignment to separate class, see http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
 #ifdef Q_OS_MAC
     // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
     // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Note: by default on Mac Qt swaps CTRL and META
     ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 #endif
+
     QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
     connect(shortcut, SIGNAL(activated()),
             ui->deleteAction, SIGNAL(triggered()));
@@ -110,6 +111,22 @@ MainWindow::~MainWindow()
     Settings::destroyInstance();
 }
 
+bool MainWindow::read(const QString &filePath)
+{
+    bool result;
+    QFile file(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
+    ScreenieScene *screenieScene = screenieSceneDao->read();
+    if (screenieScene != 0) {
+        m_documentFilePath = filePath;
+        newScene(*screenieScene);
+        result = true;
+    } else {
+        result = false;
+    }
+    return result;
+}
+
 // protected
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -144,26 +161,14 @@ void MainWindow::newScene(ScreenieScene &screenieScene)
     updateTitle();
 }
 
-bool MainWindow::read(const QString &filePath)
-{
-    bool result;
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    ScreenieScene *screenieScene = screenieSceneDao->read();
-    if (screenieScene != 0) {
-        newScene(*screenieScene);
-        result = true;
-    } else {
-        result = false;
-    }
-    return result;
-}
-
 bool MainWindow::write(const QString &filePath)
 {
     bool result;
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
+    QFile file(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
     result = screenieSceneDao->write(*m_screenieScene);
     if (result) {
+        m_screenieScene->setModified(false);
         updateTitle();
     }
     return result;
@@ -384,7 +389,6 @@ void MainWindow::on_openAction_triggered()
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
                 settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-                m_documentFilePath = filePath;
             }
 #ifdef DEBUG
             qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);

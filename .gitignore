@@ -6,7 +6,7 @@ Makefile*
 *.qm
 *.dll
 *.so
-./doc
+Doxydoc
 
 # Qt build
 ui_*.h

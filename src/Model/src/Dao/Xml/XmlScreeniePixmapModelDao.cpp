@@ -37,13 +37,13 @@ public:
 
 //  public
 
-XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamWriter *xmlStreamWriter)
+XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamWriter &xmlStreamWriter)
     : AbstractXmlScreenieModelDao(xmlStreamWriter),
       d(new XmlScreeniePixmapModelDaoPrivate())
 {
 }
 
-XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamReader *xmlStreamReader)
+XmlScreeniePixmapModelDao::XmlScreeniePixmapModelDao(QXmlStreamReader &xmlStreamReader)
     : AbstractXmlScreenieModelDao(xmlStreamReader),
       d(new XmlScreeniePixmapModelDaoPrivate())
 {

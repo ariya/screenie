@@ -37,7 +37,6 @@ class ScreenieScenePrivate;
 class ScreenieScene : public QObject
 {
     Q_OBJECT
-
 public:
     MODEL_API explicit ScreenieScene(QObject *parent = 0);
     MODEL_API virtual ~ScreenieScene();
@@ -70,8 +69,8 @@ public:
      * \sa #count()
      */
     MODEL_API ScreenieModelInterface *getModel(int index) const;
-    MODEL_API const QList<ScreenieModelInterface *> getModels() const;
-    MODEL_API const QList<ScreenieModelInterface *> getSelectedModels() const;
+    MODEL_API const QList<ScreenieModelInterface *> &getModels() const;
+    MODEL_API QList<ScreenieModelInterface *> getSelectedModels() const;
     MODEL_API int count() const;
 
     MODEL_API bool isBackgroundEnabled() const;
@@ -100,21 +99,17 @@ public:
     /*!
      * Returns whether this ScreenieScene has been modified since creation or the last save.
      *
-     * \ return \c true if this ScreenieScene has unsaved changes; \c false else
+     * \return \c true if this ScreenieScene has unsaved changes; \c false else
      */
     MODEL_API bool isModified() const;
 
     /*!
      * Sets this ScreenieScene as \p modified.
      *
-     * Implementation note: this method is only to be called by this ScreenieScene itself and
-     * the corresponding DAO classes in the same module, hence not exported.
-     *
      * \param modified
      *        set to \c true if modified; \c false else
-     * \sa ScreenieSceneDao#write(const ScreenieScene &)
      */
-    void setModified(bool modified);
+    MODEL_API void setModified(bool modified);
 
 signals:
     /*!

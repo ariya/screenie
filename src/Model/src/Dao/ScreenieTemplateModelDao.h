@@ -31,8 +31,8 @@ public:
     /*!
      * Writes the \p screeniePixmapModel.
      *
-     * \param screeniePixmapModel
-     *        the ScreeniePixmapModel to be written
+     * \param screenieTemplateModel
+     *        the ScreenieTemplateModel to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
     virtual bool write(const ScreenieTemplateModel &screenieTemplateModel) = 0;
