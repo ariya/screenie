@@ -5,7 +5,6 @@ include(Sources.pri)
 TEMPLATE = lib
 DEFINES += RESOURCES_EXPORT
 
-DESTDIR = $$PWD/../../bin/
 
 
 
