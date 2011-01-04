@@ -110,6 +110,22 @@ MainWindow::~MainWindow()
     Settings::destroyInstance();
 }
 
+bool MainWindow::read(const QString &filePath)
+{
+    bool result;
+    QFile file(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
+    ScreenieScene *screenieScene = screenieSceneDao->read();
+    if (screenieScene != 0) {
+        m_documentFilePath = filePath;
+        newScene(*screenieScene);
+        result = true;
+    } else {
+        result = false;
+    }
+    return result;
+}
+
 // protected
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -137,21 +153,6 @@ void MainWindow::newScene(ScreenieScene &screenieScene)
 {
     updateScene(screenieScene);
     updateTitle();
-}
-
-bool MainWindow::read(const QString &filePath)
-{
-    bool result;
-    QFile file(filePath);
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
-    ScreenieScene *screenieScene = screenieSceneDao->read();
-    if (screenieScene != 0) {
-        newScene(*screenieScene);
-        result = true;
-    } else {
-        result = false;
-    }
-    return result;
 }
 
 bool MainWindow::write(const QString &filePath)
@@ -344,7 +345,6 @@ void MainWindow::on_openAction_triggered()
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
                 settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-                m_documentFilePath = filePath;
             }
 #ifdef DEBUG
             qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);

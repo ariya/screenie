@@ -75,6 +75,11 @@ int main(int argc, char *argv[])
     app.installTranslator(&qtTranslator);
     MainWindow mainWindow;
 
+    // simplistic command line parsing: first arg is assumed to be a file path
+    if (argc > 1) {
+        mainWindow.read(argv[1]);
+    }
+
     mainWindow.show();
     return app.exec();
 }
