@@ -35,10 +35,12 @@
 ScreenieApplication::ScreenieApplication(int argc, char **argv)
     : QApplication(argc, argv)
 {
+    m_arguments = arguments();
 }
 
 void ScreenieApplication::show()
 {
+
 #ifdef Q_OS_MAC
     // Mac apps prefer not to have icons in menus
     QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
@@ -63,9 +65,8 @@ void ScreenieApplication::show()
     m_mainWindow = new MainWindow();
     m_mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
     // simplistic command line parsing: first arg is assumed to be a file path
-    QStringList args = arguments();
-    if (args.count() > 1) {
-        m_mainWindow->read(args.at(1));
+    if (m_arguments.count() > 1) {
+        m_mainWindow->read(m_arguments.at(1));
     }
     m_mainWindow->show();
 }

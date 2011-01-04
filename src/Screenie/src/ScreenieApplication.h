@@ -21,6 +21,7 @@
 #ifndef SCREENIEAPPLICATION_H
 #define SCREENIEAPPLICATION_H
 
+#include <QtCore/QStringList>
 #include <QtGui/QApplication>
 
 class QEvent;
@@ -50,6 +51,7 @@ protected:
 
 private:
     MainWindow *m_mainWindow;
+    QStringList m_arguments;
 };
 
 #endif // SCREENIEAPPLICATION_H
