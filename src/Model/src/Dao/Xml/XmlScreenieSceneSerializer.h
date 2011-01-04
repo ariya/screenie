@@ -18,50 +18,25 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef CLIPBOARD_H
-#define CLIPBOARD_H
+#ifndef XMLSCREENIESCENESERIALIZER_H
+#define XMLSCREENIESCENESERIALIZER_H
 
-#include <QtCore/QObject>
+#include "../../ModelLib.h"
+#include "../ScreenieSceneSerializer.h"
 
-class QGraphicsScene;
+class XmlScreenieSceneSerializerPrivate;
 
-#include "../KernelLib.h"
-
-class ScreenieControl;
-class ScreenieModelInterface;
-class ClipboardPrivate;
-
-/*!
- * Support for cut/copy/paste operations.
- */
-class Clipboard : public QObject
+class XmlScreenieSceneSerializer : public ScreenieSceneSerializer
 {
-    Q_OBJECT
 public:
-    KERNEL_API explicit Clipboard(ScreenieControl &screenieControl, QObject *parent = 0);
-    KERNEL_API virtual ~Clipboard();
+    MODEL_API XmlScreenieSceneSerializer();
+    MODEL_API virtual ~XmlScreenieSceneSerializer();
 
-    /*!
-     * \return \c true if this Clipboard has valid MIME data to paste; \c false else
-     */
-    KERNEL_API bool hasData() const;
-
-signals:
-    /*!
-     * Connected to the underlying QClipboard::dataChanged() signal.
-     */
-    void dataChanged();
-
-public slots:
-    KERNEL_API void cut();
-    KERNEL_API void copy();
-    KERNEL_API void paste();
+    MODEL_API virtual QByteArray serialize(const ScreenieScene &screenieScene, Mode mode);
+    MODEL_API virtual ScreenieScene *deserialize(QByteArray &data) const;
 
 private:
-    ClipboardPrivate *d;
-
-    void frenchConnection();
-    void storeMimeData();
+    XmlScreenieSceneSerializerPrivate *d;
 };
 
-#endif // CLIPBOARD_H
+#endif // XMLSCREENIESCENESERIALIZER_H

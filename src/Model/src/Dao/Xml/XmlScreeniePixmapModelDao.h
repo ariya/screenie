@@ -36,8 +36,8 @@ class XmlScreeniePixmapModelDaoPrivate;
 class XmlScreeniePixmapModelDao : public AbstractXmlScreenieModelDao, public ScreeniePixmapModelDao
 {
 public:
-    explicit XmlScreeniePixmapModelDao(QXmlStreamWriter *xmlStreamWriter);
-    explicit XmlScreeniePixmapModelDao(QXmlStreamReader *xmlStreamReader);
+    explicit XmlScreeniePixmapModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit XmlScreeniePixmapModelDao(QXmlStreamReader &xmlStreamReader);
     virtual ~XmlScreeniePixmapModelDao();
 
     virtual bool write(const ScreeniePixmapModel &screeniePixmapModel);

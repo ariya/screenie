@@ -30,13 +30,14 @@ public:
     virtual ~ScreenieSceneDao() {}
 
     /*!
-     * Writes the \p screenieScene. Sets the \em modified flag to \c false.
+     * Writes the \p screenieScene. The \em modified flag is \em not changed. It needs to be
+     * explicitly set by the caller, if required.
      *
      * \param screenieScene
      *        the ScreenieScene to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
-    virtual bool write(ScreenieScene &screenieScene) = 0;
+    virtual bool write(const ScreenieScene &screenieScene) = 0;
 
     /*!
      * Creates and reads the \em current ScreenieScene. The caller is then the owner

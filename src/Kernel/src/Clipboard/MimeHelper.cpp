@@ -20,11 +20,21 @@
 
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
+#include <QtCore/QString>
 
+#include "../../../Utils/src/Version.h"
 #include "ScreenieMimeData.h"
 #include "MimeHelper.h"
 
+#ifdef DEBUG
+#include <QtCore/QStringList>
+#endif
+
 // public
+
+const QString MimeHelper::ScreenieMimeType = QString("application/x-") + Version::getApplicationName().toLower();
+const QString MimeHelper::XmlMimeType = QString("text/xml");
+const QString MimeHelper::TextMimeType = QString("text/plain");
 
 MimeHelper::MimeHelper()
 {
@@ -33,6 +43,11 @@ MimeHelper::MimeHelper()
 bool MimeHelper::accept(const QMimeData *mimeData, Mode mode)
 {
     bool result;
+#ifdef DEBUG
+    foreach (QString mime, mimeData->formats()) {
+        qDebug("MimeHelper::accept: has MIME: %s", qPrintable(mime));
+    }
+#endif
     if (mimeData != 0) {
         if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
             const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);

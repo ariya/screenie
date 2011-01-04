@@ -33,13 +33,13 @@ public:
 
 //  public
 
-XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter *xmlStreamWriter)
+XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamWriter &xmlStreamWriter)
     : AbstractXmlScreenieModelDao(xmlStreamWriter),
       d(new XmlScreenieFilePathModelDaoPrivate())
 {
 }
 
-XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamReader *xmlStreamReader)
+XmlScreenieFilePathModelDao::XmlScreenieFilePathModelDao(QXmlStreamReader &xmlStreamReader)
     : AbstractXmlScreenieModelDao(xmlStreamReader),
       d(new XmlScreenieFilePathModelDaoPrivate())
 {

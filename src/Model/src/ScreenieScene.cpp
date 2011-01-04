@@ -88,7 +88,7 @@ void ScreenieScene::removeModel(int index)
     ScreenieModelInterface *screenieModel = d->screenieModels.at(index);
     d->screenieModels.removeAt(index);
     emit modelRemoved(*screenieModel);
-    delete screenieModel;    
+    delete screenieModel;
 }
 
 ScreenieModelInterface *ScreenieScene::getModel(int index) const
@@ -103,12 +103,12 @@ ScreenieModelInterface *ScreenieScene::getModel(int index) const
     return result;
 }
 
-const QList<ScreenieModelInterface *> ScreenieScene::getModels() const
+const QList<ScreenieModelInterface *> &ScreenieScene::getModels() const
 {
     return d->screenieModels;
 }
 
-const QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
+QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
 {
     QList<ScreenieModelInterface *> result;
     foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {

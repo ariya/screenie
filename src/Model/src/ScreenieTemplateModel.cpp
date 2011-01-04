@@ -70,6 +70,9 @@ ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
 
 ScreenieTemplateModel::~ScreenieTemplateModel()
 {
+#ifdef DEBUG
+    qDebug("ScreenieTemplateModel:~ScreenieTemplateModel: called.");
+#endif
     delete d;
 }
 

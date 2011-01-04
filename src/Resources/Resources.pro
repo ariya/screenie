@@ -11,5 +11,3 @@ DEFINES += RESOURCES_EXPORT
 
 
 
-
-
