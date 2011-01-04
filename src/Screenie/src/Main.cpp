@@ -59,7 +59,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
-    /* Load translation try from /usr/share/screenie, then ./l10n/screenie then ./ */
+    // Load translation try from /usr/share/screenie, then ./l10n/screenie then ./
+    /*!\todo Move i18n stuff into separate Babelfish class */
     QString locale = QLocale::system().name();
     QTranslator translator;
     if (translator.load(QString("screenie_") + locale, "/usr/share/screenie/") == false) {
@@ -69,12 +70,11 @@ int main(int argc, char *argv[])
     }
     app.installTranslator(&translator);
 
-    /* Load the system translator to get the Save dialog translated */
+    // Load the system translator to get the Save dialog translated
     QTranslator qtTranslator;
     qtTranslator.load(QString("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
     MainWindow mainWindow;
-
     mainWindow.show();
     return app.exec();
 }

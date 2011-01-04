@@ -50,6 +50,8 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    void showFullScreen();
+    void showNormal();
 
 private:
     Ui::MainWindow *ui;
@@ -77,6 +79,7 @@ private:
     void updateScene(ScreenieScene &screenieScene);
 
     bool proceedWithModifiedScene();
+    void restoreWindowGeometry();
 
 private slots:
     // File
@@ -114,6 +117,7 @@ private slots:
 
     void updateUi();
     void updateDefaultValues();
+
 };
 
 #endif // MAINWINDOW_H

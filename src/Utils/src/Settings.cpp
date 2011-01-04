@@ -19,10 +19,12 @@
  */
 
 #include <QtCore/QSize>
+#include <QtCore/QSize>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 #include <QtCore/QDir>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QMainWindow>
 
 #include "Version.h"
 #include "Settings.h"
@@ -36,6 +38,9 @@ public:
     static const QString DefaultLastImageDirectoryPath;
     static const QString DefaultLastExportDirectoryPath;
     static const QString DefaultLastDocumentDirectoryPath;
+    static const bool DefaultFullScreen;
+    static const QPoint DefaultMainWindowPosition;
+    static const QSize DefaultMainWindowSize;
 
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
@@ -66,6 +71,9 @@ const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
 const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
 const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
 const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+const bool SettingsPrivate::DefaultFullScreen = false;
+const QPoint SettingsPrivate::DefaultMainWindowPosition = QPoint();
+const QSize SettingsPrivate::DefaultMainWindowSize = QSize(800, 600);
 
 // public
 
@@ -138,15 +146,43 @@ void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentFilePath)
     }
 }
 
+Settings::WindowGeometry Settings::getWindowGeometry() const
+{
+    WindowGeometry result;
+    d->settings->beginGroup("MainWindow");
+    {
+        result.fullScreen = d->settings->value("FullScreen", SettingsPrivate::DefaultFullScreen).toBool();
+        result.position = d->settings->value("Position", SettingsPrivate::DefaultMainWindowPosition).toPoint();
+        result.size = d->settings->value("Size", SettingsPrivate::DefaultMainWindowSize).toSize();
+    }
+    d->settings->endGroup();
+    return result;
+}
+
+void Settings::setWindowGeometry(const WindowGeometry windowGeometry)
+{
+    d->settings->beginGroup("MainWindow");
+    {
+        d->settings->setValue("FullScreen", windowGeometry.fullScreen);
+        d->settings->setValue("Position", windowGeometry.position);
+        d->settings->setValue("Size", windowGeometry.size);
+    }
+    d->settings->endGroup();
+}
+
 // public slots
 
 void Settings::store()
 {
     d->settings->setValue("Version", d->version.toString());
     d->settings->setValue("Scene/MaximumImageSize", d->maximumImageSize);
-    d->settings->setValue("Paths/LastImageDirectoryPath", d->lastImageDirectoryPath);
-    d->settings->setValue("Paths/LastExportDirectoryPath", d->lastExportDirectoryPath);
-    d->settings->setValue("Paths/LastDocumentDirectoryPath", d->lastDocumentFilePath);
+    d->settings->beginGroup("Paths");
+    {
+        d->settings->setValue("LastImageDirectoryPath", d->lastImageDirectoryPath);
+        d->settings->setValue("LastExportDirectoryPath", d->lastExportDirectoryPath);
+        d->settings->setValue("LastDocumentDirectoryPath", d->lastDocumentFilePath);
+    }
+    d->settings->endGroup();
 }
 
 void Settings::restore()
@@ -163,9 +199,13 @@ void Settings::restore()
 #endif
     }
     d->maximumImageSize = d->settings->value("Scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
-    d->lastImageDirectoryPath = d->settings->value("Paths/LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
-    d->lastExportDirectoryPath = d->settings->value("Paths/LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
-    d->lastDocumentFilePath = d->settings->value("Paths/LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
+    d->settings->beginGroup("Paths");
+    {
+        d->lastImageDirectoryPath = d->settings->value("LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
+        d->lastExportDirectoryPath = d->settings->value("LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
+        d->lastDocumentFilePath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
+
+    }
 }
 
 // protected

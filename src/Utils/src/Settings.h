@@ -22,10 +22,10 @@
 #define SETTINGS_H
 
 #include <QtCore/QObject>
+#include <QtCore/QPoint>
+#include <QtCore/QSize>
 
 #include "UtilsLib.h"
-
-class QSize;
 
 class SettingsPrivate;
 
@@ -44,6 +44,12 @@ class Settings : public QObject
     Q_OBJECT
 
 public:
+    struct WindowGeometry {
+        bool fullScreen;
+        QPoint position;
+        QSize size;
+    };
+
     /*!
      * \sa #changed()
      */
@@ -77,6 +83,18 @@ public:
      * \sa #changed()
      */
     UTILS_API void setLastDocumentDirectoryPath(const QString &lastDocumentDirectoryPath);
+
+    UTILS_API WindowGeometry getWindowGeometry() const;
+
+    /*!
+     * Sets the \p windowGeometry. This method does \em not emit the signal
+     * #changed(), as this method is typically called upon application termination,
+     * when storing the main window geometry.
+     *
+     * \param windowGeometry
+     *        the WindowGeometry containing the values of the last MainWindow geometry
+     */
+    UTILS_API void setWindowGeometry(const WindowGeometry windowGeometry);
 
 public slots:
     /*!
