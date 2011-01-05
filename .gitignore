@@ -27,3 +27,8 @@ bin
 # Windows
 Thumbs.db
 
+# Installer
+*.msi
+*.wixobj
+*.wixpdb
+

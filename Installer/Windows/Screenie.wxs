@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="9C717168-DCA4-49F0-894F-2C5CEAF0A0C4" Name="Screenie" Language="1033" Version="0.1.0" Manufacturer="till-art.net" UpgradeCode="479C1D6F-20B5-4EBE-B97E-1157A9563348">
+        <Package Description="Screenie" Comments="A fancy screenshot composer" InstallerVersion="200" Compressed="yes" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="Screenie" Name="Screenie">
+                    <Component Id="Kernel.dll" DiskId="1" Guid="7ABBAFAD-AFC2-469C-8DFA-AF4A1E005C7E">
+                        <File Id="Kernel.dll" Name="Kernel.dll" Source="..\..\bin\release\Kernel.dll" />
+                    </Component>
+                    <Component Id="Model.dll" DiskId="1" Guid="1436EFC5-15B4-4D9D-ADF4-033F664FAA96">
+                        <File Id="Model.dll" Name="Model.dll" Source="..\..\bin\release\Model.dll" />
+                    </Component>
+                    <Component Id="Resources.dll" DiskId="1" Guid="36A33861-0697-4033-BCBA-EC7B0A1E3348">
+                        <File Id="Resources.dll" Name="Resources.dll" Source="..\..\bin\release\Resources.dll" />
+                    </Component>
+                    <Component Id="Screenie.exe" DiskId="1" Guid="A6A2B006-C3B7-4EA1-9BE6-F97F887331EB">
+                        <File Id="Screenie.exe" Name="Screenie.exe" Source="..\..\bin\release\Screenie.exe">
+                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Screenie" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+                        </File>
+                    </Component>
+                    <Component Id="Utils.dll" DiskId="1" Guid="7CA0C58B-A021-490F-B83E-F2DB266A258C">
+                        <File Id="Utils.dll" Name="Utils.dll" Source="..\..\bin\release\Utils.dll" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="Screenie">
+                    <Component Id="StartMenuShortcuts" Guid="E45E227E-6C6D-4843-98C5-0101C34A801A">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="Screenie" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="Kernel.dll" />
+            <ComponentRef Id="Model.dll" />
+            <ComponentRef Id="Resources.dll" />
+            <ComponentRef Id="Screenie.exe" />
+            <ComponentRef Id="Utils.dll" />
+            <ComponentRef Id="StartMenuShortcuts" />
+        </Feature>
+        <UI />
+        <UIRef Id="WixUI_Minimal" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\bin\release\Screenie.exe" />
+    </Product>
+</Wix>
