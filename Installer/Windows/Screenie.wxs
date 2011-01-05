@@ -16,8 +16,8 @@
                         <File Id="Resources1.dll" Name="Resources1.dll" Source="..\..\bin\release\Resources1.dll" />
                     </Component>
                     <Component Id="Screenie.exe" DiskId="1" Guid="A6A2B006-C3B7-4EA1-9BE6-F97F887331EB">
+                        <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Screenie" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
                         <File Id="Screenie.exe" Name="Screenie.exe" Source="..\..\bin\release\Screenie.exe">
-                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Screenie" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
                         </File>
                         <ProgId Id="Screenie.ScreenieScene" Description="Screenie Scene File" Icon="Screenie.exe" IconIndex="0">
                             <Extension Id="xsc" ContentType="application/x-screenie">
@@ -25,7 +25,6 @@
                             </Extension>
                         </ProgId>
                         <RemoveFile Id="RemoveScreenie.ini" On="uninstall" Name="Screenie.ini" Property="till_art.net" />
-                        <RemoveFolder Id="till_art.net" On="uninstall" />
                     </Component>
                     <Component Id="Utils1.dll" DiskId="1" Guid="7CA0C58B-A021-490F-B83E-F2DB266A258C">
                         <File Id="Utils1.dll" Name="Utils1.dll" Source="..\..\bin\release\Utils1.dll" />
@@ -91,5 +90,6 @@
         <UI />
         <UIRef Id="WixUI_Minimal" />
         <Icon Id="StartMenuIcon.exe" SourceFile="..\..\bin\release\Screenie.exe" />
+		<WixVariable Id="WixUILicenseRtf" Value="GPL3.rtf" />
     </Product>
 </Wix>
