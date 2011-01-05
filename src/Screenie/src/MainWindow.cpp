@@ -383,7 +383,8 @@ void MainWindow::on_openAction_triggered()
     if (proceedWithModifiedScene()) {
         Settings &settings = Settings::getInstance();
         QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
+        QString filter = tr("Screenie Scene (*.xsc)");
+        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
         if (!filePath.isNull()) {
             bool ok = read(filePath);
             if (ok) {
@@ -413,7 +414,8 @@ void MainWindow::on_saveAsAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, tr("*.xsc"));
+    QString filter = tr("Screenie Scene (*.xsc)");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter);
     if (!filePath.isNull()) {
         bool ok = write(filePath);
 #ifdef DEBUG
