@@ -206,6 +206,7 @@ void Settings::restore()
         d->lastDocumentFilePath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
 
     }
+    d->settings->endGroup();
 }
 
 // protected
