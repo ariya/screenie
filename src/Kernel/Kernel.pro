@@ -6,7 +6,7 @@ TEMPLATE = lib
 DEFINES += KERNEL_EXPORT
 
 LIBS += -L$${DESTDIR} \
-        -lUtils \
-        -lModel
+        -lUtils$${VERSION_MAJ} \
+        -lModel$${VERSION_MAJ}
 
 

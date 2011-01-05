@@ -6,5 +6,6 @@ TEMPLATE = lib
 DEFINES += MODEL_EXPORT
 
 LIBS += -L$${DESTDIR} \
-        -lUtils
+        -lUtils$${VERSION_MAJ}
+
 
