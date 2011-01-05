@@ -31,4 +31,6 @@ Thumbs.db
 *.msi
 *.wixobj
 *.wixpdb
+*.log
+
 
