@@ -169,6 +169,7 @@ bool MainWindow::write(const QString &filePath)
     result = screenieSceneDao->write(*m_screenieScene);
     if (result) {
         m_screenieScene->setModified(false);
+        m_documentFilePath = filePath;
         updateTitle();
     }
     return result;
@@ -424,7 +425,6 @@ void MainWindow::on_saveAsAction_triggered()
         if (ok) {
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            m_documentFilePath = filePath;
         }
     }
 }
