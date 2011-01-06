@@ -22,7 +22,6 @@
 #define SCREENIEGRAPHICSSCENE_H
 
 #include <QtCore/QList>
-#include <QtCore/QTimer>
 #include <QtGui/QImage>
 #include <QtGui/QGraphicsScene>
 
@@ -39,7 +38,7 @@ class QObject;
 
 #include "KernelLib.h"
 
-#include "KernelLib.h"
+class ScreenieGraphicsScenePrivate;
 
 /*!
  * Provides the drag'n'drop functionality for opening image and scene files.
@@ -65,9 +64,7 @@ protected:
     virtual bool event(QEvent *event);
 
 private:
-    bool m_itemDragDrop;
-    // temporary workaround for http://bugreports.qt.nokia.com/browse/QTBUG-16281
-    QTimer m_cursorTimer;
+    ScreenieGraphicsScenePrivate *d;
 
     void frenchConnection();
 
