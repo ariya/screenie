@@ -1,6 +1,7 @@
 Makefile*
 *.Debug
 *.Release
+*_resource.rc
 *.o
 *.exe
 *.qm
