@@ -22,10 +22,10 @@ macx {
     LIBS += -L$${DESTDIR}
 }
 
-LIBS += -lUtils \
-        -lModel \
-        -lResources \
-        -lKernel
+LIBS += -lUtils$${VERSION_MAJ} \
+        -lModel$${VERSION_MAJ} \
+        -lResources$${VERSION_MAJ} \
+        -lKernel$${VERSION_MAJ}
 
 macx {
    ICON = res/ApplicationIcon.icns

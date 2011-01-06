@@ -45,8 +45,8 @@ public:
 };
 
 // Application version
-const int VersionPrivate::Major = 0;
-const int VersionPrivate::Minor = 1;
+const int VersionPrivate::Major = 1;
+const int VersionPrivate::Minor = 0;
 const int VersionPrivate::Subminor = 0;
 const QString VersionPrivate::CodeName = QString("Anarchic Amoeba");
 const QString VersionPrivate::ApplicationTitle = "Screenie"; // note: no translation here (i18n)
