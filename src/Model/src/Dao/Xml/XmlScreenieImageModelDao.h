@@ -18,37 +18,37 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef XMLSCREENIEPIXMAPMODELDAO_H
-#define XMLSCREENIEPIXMAPMODELDAO_H
+#ifndef XMLSCREENIEIMAGEMODELDAO_H
+#define XMLSCREENIEIMAGEMODELDAO_H
 
 class QXmlStreamWriter;
 class QXmlStreamReader;
 
-#include "../ScreeniePixmapModelDao.h"
+#include "../ScreenieImageModelDao.h"
 #include "AbstractXmlScreenieModelDao.h"
 
-class ScreeniePixmapModel;
-class XmlScreeniePixmapModelDaoPrivate;
+class ScreenieImageModel;
+class XmlScreenieImageModelDaoPrivate;
 
 /*!
  * Internal class.
  */
-class XmlScreeniePixmapModelDao : public AbstractXmlScreenieModelDao, public ScreeniePixmapModelDao
+class XmlScreenieImageModelDao : public AbstractXmlScreenieModelDao, public ScreenieImageModelDao
 {
 public:
-    explicit XmlScreeniePixmapModelDao(QXmlStreamWriter &xmlStreamWriter);
-    explicit XmlScreeniePixmapModelDao(QXmlStreamReader &xmlStreamReader);
-    virtual ~XmlScreeniePixmapModelDao();
+    explicit XmlScreenieImageModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit XmlScreenieImageModelDao(QXmlStreamReader &xmlStreamReader);
+    virtual ~XmlScreenieImageModelDao();
 
-    virtual bool write(const ScreeniePixmapModel &screeniePixmapModel);
-    virtual ScreeniePixmapModel *read();
+    virtual bool write(const ScreenieImageModel &screeniePixmapModel);
+    virtual ScreenieImageModel *read();
 
 protected:
     virtual bool writeSpecific();
     virtual bool readSpecific();
 
 private:
-    XmlScreeniePixmapModelDaoPrivate *d;
+    XmlScreenieImageModelDaoPrivate *d;
 };
 
-#endif // XMLSCREENIEPIXMAPMODELDAO_H
+#endif // XMLSCREENIEIMAGEMODELDAO_H

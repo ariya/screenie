@@ -31,7 +31,7 @@
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QBrush>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 #include <QtGui/QPainter>
 #include <QtGui/QMainWindow>
 #include <QtGui/QSlider>
@@ -41,7 +41,7 @@
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieFilePathModel.h"
-#include "../../Model/src/ScreeniePixmapModel.h"
+#include "../../Model/src/ScreenieImageModel.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
 #include "TemplateOrganizer.h"
 #include "Reflection.h"
@@ -130,8 +130,8 @@ void ScreenieControl::updateModel(const QMimeData *mimeData, ScreenieModelInterf
     // prefer image data over file paths (URLs)
     if (mimeData->hasImage()) {
         /*!\todo Convert to QImage instead, as not to loose any information (on screens with fewer capabilities!) */
-        QPixmap pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
-        updatePixmapModel(pixmap, screenieModel);
+        QImage image = qvariant_cast<QImage>(mimeData->imageData());
+        updateImageModel(image, screenieModel);
     } else {
         QString filePath = mimeData->urls().first().toLocalFile();
         updateFilePathModel(filePath, screenieModel);
@@ -168,18 +168,18 @@ void ScreenieControl::addImages(QStringList filePaths, QPointF centerPosition)
     }
 }
 
-void ScreenieControl::addImage(QPixmap pixmap, QPointF centerPosition)
+void ScreenieControl::addImage(QImage image, QPointF centerPosition)
 {
-    QList<QPixmap> pixmaps;
-    pixmaps.append(pixmap);
-    addImages(pixmaps, centerPosition);
+    QList<QImage> images;
+    images.append(image);
+    addImages(images, centerPosition);
 }
 
-void ScreenieControl::addImages(QList<QPixmap> pixmaps, QPointF centerPosition)
+void ScreenieControl::addImages(QList<QImage> images, QPointF centerPosition)
 {
     QPointF position = centerPosition;
-    foreach (QPixmap pixmap, pixmaps) {
-        ScreeniePixmapModel *screenieModel = new ScreeniePixmapModel(pixmap);
+    foreach (QImage image, images) {
+        ScreenieImageModel *screenieModel = new ScreenieImageModel(image);
         applyDefaultValues(*screenieModel);
         QPointF itemPosition = calculateItemPosition(*screenieModel, position);
         position += QPointF(20.0, 20.0);
@@ -362,8 +362,8 @@ void ScreenieControl::frenchConnection()
             this, SLOT(handleModelRemoved(ScreenieModelInterface &)));
     connect(&d->screenieScene, SIGNAL(backgroundChanged()),
             this, SLOT(handleBackgroundChanged()));
-    connect(&d->screenieGraphicsScene, SIGNAL(pixmapsDropped(QList<QPixmap>, QPointF)),
-            this, SLOT(handlePixmapsDrop(QList<QPixmap>, QPointF)));
+    connect(&d->screenieGraphicsScene, SIGNAL(imagesDropped(QList<QImage>, QPointF)),
+            this, SLOT(handleImageDrop(QList<QImage>, QPointF)));
     connect(&d->screenieGraphicsScene, SIGNAL(filePathsDropped(QStringList, QPointF)),
             this, SLOT(handleFilePathsDrop(QStringList, QPointF)));
     connect(&d->screenieGraphicsScene, SIGNAL(rotate(int)),
@@ -430,16 +430,16 @@ QPointF ScreenieControl::calculateItemPosition(const ScreenieModelInterface &scr
     return result;
 }
 
-QPixmap ScreenieControl::scaleToTemplate(const ScreenieTemplateModel &templateModel, const QPixmap &pixmap)
+QImage ScreenieControl::scaleToTemplate(const ScreenieTemplateModel &templateModel, const QImage &image)
 {
-    QPixmap result;
+    QImage result;
     const SizeFitter &sizeFitter = templateModel.getSizeFitter();
     QSize fittedSize;
-    bool doResize = sizeFitter.fit(pixmap.size(), fittedSize);
+    bool doResize = sizeFitter.fit(image.size(), fittedSize);
     if (doResize) {
-        result = pixmap.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        result = image.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     } else {
-        result = pixmap;
+        result = image;
     }
     return result;
 }
@@ -452,26 +452,26 @@ QPointF ScreenieControl::calculateItemPosition(const QPointF &sourcePosition, co
     return result;
 }
 
-void ScreenieControl::updatePixmapModel(const QPixmap &pixmap, ScreenieModelInterface &screenieModel)
+void ScreenieControl::updateImageModel(const QImage &image, ScreenieModelInterface &screenieModel)
 {
-    QPixmap actualPixmap = pixmap;
-    if (!actualPixmap.isNull()) {
-        if (screenieModel.inherits(ScreeniePixmapModel::staticMetaObject.className())) {
-            ScreeniePixmapModel &screeniePixmapModel = static_cast<ScreeniePixmapModel &>(screenieModel);
-            QPointF itemPosition = calculateItemPosition(screeniePixmapModel.getPosition(), screeniePixmapModel.getSize(), actualPixmap.size());
-            screeniePixmapModel.setPixmap(actualPixmap);
-            screeniePixmapModel.setPosition(itemPosition);
+    QImage actualImage = image;
+    if (!actualImage.isNull()) {
+        if (screenieModel.inherits(ScreenieImageModel::staticMetaObject.className())) {
+            ScreenieImageModel &screenieImageModel = static_cast<ScreenieImageModel &>(screenieModel);
+            QPointF itemPosition = calculateItemPosition(screenieImageModel.getPosition(), screenieImageModel.getSize(), actualImage.size());
+            screenieImageModel.setImage(actualImage);
+            screenieImageModel.setPosition(itemPosition);
         } else {
-            // convert to ScreeniePixmapModel
+            // convert to ScreenieImageModel
             if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-                actualPixmap = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), actualPixmap);
+                actualImage = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), actualImage);
             }
-            ScreeniePixmapModel *screeniePixmapModel = new ScreeniePixmapModel(actualPixmap);
-            QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), actualPixmap.size());
-            screeniePixmapModel->convert(screenieModel);
-            screeniePixmapModel->setPosition(itemPosition);
+            ScreenieImageModel *screenieImageModel = new ScreenieImageModel(actualImage);
+            QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), actualImage.size());
+            screenieImageModel->convert(screenieModel);
+            screenieImageModel->setPosition(itemPosition);
             d->screenieScene.removeModel(&screenieModel);
-            d->screenieScene.addModel(screeniePixmapModel);
+            d->screenieScene.addModel(screenieImageModel);
         }
     }
 }
@@ -524,20 +524,20 @@ void ScreenieControl::handleFilePathsDrop(QStringList filePaths, QPointF centerP
     }
 }
 
-void ScreenieControl::handlePixmapsDrop(QList<QPixmap> pixmaps, QPointF centerPosition)
+void ScreenieControl::handleImageDrop(QList<QImage> images, QPointF centerPosition)
 {
     ScreenieTemplateModel *templateModel;
     if (!d->screenieScene.hasTemplates()) {
-        addImages(pixmaps, centerPosition);
+        addImages(images, centerPosition);
     } else {
         QList<ScreenieTemplateModel *> templateModels = d->templateOrganizer.getOrderedTemplates();
         int i = 0;
-        int n = pixmaps.count();
+        int n = images.count();
         QList<ScreenieTemplateModel *>::const_iterator it = templateModels.constBegin();
         while (i < n && it != templateModels.constEnd()) {
             templateModel = *it;
-            QPixmap pixmap = pixmaps.at(i);
-            updatePixmapModel(pixmap, *templateModel);
+            QImage image = images.at(i);
+            updateImageModel(image, *templateModel);
             i++;
             it++;
         }

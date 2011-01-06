@@ -29,14 +29,14 @@
 #include "../../ScreenieScene.h"
 #include "../../ScreenieModelInterface.h"
 #include "../../ScreenieFilePathModel.h"
-#include "../../ScreeniePixmapModel.h"
+#include "../../ScreenieImageModel.h"
 #include "../../ScreenieTemplateModel.h"
 #include "../ScreenieFilePathModelDao.h"
-#include "../ScreeniePixmapModelDao.h"
+#include "../ScreenieIMageModelDao.h"
 #include "../ScreenieTemplateModelDao.h"
 #include "../ScreenieSceneSerializer.h"
 #include "XmlScreenieFilePathModelDao.h"
-#include "XmlScreeniePixmapModelDao.h"
+#include "XmlScreenieImageModelDao.h"
 #include "XmlScreenieTemplateModelDao.h"
 #include "XmlScreenieSceneDao.h"
 
@@ -59,7 +59,7 @@ public:
     QXmlStreamWriter *streamWriter;
     QXmlStreamReader *streamReader;
     ScreenieFilePathModelDao *screenieFilePathModelDao;
-    ScreeniePixmapModelDao *screeniePixmapModelDao;
+    ScreenieImageModelDao *screeniePixmapModelDao;
     ScreenieTemplateModelDao *screenieTemplateModelDao;
 };
 
@@ -184,8 +184,8 @@ bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         if (screenieModel->inherits(ScreenieFilePathModel::staticMetaObject.className())) {
             result = writeFilePathModel(static_cast<ScreenieFilePathModel &>(*screenieModel));
-        } else if (screenieModel->inherits(ScreeniePixmapModel::staticMetaObject.className())) {
-            result = writePixmapModel(static_cast<ScreeniePixmapModel &>(*screenieModel));
+        } else if (screenieModel->inherits(ScreenieImageModel::staticMetaObject.className())) {
+            result = writePixmapModel(static_cast<ScreenieImageModel &>(*screenieModel));
         } else if (screenieModel->inherits(ScreenieTemplateModel::staticMetaObject.className())) {
             result = writeTemplateModel(static_cast<ScreenieTemplateModel &>(*screenieModel));
         }
@@ -213,11 +213,11 @@ bool XmlScreenieSceneDao::writeFilePathModel(const ScreenieFilePathModel &screen
     return result;
 }
 
-bool XmlScreenieSceneDao::writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel)
+bool XmlScreenieSceneDao::writePixmapModel(const ScreenieImageModel &screeniePixmapModel)
 {
     bool result;
     if (d->screeniePixmapModelDao == 0) {
-        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(*d->streamWriter);
+        d->screeniePixmapModelDao = new XmlScreenieImageModelDao(*d->streamWriter);
     }
     d->streamWriter->writeStartElement("pixmapmodel");
     {
@@ -264,7 +264,7 @@ ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
                 ok = false;
             }
         } else if (d->streamReader->name() == "pixmapmodel") {
-            ScreeniePixmapModel *pixmapModel = readPixmapModel();
+            ScreenieImageModel *pixmapModel = readPixmapModel();
             if (pixmapModel != 0) {
                 result->addModel(pixmapModel);
             } else {
@@ -309,12 +309,12 @@ ScreenieFilePathModel *XmlScreenieSceneDao::readFilePathModel() const
     return result;
 }
 
-ScreeniePixmapModel *XmlScreenieSceneDao::readPixmapModel() const
+ScreenieImageModel *XmlScreenieSceneDao::readPixmapModel() const
 {
-    ScreeniePixmapModel *result;
+    ScreenieImageModel *result;
 
     if (d->screeniePixmapModelDao == 0) {
-        d->screeniePixmapModelDao = new XmlScreeniePixmapModelDao(*d->streamReader);
+        d->screeniePixmapModelDao = new XmlScreenieImageModelDao(*d->streamReader);
     }
     result = d->screeniePixmapModelDao->read();
     return result;

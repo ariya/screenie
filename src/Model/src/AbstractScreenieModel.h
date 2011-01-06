@@ -22,7 +22,7 @@
 #define ABSTRACTSCREENIEMODEL_H
 
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 class AbstractScreenieModelPrivate;
 
@@ -68,7 +68,7 @@ public:
     virtual void convert(ScreenieModelInterface &source);
 
 protected:
-    QPixmap fitToMaximumSize(const QPixmap &pixmap) const;
+    QImage fitToMaximumSize(const QImage &image) const;
 
 private:
     AbstractScreenieModelPrivate *d;

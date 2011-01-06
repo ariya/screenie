@@ -27,7 +27,8 @@
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QPainter>
-
+#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Model/src/ScreenieModelInterface.h"
@@ -55,7 +56,8 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
     // we also want to be able to change the reflection also in the fully translucent areas
     // of the reflection
     setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    QPixmap pixmap = m_screenieModel.readPixmap();
+    QPixmap pixmap;
+    pixmap.convertFromImage(m_screenieModel.readImage());
     updatePixmap(pixmap);
     setAcceptDrops(true);
     frenchConnection();
@@ -294,7 +296,8 @@ void ScreeniePixmapItem::updatePixmap(const QPixmap &pixmap)
 
 void ScreeniePixmapItem::updatePixmap()
 {
-    QPixmap pixmap = m_screenieModel.readPixmap();
+    QPixmap pixmap;
+    pixmap.convertFromImage(m_screenieModel.readImage());
     updatePixmap(pixmap);
 }
 

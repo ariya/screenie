@@ -23,7 +23,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QTimer>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 #include <QtGui/QGraphicsScene>
 
 class QGraphicsSceneDragDropEvent;
@@ -52,7 +52,7 @@ public:
     KERNEL_API virtual ~ScreenieGraphicsScene();
 
 signals:
-    void pixmapsDropped(QList<QPixmap> pixmaps, QPointF position);
+    void imagesDropped(QList<QImage> images, QPointF position);
     void filePathsDropped(QStringList filePaths, QPointF position);
     void rotate(int angle);
     void addDistance(int distance);
@@ -80,7 +80,6 @@ private:
 
 private slots:
     void restoreCursor();
-
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H

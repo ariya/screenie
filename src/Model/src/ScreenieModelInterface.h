@@ -23,7 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "ModelLib.h"
 
@@ -40,21 +40,21 @@ public:
     virtual ~ScreenieModelInterface() {}
 
     /*!
-     * Returns the QPixmap.
+     * Returns the QImage.
      *
      * \sa #setFilePath(const QString &)
      */
-    virtual const QPixmap &readPixmap() const = 0;
+    virtual const QImage &readImage() const = 0;
 
     /*!
      * Returns the size of the image.
      *
-     * Implementation note: if #readPixmap has not yet been called the image is currently
+     * Implementation note: if #readImage has not yet been called the image is currently
      * read from disk first, so it might be potentially expensive, but only for the first
      * time (the image is stored in memory).
      *
      * \return the QSize of the image
-     * \sa #readPixmap()
+     * \sa #readImage()
      */
     virtual QSize getSize() const = 0;
 
@@ -137,7 +137,7 @@ signals:
     void distanceChanged();
     void positionChanged();
     void changed();
-    void pixmapChanged(const QPixmap &pixmap);
+    void imageChanged(const QImage &image);
     void filePathChanged(const QString &filePath);
     void selectionChanged();
 };

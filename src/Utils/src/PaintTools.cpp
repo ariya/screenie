@@ -19,6 +19,7 @@
  */
 
 #include <QtCore/QSize>
+#include <QtGui/QImage>
 #include <QtGui/QPixmap>
 #include <QtGui/QLinearGradient>
 #include <QtGui/QPainter>
@@ -28,18 +29,18 @@
 
 // public
 
-QPixmap PaintTools::createDefaultImage()
+QImage PaintTools::createDefaultImage()
 {
-    QPixmap result = QPixmap(400, 300);
+    QImage result = QImage(400, 300, QImage::Format_ARGB32_Premultiplied);
     QPainter painter(&result);
     drawBackground(painter, result);
     drawText("?", painter, result);
     return result;
 }
 
-QPixmap PaintTools::createTemplateImage(const QSize &size)
+QImage PaintTools::createTemplateImage(const QSize &size)
 {
-    QPixmap result = QPixmap(size);
+    QImage result = QImage(size, QImage::Format_ARGB32_Premultiplied);
     QPainter painter(&result);
     drawBackground(painter, result);
     drawText("T", painter, result);
@@ -69,23 +70,23 @@ QBrush PaintTools::createCheckerPattern()
 
 // private
 
-void PaintTools::drawBackground(QPainter &painter, QPixmap &pixmap)
+void PaintTools::drawBackground(QPainter &painter, QImage &image)
 {
-    QLinearGradient gradient(QPoint(0, 0), QPoint(0, pixmap.height()));
+    QLinearGradient gradient(QPoint(0, 0), QPoint(0, image.height()));
     gradient.setColorAt(0, QColor(192, 192, 192));
     gradient.setColorAt(1, QColor(128, 128, 128));
-    painter.fillRect(pixmap.rect(), gradient);
+    painter.fillRect(image.rect(), gradient);
     painter.setPen(QPen(QColor(96, 96, 96), 3, Qt::SolidLine));
-    painter.drawRect(pixmap.rect());
+    painter.drawRect(image.rect());
 }
 
-void PaintTools::drawText(const QString &text, QPainter &painter, QPixmap &pixmap)
+void PaintTools::drawText(const QString &text, QPainter &painter, QImage &image)
 {
     QFont font;
     font.setPixelSize(100);
     painter.setFont(font);
     painter.setPen(Qt::white);
-    painter.drawText(pixmap.rect(), Qt::AlignCenter, text);
+    painter.drawText(image.rect(), Qt::AlignCenter, text);
     painter.end();
 }
 

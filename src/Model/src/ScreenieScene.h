@@ -23,7 +23,6 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtGui/QPixmap>
 #include <QtGui/QColor>
 
 #include "ModelLib.h"

@@ -20,7 +20,7 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "../../Utils/src/SizeFitter.h"
 #include "../../Utils/src/PaintTools.h"
@@ -35,13 +35,13 @@ public:
 
     ScreenieFilePathModelPrivate(const ScreenieFilePathModelPrivate &other)
         : filePath(other.filePath),
-          pixmap(other.pixmap),
+          image(other.image),
           sizeFitter(other.sizeFitter)
     {
     }
 
     QString filePath;
-    QPixmap pixmap;
+    QImage image;
     const SizeFitter *sizeFitter;
 };
 
@@ -64,33 +64,33 @@ ScreenieFilePathModel::~ScreenieFilePathModel()
 #endif
 }
 
-const QPixmap &ScreenieFilePathModel::readPixmap() const
+const QImage &ScreenieFilePathModel::readImage() const
 {
-    d->pixmap.load(d->filePath);
-    if (!d->pixmap.isNull()) {
+    d->image.load(d->filePath);
+    if (!d->image.isNull()) {
         if (d->sizeFitter != 0) {
             QSize fittedSize;
-            bool doResize = d->sizeFitter->fit(d->pixmap.size(), fittedSize);
+            bool doResize = d->sizeFitter->fit(d->image.size(), fittedSize);
             if (doResize) {
-                d->pixmap = d->pixmap.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                d->image = d->image.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             }
         } else {
-            d->pixmap = fitToMaximumSize(d->pixmap);
+            d->image = fitToMaximumSize(d->image);
         }
     } else {
-        d->pixmap = PaintTools::createDefaultImage();
+        d->image = PaintTools::createDefaultImage();
     }
-    return d->pixmap;
+    return d->image;
 }
 
 QSize ScreenieFilePathModel::getSize() const
 {
     QSize result;
-    if (!d->pixmap.isNull()) {
-        result = d->pixmap.size();
+    if (!d->image.isNull()) {
+        result = d->image.size();
     } else {
         /*!\todo Optimisation: use Exiv2 library to quickly read the image size from disk (EXIF data) */
-        result = readPixmap().size();
+        result = readImage().size();
     }
     return result;
 }
@@ -110,7 +110,7 @@ void ScreenieFilePathModel::setFilePath(const QString &filePath)
 {
     if (d->filePath != filePath) {
         d->filePath = filePath;
-        d->pixmap = QPixmap();
+        d->image = QImage();
         emit filePathChanged(filePath);
     }
 }

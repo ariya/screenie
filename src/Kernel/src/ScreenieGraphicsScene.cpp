@@ -24,7 +24,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QList>
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 #include <QtGui/QGraphicsSceneDragDropEvent>
 #include <QtGui/QDropEvent>
 #include <QtGui/QWidget>
@@ -76,14 +76,14 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
     if (!m_itemDragDrop) {
         QList<QUrl> urls = event->mimeData()->urls();
-        QList<QPixmap> pixmaps;
+        QList<QImage> images;
         QStringList filePaths;
 
         // prefer image data over filepaths
         if (event->mimeData()->hasImage()) {
-            QPixmap pixmap;
-            pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
-            pixmaps.append(pixmap);
+            QImage image;
+            image = qvariant_cast<QImage>(event->mimeData()->imageData());
+            images.append(image);
         } else {
             foreach (QUrl url, urls) {
                 /*!\todo Support for "http:// images"? For now we assume the paths can be converted to local paths. */
@@ -93,8 +93,8 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
                 }
             }
         }
-        if (pixmaps.size() > 0) {
-            emit pixmapsDropped(pixmaps, event->scenePos());
+        if (images.size() > 0) {
+            emit imagesDropped(images, event->scenePos());
         }
         if (filePaths.size() > 0) {
             emit filePathsDropped(filePaths, event->scenePos());

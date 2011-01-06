@@ -22,6 +22,7 @@
 #define PAINTTOOLS_H
 
 #include <QtGui/QPixmap>
+#include <QtGui/QImage>
 #include <QtGui/QBrush>
 
 class QPainter;
@@ -39,12 +40,12 @@ public:
     /*!
      * Creates a stub image with a big '?' in the center.
      */
-    UTILS_API static QPixmap createDefaultImage();
+    UTILS_API static QImage createDefaultImage();
 
     /*!
      * Creates a template image.
      */
-    UTILS_API static QPixmap createTemplateImage(const QSize &size);
+    UTILS_API static QImage createTemplateImage(const QSize &size);
 
     /*!
      * Returns the upper half of the \p pixmap.
@@ -61,8 +62,8 @@ public:
     UTILS_API static QBrush createCheckerPattern();
 
 private:
-   static void drawBackground(QPainter &painter, QPixmap &pixmap);
-   static void drawText(const QString &text, QPainter &painter, QPixmap &pixmap);
+   static void drawBackground(QPainter &painter, QImage &image);
+   static void drawText(const QString &text, QPainter &painter, QImage &image);
 };
 
 #endif // PAINTTOOLS_H

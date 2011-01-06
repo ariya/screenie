@@ -18,32 +18,32 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIEPIXMAPMODELDAO_H
-#define SCREENIEPIXMAPMODELDAO_H
+#ifndef SCREENIEIMAGEMODELDAO_H
+#define SCREENIEIMAGEMODELDAO_H
 
-class ScreeniePixmapModel;
+class ScreenieImageModel;
 
-class ScreeniePixmapModelDao
+class ScreenieImageModelDao
 {
 public:
-    virtual ~ScreeniePixmapModelDao() {}
+    virtual ~ScreenieImageModelDao() {}
 
     /*!
      * Writes the \p screeniePixmapModel.
      *
-     * \param screeniePixmapModel
-     *        the ScreeniePixmapModel to be written
+     * \param screenieImageModel
+     *        the ScreenieImageModel to be written
      * \return \c true if written succesfully; \c false else (no file permission, disk full, write error)
      */
-    virtual bool write(const ScreeniePixmapModel &screeniePixmapModel) = 0;
+    virtual bool write(const ScreenieImageModel &screenieImageModel) = 0;
 
     /*!
-     * Creates and reads the \em current ScreeniePixmapModel. The caller is then the owner
+     * Creates and reads the \em current ScreenieImageModel. The caller is then the owner
      * of the returned instance.
      *
-     * \return the ScreeniePixmapModel read from the \em current position in the persistence stream;
+     * \return the ScreenieImageModel read from the \em current position in the persistence stream;
      *         must be \c deleted by the caller; may be 0 on error
      */
-    virtual ScreeniePixmapModel *read() = 0;
+    virtual ScreenieImageModel *read() = 0;
 };
-#endif // SCREENIEPIXMAPMODELDAO_H
+#endif // SCREENIEIMAGEMODELDAO_H
