@@ -5,8 +5,14 @@ include(Sources.pri)
 TEMPLATE = lib
 DEFINES += KERNEL_EXPORT
 
-LIBS += -L$${DESTDIR} \
-        -lUtils$${VERSION_MAJ} \
-        -lModel$${VERSION_MAJ}
+win32 {
+  LIBS += -L$${DESTDIR} \
+          -lUtils$${VERSION_MAJ} \
+          -lModel$${VERSION_MAJ}
+} else {
+  LIBS += -L$${DESTDIR} \
+          -lUtils \
+          -lModel
+}
 
 

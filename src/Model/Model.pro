@@ -5,7 +5,12 @@ include(Sources.pri)
 TEMPLATE = lib
 DEFINES += MODEL_EXPORT
 
-LIBS += -L$${DESTDIR} \
-        -lUtils$${VERSION_MAJ}
+win32 {
+  LIBS += -L$${DESTDIR} \
+          -lUtils$${VERSION_MAJ}
+} else {
+  LIBS += -L$${DESTDIR} \
+          -lUtils
+}
 
 
