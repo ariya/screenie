@@ -478,10 +478,12 @@ void MainWindow::on_addImageAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastImageDirectoryPath = settings.getLastImageDirectoryPath();
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Add Image"), lastImageDirectoryPath);
-    if (!filePath.isNull()) {
-        m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
-        lastImageDirectoryPath = QFileInfo(filePath).absolutePath();
+    QStringList filePaths = QFileDialog::getOpenFileNames(this, tr("Add Image"), lastImageDirectoryPath);
+    if (filePaths.count() > 0) {
+        foreach(QString filePath, filePaths) {
+            m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
+        }
+        lastImageDirectoryPath = QFileInfo(filePaths.last()).absolutePath();
         settings.setLastImageDirectoryPath(lastImageDirectoryPath);
     }
 }
