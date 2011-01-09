@@ -387,6 +387,7 @@ void MainWindow::on_openAction_triggered()
         QString filter = tr("Screenie Scene (*.xsc)");
         QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
         if (!filePath.isNull()) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
             bool ok = read(filePath);
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
@@ -402,6 +403,7 @@ void MainWindow::on_openAction_triggered()
 void MainWindow::on_saveAction_triggered()
 {
     if (!m_documentFilePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = write(m_documentFilePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
@@ -418,6 +420,7 @@ void MainWindow::on_saveAsAction_triggered()
     QString filter = tr("Screenie Scene (*.xsc)");
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter);
     if (!filePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = write(filePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
@@ -437,6 +440,7 @@ void MainWindow::on_exportAction_triggered()
     QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
+        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = exportImage.exportImage(filePath);
         if (ok) {
             lastExportDirectoryPath = QFileInfo(filePath).absolutePath();

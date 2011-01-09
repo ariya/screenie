@@ -38,12 +38,12 @@ public:
     }
 
     ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
-        : pixmap(other.pixmap),
+        : image(other.image),
           sizeFitter(other.sizeFitter),
           order(other.order)
     {}
 
-    QPixmap pixmap;
+    QImage image;
     SizeFitter sizeFitter;
     int order;
 };
@@ -76,12 +76,12 @@ ScreenieTemplateModel::~ScreenieTemplateModel()
     delete d;
 }
 
-const QPixmap &ScreenieTemplateModel::readPixmap() const
+const QImage &ScreenieTemplateModel::readImage() const
 {
-    if (d->pixmap.isNull()) {
-        d->pixmap = PaintTools::createTemplateImage(getSize());
+    if (d->image.isNull()) {
+        d->image = PaintTools::createTemplateImage(getSize());
     }
-    return d->pixmap;
+    return d->image;
 }
 
 ScreenieModelInterface *ScreenieTemplateModel::copy() const

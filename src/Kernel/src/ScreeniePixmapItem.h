@@ -34,6 +34,7 @@ class QGraphicsSceneDragDropEvent;
 class ScreenieModelInterface;
 class ScreenieControl;
 class Reflection;
+class ScreeniePixmapItemPrivate;
 
 /*!
  * The visual representation of a ScreenieModel in a QGraphicsView. Implements the
@@ -64,11 +65,7 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    ScreenieModelInterface &m_screenieModel;
-    ScreenieControl &m_screenieControl;
-    Reflection &m_reflection;
-    bool m_transformPixmap;
-    bool m_ignoreUpdates;
+    ScreeniePixmapItemPrivate *d;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);

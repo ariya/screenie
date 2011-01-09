@@ -125,8 +125,8 @@ void Clipboard::paste()
             }
         } else if (mimeData->hasImage()) {
             // from different image application
-            QPixmap pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
-            d->screenieControl.addImage(pixmap);
+            QImage image = qvariant_cast<QImage>(mimeData->imageData());
+            d->screenieControl.addImage(image);
         } else if (mimeData->hasUrls()) {
             // from different file application
             QList<QUrl> urls = mimeData->urls();

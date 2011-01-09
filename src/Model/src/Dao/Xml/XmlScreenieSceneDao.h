@@ -31,7 +31,7 @@ class QIODevice;
 
 class ScreenieScene;
 class ScreenieFilePathModel;
-class ScreeniePixmapModel;
+class ScreenieImageModel;
 class ScreenieTemplateModel;
 class XmlScreenieSceneDaoPrivate;
 
@@ -57,12 +57,12 @@ private:
     bool writeScreenieScene(const ScreenieScene &screenieScene, ScreenieSceneSerializer::Mode mode);
     bool writeScreenieModels(const ScreenieScene &screenieScene, ScreenieSceneSerializer::Mode mode);
     bool writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel);
-    bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
+    bool writePixmapModel(const ScreenieImageModel &screeniePixmapModel);
     bool writeTemplateModel(const ScreenieTemplateModel &screenieTemplateModel);
 
     ScreenieScene *readScreenieScene() const;
     ScreenieFilePathModel *readFilePathModel() const;
-    ScreeniePixmapModel *readPixmapModel() const;
+    ScreenieImageModel *readPixmapModel() const;
     ScreenieTemplateModel *readTemplateModel() const;
 
     void cleanUp() const;

@@ -21,7 +21,7 @@
 #include <cstdlib>
 
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "../../Utils/src/Settings.h"
 #include "DefaultScreenieModel.h"
@@ -251,15 +251,15 @@ void AbstractScreenieModel::convert(ScreenieModelInterface &source)
 
 // protected
 
-QPixmap AbstractScreenieModel::fitToMaximumSize(const QPixmap &pixmap) const
+QImage AbstractScreenieModel::fitToMaximumSize(const QImage &image) const
 {
-    QPixmap result;
+    QImage result;
     QSize maximumImageSize = Settings::getInstance().getMaximumImageSize();
-    QSize actualSize = pixmap.size();
+    QSize actualSize = image.size();
     if (actualSize.width() > maximumImageSize.width() || actualSize.height() > maximumImageSize.height()) {
-        result = pixmap.scaled(maximumImageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        result = image.scaled(maximumImageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     } else {
-        result = pixmap;
+        result = image;
     }
     return result;
 }

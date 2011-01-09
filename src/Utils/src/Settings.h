@@ -84,6 +84,20 @@ public:
      */
     UTILS_API void setLastDocumentDirectoryPath(const QString &lastDocumentDirectoryPath);
 
+    UTILS_API qreal getRotationGestureSensitivity() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setRotationGestureSensitivity(qreal rotationGestureSensitivity);
+
+    UTILS_API qreal getDistanceGestureSensitivity() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setDistanceGestureSensitivity(qreal distanceGestureSensitivity);
+
     UTILS_API WindowGeometry getWindowGeometry() const;
 
     /*!

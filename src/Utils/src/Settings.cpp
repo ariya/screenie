@@ -38,15 +38,19 @@ public:
     static const QString DefaultLastImageDirectoryPath;
     static const QString DefaultLastExportDirectoryPath;
     static const QString DefaultLastDocumentDirectoryPath;
+    static const qreal DefaultRotationGestureSensitivity;
+    static const qreal DefaultDistanceGestureSensitivity;
     static const bool DefaultFullScreen;
     static const QPoint DefaultMainWindowPosition;
     static const QSize DefaultMainWindowSize;
 
+    Version version;
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
     QString lastExportDirectoryPath;
     QString lastDocumentFilePath;
-    Version version;
+    qreal rotationGestureSensitivity;
+    qreal distanceGestureSensitivity;
 
     QSettings *settings;
 
@@ -68,9 +72,12 @@ public:
 Settings *SettingsPrivate::instance = 0;
 
 const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
-const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+// workaround for http://bugreports.qt.nokia.com/browse/QTBUG-3239: use fromNativeSeparators
+const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::PicturesLocation));
 const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
-const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
+const qreal SettingsPrivate::DefaultRotationGestureSensitivity = 2.0; // these values work well on a MacBook Pro ;)
+const qreal SettingsPrivate::DefaultDistanceGestureSensitivity = 10.0;
 const bool SettingsPrivate::DefaultFullScreen = false;
 const QPoint SettingsPrivate::DefaultMainWindowPosition = QPoint();
 const QSize SettingsPrivate::DefaultMainWindowSize = QSize(800, 600);
@@ -146,10 +153,36 @@ void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentFilePath)
     }
 }
 
+qreal Settings::getRotationGestureSensitivity() const
+{
+   return d->rotationGestureSensitivity;
+}
+
+void Settings::setRotationGestureSensitivity(qreal rotationGestureSensitivity)
+{
+    if (d->rotationGestureSensitivity != rotationGestureSensitivity) {
+        d->rotationGestureSensitivity = rotationGestureSensitivity;
+        emit changed();
+    }
+}
+
+qreal Settings::getDistanceGestureSensitivity() const
+{
+   return d->distanceGestureSensitivity;
+}
+
+void Settings::setDistanceGestureSensitivity(qreal distanceGestureSensitivity)
+{
+    if (d->distanceGestureSensitivity != distanceGestureSensitivity) {
+        d->distanceGestureSensitivity = distanceGestureSensitivity;
+        emit changed();
+    }
+}
+
 Settings::WindowGeometry Settings::getWindowGeometry() const
 {
     WindowGeometry result;
-    d->settings->beginGroup("MainWindow");
+    d->settings->beginGroup("UI/MainWindow");
     {
         result.fullScreen = d->settings->value("FullScreen", SettingsPrivate::DefaultFullScreen).toBool();
         result.position = d->settings->value("Position", SettingsPrivate::DefaultMainWindowPosition).toPoint();
@@ -161,7 +194,7 @@ Settings::WindowGeometry Settings::getWindowGeometry() const
 
 void Settings::setWindowGeometry(const WindowGeometry windowGeometry)
 {
-    d->settings->beginGroup("MainWindow");
+    d->settings->beginGroup("UI/MainWindow");
     {
         d->settings->setValue("FullScreen", windowGeometry.fullScreen);
         d->settings->setValue("Position", windowGeometry.position);
@@ -181,6 +214,12 @@ void Settings::store()
         d->settings->setValue("LastImageDirectoryPath", d->lastImageDirectoryPath);
         d->settings->setValue("LastExportDirectoryPath", d->lastExportDirectoryPath);
         d->settings->setValue("LastDocumentDirectoryPath", d->lastDocumentFilePath);
+    }
+    d->settings->endGroup();
+    d->settings->beginGroup("UI/Gestures");
+    {
+        d->settings->setValue("RotationSensitivity", d->rotationGestureSensitivity);
+        d->settings->setValue("DistanceSensitivity", d->distanceGestureSensitivity);
     }
     d->settings->endGroup();
 }
@@ -205,6 +244,12 @@ void Settings::restore()
         d->lastExportDirectoryPath = d->settings->value("LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
         d->lastDocumentFilePath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
 
+    }
+    d->settings->endGroup();
+    d->settings->beginGroup("UI/Gestures");
+    {
+        d->rotationGestureSensitivity = d->settings->value("RotationSensitivity", SettingsPrivate::DefaultRotationGestureSensitivity).toReal();
+        d->distanceGestureSensitivity = d->settings->value("DistanceSensitivity", SettingsPrivate::DefaultDistanceGestureSensitivity).toReal();
     }
     d->settings->endGroup();
 }

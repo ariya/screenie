@@ -22,8 +22,7 @@
 #define SCREENIEGRAPHICSSCENE_H
 
 #include <QtCore/QList>
-#include <QtCore/QTimer>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 #include <QtGui/QGraphicsScene>
 
 class QGraphicsSceneDragDropEvent;
@@ -39,7 +38,7 @@ class QObject;
 
 #include "KernelLib.h"
 
-#include "KernelLib.h"
+class ScreenieGraphicsScenePrivate;
 
 /*!
  * Provides the drag'n'drop functionality for opening image and scene files.
@@ -52,7 +51,7 @@ public:
     KERNEL_API virtual ~ScreenieGraphicsScene();
 
 signals:
-    void pixmapsDropped(QList<QPixmap> pixmaps, QPointF position);
+    void imagesDropped(QList<QImage> images, QPointF position);
     void filePathsDropped(QStringList filePaths, QPointF position);
     void rotate(int angle);
     void addDistance(int distance);
@@ -65,9 +64,7 @@ protected:
     virtual bool event(QEvent *event);
 
 private:
-    bool m_itemDragDrop;
-    // temporary workaround for http://bugreports.qt.nokia.com/browse/QTBUG-16281
-    QTimer m_cursorTimer;
+    ScreenieGraphicsScenePrivate *d;
 
     void frenchConnection();
 
@@ -80,7 +77,6 @@ private:
 
 private slots:
     void restoreCursor();
-
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H

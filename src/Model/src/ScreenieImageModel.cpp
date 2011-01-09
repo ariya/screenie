@@ -20,73 +20,73 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "../../Utils/src/PaintTools.h"
-#include "ScreeniePixmapModel.h"
+#include "ScreenieImageModel.h"
 
 class ScreeniePixmapModelPrivate
 {
 public:
     ScreeniePixmapModelPrivate() {}
     ScreeniePixmapModelPrivate(const ScreeniePixmapModelPrivate &other)
-        : pixmap(other.pixmap) {}
+        : image(other.image) {}
 
-    QPixmap pixmap;
+    QImage image;
 };
 
-ScreeniePixmapModel::ScreeniePixmapModel(QPixmap pixmap)
+ScreenieImageModel::ScreenieImageModel(QImage image)
     : d(new ScreeniePixmapModelPrivate())
 {
-    d->pixmap = fitToMaximumSize(pixmap);
+    d->image = fitToMaximumSize(image);
 }
 
-ScreeniePixmapModel::ScreeniePixmapModel(const ScreeniePixmapModel &other)
+ScreenieImageModel::ScreenieImageModel(const ScreenieImageModel &other)
     : AbstractScreenieModel(other),
       d(new ScreeniePixmapModelPrivate(*other.d))
 {
 }
 
-ScreeniePixmapModel::~ScreeniePixmapModel()
+ScreenieImageModel::~ScreenieImageModel()
 {
     delete d;
 #ifdef DEBUG
-    qDebug("ScreeniePixmapModel:~ScreeniePixmapModel: called.");
+    qDebug("ScreenieImageModel:~ScreenieImageModel: called.");
 #endif
 }
 
-const QPixmap &ScreeniePixmapModel::readPixmap() const
+const QImage &ScreenieImageModel::readImage() const
 {
-    return d->pixmap;
+    return d->image;
 }
 
-QSize ScreeniePixmapModel::getSize() const
+QSize ScreenieImageModel::getSize() const
 {
-    return d->pixmap.size();
+    return d->image.size();
 }
 
-ScreenieModelInterface *ScreeniePixmapModel::copy() const
+ScreenieModelInterface *ScreenieImageModel::copy() const
 {
-    ScreeniePixmapModel *result = new ScreeniePixmapModel(*this);
+    ScreenieImageModel *result = new ScreenieImageModel(*this);
     return result;
 }
 
-bool ScreeniePixmapModel::isTemplate() const
+bool ScreenieImageModel::isTemplate() const
 {
     return false;
 }
 
-void ScreeniePixmapModel::setPixmap(QPixmap pixmap)
+void ScreenieImageModel::setImage(QImage image)
 {
-    if (d->pixmap.cacheKey() != pixmap.cacheKey()) {
-        d->pixmap = fitToMaximumSize(pixmap);
-        emit pixmapChanged(d->pixmap);
+    if (d->image.cacheKey() != image.cacheKey()) {
+        d->image = fitToMaximumSize(image);
+        emit imageChanged(d->image);
     }
 }
 
-QPixmap ScreeniePixmapModel::getPixmap() const
+QImage ScreenieImageModel::getImage() const
 {
-    return d->pixmap;
+    return d->image;
 }
 
 
