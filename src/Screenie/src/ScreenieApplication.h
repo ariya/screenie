@@ -35,12 +35,22 @@ class ScreenieApplication : public QApplication
 {
     Q_OBJECT
 public:
-    explicit ScreenieApplication(int argc, char **argv);
+
+    /*!
+     * Creates this ScreenieApplication.
+     *
+     * Implementation note: it is absolutely \em crucial to note that \p argc really
+     * has to be a reference! Also refer to http://bugreports.qt.nokia.com/browse/QTBUG-5637
+     * Otherwise curious crashes happen when calling arguments() (depending on the location
+     * of the call).
+     */
+    ScreenieApplication(int &argc, char **argv);
 
     /*!
      * Shows the MainWindow.
      */
     void show();
+
 protected:
     /*!
      * Handles FileOpen events.
@@ -51,7 +61,6 @@ protected:
 
 private:
     MainWindow *m_mainWindow;
-    QStringList m_arguments;
 };
 
 #endif // SCREENIEAPPLICATION_H
