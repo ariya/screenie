@@ -32,7 +32,7 @@
 #include "../../ScreenieImageModel.h"
 #include "../../ScreenieTemplateModel.h"
 #include "../ScreenieFilePathModelDao.h"
-#include "../ScreenieIMageModelDao.h"
+#include "../ScreenieImageModelDao.h"
 #include "../ScreenieTemplateModelDao.h"
 #include "../ScreenieSceneSerializer.h"
 #include "XmlScreenieFilePathModelDao.h"
