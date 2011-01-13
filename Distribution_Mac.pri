@@ -2,14 +2,18 @@
 
 CONFIG(debug, debug|release) {
     APP_BUNDLE = bin/debug/$${APP_NAME}.app
-    message(Distributing $$APP_NAME in debug mode)
+    message(Distributing $$APP_NAME in DEBUG mode)
 } else {
     APP_BUNDLE = bin/release/$${APP_NAME}.app
-    message(Distributing $$APP_NAME in release mode)
+    message(Distributing $$APP_NAME in RELEASE mode)
 }
 DIST_APP_BUNDLE = dist/$${APP_NAME}.app
 FRAMEWORKS_DIR = $${DIST_APP_BUNDLE}/Contents/Frameworks
 QT_PLUGINS_DIR = $${DIST_APP_BUNDLE}/Contents/PlugIns
+
+#
+# Distribution
+#
 
 distribution.commands += @echo Making dist on Mac;
 
@@ -23,6 +27,8 @@ distribution.commands += cp -R ./$$APP_BUNDLE ./$$DIST_APP_BUNDLE;
 distribution.commands += test -d $$FRAMEWORKS_DIR/QtCore.framework || mkdir $$FRAMEWORKS_DIR/QtCore.framework;
 distribution.commands += test -d $$FRAMEWORKS_DIR/QtCore.framework/Versions || mkdir $$FRAMEWORKS_DIR/QtCore.framework/Versions;
 distribution.commands += test -d $$FRAMEWORKS_DIR/QtCore.framework/Versions/4 || mkdir $$FRAMEWORKS_DIR/QtCore.framework/Versions/4;
+
+# TODO: Use $$[QT_INSTALL_BINS] etc. instead!
 distribution.commands += cp /Library/Frameworks/QtCore.framework/QtCore $$FRAMEWORKS_DIR/QtCore.framework/Versions/4;
 
 distribution.commands += install_name_tool -id @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore $$DIST_APP_BUNDLE/Contents/Frameworks/QtCore.framework/Versions/4/QtCore;
@@ -131,6 +137,12 @@ distribution.commands += lipo -remove i386 $$QT_PLUGINS_DIR/imageformats/libqjpe
 distribution.commands += lipo -remove i386 $$QT_PLUGINS_DIR/imageformats/libqtiff.dylib -output $$QT_PLUGINS_DIR/imageformats/libqtiff.dylib;
 distribution.commands += lipo -remove i386 $$QT_PLUGINS_DIR/imageformats/libqgif.dylib -output $$QT_PLUGINS_DIR/imageformats/libqgif.dylib;
 
+#
+# Installer
+#
+
+# TODO: Create compressed DMG disk image with some fancy background image ;)
+installer.commands =
 
 
 
