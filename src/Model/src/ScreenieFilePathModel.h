@@ -23,6 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
+#include <QtCore/QString>
 #include <QtGui/QImage>
 
 class QString;
@@ -61,6 +62,7 @@ public:
     virtual QSize getSize() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
 
     virtual QString getFilePath() const;
     virtual void setFilePath(const QString &filePath);

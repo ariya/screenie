@@ -57,12 +57,14 @@ public:
 
 protected:
     virtual int type() const;
+    virtual void contextMenuEvent (QGraphicsSceneContextMenuEvent *event);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
     ScreeniePixmapItemPrivate *d;
@@ -75,7 +77,6 @@ private:
     void transformPixmap(QGraphicsSceneMouseEvent *event);
     void changeReflection(QGraphicsSceneMouseEvent *event);
     void addReflectionOpacity(int reflectionOpacity);
-
     void selectExclusive();
 
 private slots:

@@ -20,6 +20,7 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
+#include <QtCore/QDir>
 #include <QtGui/QImage>
 
 #include "../../Utils/src/SizeFitter.h"
@@ -30,19 +31,22 @@ class ScreenieFilePathModelPrivate
 {
 public:
     ScreenieFilePathModelPrivate(const QString &theFilePath, const SizeFitter *theSizeFitter)
-        : filePath(theFilePath),
-          sizeFitter(theSizeFitter) {}
+        : valid(false),
+          filePath(theFilePath),
+          sizeFitter(theSizeFitter)
+    {}
 
     ScreenieFilePathModelPrivate(const ScreenieFilePathModelPrivate &other)
-        : filePath(other.filePath),
+        : valid(other.valid),
+          filePath(other.filePath),
           image(other.image),
           sizeFitter(other.sizeFitter)
-    {
-    }
+    {}
 
+    bool valid;
     QString filePath;
     QImage image;
-    const SizeFitter *sizeFitter;
+    const SizeFitter *sizeFitter;    
 };
 
 ScreenieFilePathModel::ScreenieFilePathModel(const QString &filePath, const SizeFitter *sizeFitter)
@@ -77,8 +81,10 @@ const QImage &ScreenieFilePathModel::readImage() const
         } else {
             d->image = fitToMaximumSize(d->image);
         }
+        d->valid = true;
     } else {
         d->image = PaintTools::createDefaultImage();
+        d->valid = false;
     }
     return d->image;
 }
@@ -89,7 +95,7 @@ QSize ScreenieFilePathModel::getSize() const
     if (!d->image.isNull()) {
         result = d->image.size();
     } else {
-        /*!\todo Optimisation: use Exiv2 library to quickly read the image size from disk (EXIF data) */
+        /*!\todo Optimisation: use Exiv2 (or http://www.sentex.net/~mwandel/jhead/) library to quickly read the image size from disk (EXIF data). */
         result = readImage().size();
     }
     return result;
@@ -105,6 +111,16 @@ bool ScreenieFilePathModel::isTemplate() const
 {
     return false;
 }
+
+QString ScreenieFilePathModel::getOverlayText() const
+{
+    QString result;
+    if (!d->valid) {
+        result = QDir::convertSeparators(d->filePath);
+    }
+    return result;
+}
+
 
 void ScreenieFilePathModel::setFilePath(const QString &filePath)
 {

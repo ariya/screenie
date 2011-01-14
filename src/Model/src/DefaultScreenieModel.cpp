@@ -32,6 +32,7 @@ public:
           reflectionOffset(40),
           reflectionOpacity(50)
     {}
+
     qreal distance;
     int rotation;
     bool reflectionEnabled;

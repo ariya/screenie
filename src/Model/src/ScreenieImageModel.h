@@ -23,6 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
+#include <QtCore/QString>
 #include <QtGui/QImage>
 
 #include "AbstractScreenieModel.h"
@@ -56,6 +57,7 @@ public:
     virtual QSize getSize() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
 
     QImage getImage() const;
     void setImage(QImage image);

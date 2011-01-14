@@ -132,6 +132,11 @@ public:
 
     virtual bool isTemplate() const = 0;
 
+    /*!
+     * \return a QString containing the overlay text to be drawn over the pixmap; a \em null QString if nothing to draw
+     */
+    virtual QString getOverlayText() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();
