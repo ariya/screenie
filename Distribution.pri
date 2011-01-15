@@ -8,4 +8,6 @@ win32 {
 
 distribution.depends = all
 
-QMAKE_EXTRA_TARGETS += distribution
+installer.depends = distribution
+
+QMAKE_EXTRA_TARGETS += distribution installer

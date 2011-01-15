@@ -21,6 +21,7 @@
 #include <limits>
 
 #include <QtCore/QSize>
+#include <QtCore/QString>
 
 #include "../../Utils/src/SizeFitter.h"
 #include "../../Utils/src/PaintTools.h"
@@ -93,6 +94,12 @@ ScreenieModelInterface *ScreenieTemplateModel::copy() const
 bool ScreenieTemplateModel::isTemplate() const
 {
     return true;
+}
+
+QString ScreenieTemplateModel::getOverlayText() const
+{
+    QString result = tr("ID: %1").arg(d->order);
+    return result;
 }
 
 SizeFitter &ScreenieTemplateModel::getSizeFitter() const

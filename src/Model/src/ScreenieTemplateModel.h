@@ -21,6 +21,8 @@
 #ifndef SCREENIETEMPLATEMODEL_H
 #define SCREENIETEMPLATEMODEL_H
 
+#include <QtCore/QString>
+
 class QImage;
 class QSize;
 
@@ -62,6 +64,7 @@ public:
     virtual const QImage &readImage() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
 
     SizeFitter &getSizeFitter() const;
 

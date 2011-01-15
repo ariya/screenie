@@ -405,7 +405,7 @@ void ScreenieControl::setRenderQuality(RenderQuality renderQuality)
             item->setTransformationMode(Qt::SmoothTransformation);
         }
         foreach (QGraphicsView *view, d->screenieGraphicsScene.views()) {
-            view->setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform);
+            view->setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform|QPainter::TextAntialiasing);
         }
     default:
         break;

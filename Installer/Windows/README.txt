@@ -28,6 +28,18 @@ Installer Creation
 Alternatively use the WiX tools "candle.exe" and "light.exe" directly.
 
 
+License Text
+------------
+
+The license text is taken from a given *.rtf Rich Text Format document,
+in this case the GPL3.rtf.
+
+DON'T edit this file with MS Word, as this adds more data than necessary
+to the document and WiX installer has trouble displaying that document
+(the license screen remains blank, unless a button is clicked or so).
+
+Only use WordPad (possibly other RTF editors - OpenOffice might be fine, too).
+
 Links
 -----
 

@@ -28,6 +28,8 @@
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
+#include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
 
 #include "../../Utils/src/PaintTools.h"
@@ -96,6 +98,15 @@ int ScreeniePixmapItem::type() const
     return ScreeniePixmapType;
 }
 
+void ScreeniePixmapItem::contextMenuEvent (QGraphicsSceneContextMenuEvent *event)
+{
+#ifdef DEBUG
+    qDebug("ScreeniePixmapItem::contextMenuEvent: called.");
+#endif
+    // for now we only allow properties of a single item to be modified at the same time
+    selectExclusive();
+}
+
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
    d->transformPixmap = isInsidePixmap(event->pos());
@@ -146,6 +157,31 @@ QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVarian
         d->screenieModel.setSelected(value.toBool());
     }
     return QGraphicsPixmapItem::itemChange(change, value);
+}
+
+void ScreeniePixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsPixmapItem::paint(painter, option, widget);
+    QString overlayText = d->screenieModel.getOverlayText();
+    if (!overlayText.isNull()) {
+        QRectF rect = boundingRect();
+        /*!\todo Optimise this; cache the font, re-calculate when overlay text changes (add signal) */
+        if (rect.width() > 100 && rect.height() > 48) {
+            rect.adjust(10.0, 10.0, -10.0, -10.0);
+            int length = overlayText.length();
+            QFont font("Arial");
+            if (length > 10) {
+                font.setPixelSize(16);
+            } else {
+                font.setPixelSize(24);
+            }
+            QFontMetrics fontMetrics(font);
+            overlayText = fontMetrics.elidedText(overlayText, Qt::ElideMiddle, rect.width());
+            painter->setPen(Qt::white);
+            painter->setFont(font);
+            painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, overlayText);
+        }
+    }
 }
 
 // private

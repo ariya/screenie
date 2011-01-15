@@ -30,6 +30,8 @@
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QFileDialog>
 #include <QtGui/QSlider>
+#include <QtGui/QSpinBox>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMessageBox>
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
@@ -233,6 +235,7 @@ void MainWindow::updateColorUi()
     ui->backgroundColorGroupBox->setChecked(m_screenieScene->isBackgroundEnabled());
     ui->backgroundColorGroupBox->blockSignals(false);
     QColor backgroundColor = m_screenieScene->getBackgroundColor();
+    // sliders
     ui->redSlider->blockSignals(true);
     ui->redSlider->setValue(backgroundColor.red());
     ui->redSlider->blockSignals(false);
@@ -242,6 +245,18 @@ void MainWindow::updateColorUi()
     ui->blueSlider->blockSignals(true);
     ui->blueSlider->setValue(backgroundColor.blue());
     ui->blueSlider->blockSignals(false);
+    // spinboxes
+    ui->redSpinBox->blockSignals(true);
+    ui->redSpinBox->setValue(backgroundColor.red());
+    ui->redSpinBox->blockSignals(false);
+    ui->greenSpinBox->blockSignals(true);
+    ui->greenSpinBox->setValue(backgroundColor.green());
+    ui->greenSpinBox->blockSignals(false);
+    ui->blueSpinBox->blockSignals(true);
+    ui->blueSpinBox->setValue(backgroundColor.blue());
+    ui->blueSpinBox->blockSignals(false);
+    // html colour (without # prepended)
+    ui->htmlBGColorLineEdit->setText(backgroundColor.name().right(6));
 }
 
 void MainWindow::updateEditActions()
@@ -549,6 +564,7 @@ void MainWindow::on_redSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setRedBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
 }
 
 void MainWindow::on_greenSlider_valueChanged(int value)
@@ -556,6 +572,7 @@ void MainWindow::on_greenSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setGreenBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
 }
 
 void MainWindow::on_blueSlider_valueChanged(int value)
@@ -563,6 +580,48 @@ void MainWindow::on_blueSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setBlueBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+
+void MainWindow::on_redSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setRedBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_greenSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setGreenBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_blueSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setBlueBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_htmlBGColorLineEdit_editingFinished()
+{
+    QString htmlNotation = QString("#") + ui->htmlBGColorLineEdit->text();
+    QColor color(htmlNotation);
+    qDebug("Foreground role: %d", ui->htmlBGColorLineEdit->foregroundRole());
+    QPalette palette;
+    if (color.isValid()) {
+        m_screenieControl->setBackgroundColor(color);
+        palette.setColor(ui->htmlBGColorLineEdit->foregroundRole(), Qt::black);
+
+    } else {
+        palette.setColor(ui->htmlBGColorLineEdit->foregroundRole(), Qt::red);
+    }
+    ui->htmlBGColorLineEdit->setPalette(palette);
 }
 
 void MainWindow::on_aboutQtAction_triggered() {

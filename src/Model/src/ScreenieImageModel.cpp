@@ -76,6 +76,11 @@ bool ScreenieImageModel::isTemplate() const
     return false;
 }
 
+QString ScreenieImageModel::getOverlayText() const
+{
+    return QString();
+}
+
 void ScreenieImageModel::setImage(QImage image)
 {
     if (d->image.cacheKey() != image.cacheKey()) {

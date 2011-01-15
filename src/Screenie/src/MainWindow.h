@@ -108,10 +108,15 @@ private slots:
     void on_reflectionGroupBox_toggled(bool enable);
     void on_reflectionOffsetSlider_valueChanged(int value);
     void on_reflectionOpacitySlider_valueChanged(int value);
+
     void on_backgroundColorGroupBox_toggled(bool enable);
     void on_redSlider_valueChanged(int value);
     void on_greenSlider_valueChanged(int value);
     void on_blueSlider_valueChanged(int value);
+    void on_redSpinBox_valueChanged(int value);
+    void on_greenSpinBox_valueChanged(int value);
+    void on_blueSpinBox_valueChanged(int value);
+    void on_htmlBGColorLineEdit_editingFinished();
 
     void on_aboutQtAction_triggered();
 
