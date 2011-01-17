@@ -18,44 +18,34 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef RECENTFILES_H
-#define RECENTFILES_H
+#ifndef TEMPLATEMODELPROPERTYDIALOG_H
+#define TEMPLATEMODELPROPERTYDIALOG_H
 
-#include <QtCore/QObject>
+#include <QtGui/QDialog>
 
-class QActionGroup;
-class QAction;
+class ScreenieTemplateModel;
+class TemplateModelPropertyDialogPrivate;
 
-/*!
- * \brief The recently opened files.
- *
- * Provides a menu with QActions which give access to the recently opened files.
- */
-class RecentFiles : public QObject
+namespace Ui {
+    class TemplateModelPropertyDialog;
+}
+
+class TemplateModelPropertyDialog : public QDialog
 {
     Q_OBJECT
-
 public:
-    RecentFiles();
-    virtual ~RecentFiles();
-
-    QActionGroup &getRecentFilesActionGroup() const;
-
-signals:
-    void openRecentFile(const QString &filePath);
+    explicit TemplateModelPropertyDialog(ScreenieTemplateModel &templateModel, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~TemplateModelPropertyDialog();
 
 private:
-    QActionGroup *m_recentFilesActionGroup;
-    bool m_ignoreUpdateSignals;
-    QAction *m_clearRecentFilesAction;
+    Ui::TemplateModelPropertyDialog *ui;
+    TemplateModelPropertyDialogPrivate *d;
 
-    void initialise();
+    void initializeUi();
     void frenchConnection();
 
 private slots:
-    void updateRecentFilesActions();
-    void handleRecentFilesAction();
-    void clearRecentFilesMenu();
+    void updateUi();
 };
 
-#endif // RECENTFILES_H
+#endif // TEMPLATEMODELPROPERTYDIALOG_H

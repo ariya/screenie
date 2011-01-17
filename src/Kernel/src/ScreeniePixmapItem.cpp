@@ -25,18 +25,21 @@
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
+#include <QtGui/QDialog>
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "Clipboard/MimeHelper.h"
 #include "Reflection.h"
 #include "ScreenieControl.h"
+#include "PropertyDialogFactory.h"
 #include "ScreeniePixmapItem.h"
 
 const int ScreeniePixmapItem::ScreeniePixmapType = QGraphicsItem::UserType + 1;
@@ -96,13 +99,23 @@ int ScreeniePixmapItem::type() const
     return ScreeniePixmapType;
 }
 
-void ScreeniePixmapItem::contextMenuEvent (QGraphicsSceneContextMenuEvent *event)
+void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
 #ifdef DEBUG
     qDebug("ScreeniePixmapItem::contextMenuEvent: called.");
 #endif
     // for now we only allow properties of a single item to be modified at the same time
     selectExclusive();
+    QWidget *parent;
+    if (scene() != 0) {
+        parent = scene()->views().first()->viewport();
+    } else {
+        parent = 0;
+    }
+    QDialog *propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
+    if (propertyDialog != 0) {
+        propertyDialog->show();
+    }
 }
 
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

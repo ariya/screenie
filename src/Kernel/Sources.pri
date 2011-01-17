@@ -14,7 +14,9 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/TemplateOrganizer.h \
            $$PWD/src/Clipboard/Clipboard.h \
            $$PWD/src/Clipboard/ScreenieMimeData.h \
-           $$PWD/src/Clipboard/MimeHelper.h
+           $$PWD/src/Clipboard/MimeHelper.h \
+           $$PWD/src/PropertyDialogFactory.h \
+           src/TemplateModelPropertyDialog.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -25,3 +27,7 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Clipboard/Clipboard.cpp \
            $$PWD/src/Clipboard/ScreenieMimeData.cpp \
            $$PWD/src/Clipboard/MimeHelper.cpp \
+           $$PWD/src/PropertyDialogFactory.cpp \
+           $$PWD/src/TemplateModelPropertyDialog.cpp
+
+FORMS += $$PWD/ui/TemplateModelPropertyDialog.ui

@@ -53,6 +53,7 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "../../Kernel/src/PropertyDialogFactory.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -120,6 +121,7 @@ MainWindow::~MainWindow()
 
     // destroy singletons
     Settings::destroyInstance();
+    PropertyDialogFactory::destroyInstance();
 }
 
 bool MainWindow::read(const QString &filePath)
