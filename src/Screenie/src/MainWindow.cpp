@@ -23,6 +23,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QMainWindow>
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
 #include <QtGui/QGraphicsScene>
@@ -51,6 +53,7 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -64,6 +67,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ignoreUpdateSignals(false)
 {
     ui->setupUi(this);
+
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
     setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
@@ -155,6 +164,10 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
     connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
+
+    // recent files
+    connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
+            this, SLOT(handleRecentFile(const QString &)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -407,6 +420,7 @@ void MainWindow::on_openAction_triggered()
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
                 settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+                settings.addRecentFile(filePath);
             }
 #ifdef DEBUG
             qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
@@ -443,6 +457,7 @@ void MainWindow::on_saveAsAction_triggered()
         if (ok) {
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            settings.addRecentFile(filePath);
         }
     }
 }
@@ -648,5 +663,11 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
+void  MainWindow::handleRecentFile(const QString &filePath)
+{
+    if (proceedWithModifiedScene()) {
+        read(filePath);
+    }
+}
 
 

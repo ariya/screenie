@@ -281,11 +281,18 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="recentFilesMenu">
+     <property name="title">
+      <string>&amp;Recent Files</string>
+     </property>
+    </widget>
     <addaction name="newAction"/>
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
     <addaction name="exportAction"/>
+    <addaction name="separator"/>
+    <addaction name="recentFilesMenu"/>
     <addaction name="separator"/>
     <addaction name="quitAction"/>
    </widget>

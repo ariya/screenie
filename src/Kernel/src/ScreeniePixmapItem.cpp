@@ -72,9 +72,7 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
     // we also want to be able to change the reflection also in the fully translucent areas
     // of the reflection
     setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    QPixmap pixmap;
-    pixmap.convertFromImage(d->screenieModel.readImage());
-    updatePixmap(pixmap);
+    updatePixmap(d->screenieModel.readImage());
     setAcceptDrops(true);
     frenchConnection();
 }
@@ -196,8 +194,8 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updateItem()));
     connect(&d->screenieModel, SIGNAL(reflectionChanged()),
             this, SLOT(updateReflection()));
-    connect(&d->screenieModel, SIGNAL(pixmapChanged(const QPixmap &)),
-            this, SLOT(updatePixmap(const QPixmap &)));
+    connect(&d->screenieModel, SIGNAL(imageChanged(const QImage &)),
+            this, SLOT(updatePixmap(const QImage &)));
     connect(&d->screenieModel, SIGNAL(filePathChanged(const QString &)),
             this, SLOT(updatePixmap()));
     connect(&d->screenieModel, SIGNAL(selectionChanged()),
@@ -337,8 +335,10 @@ void ScreeniePixmapItem::updateReflection()
     setPixmap(pixmap);
 }
 
-void ScreeniePixmapItem::updatePixmap(const QPixmap &pixmap)
+void ScreeniePixmapItem::updatePixmap(const QImage &image)
 {
+    QPixmap pixmap;
+    pixmap.convertFromImage(image);
     setPixmap(pixmap);
     updateReflection();
     updateItem();
@@ -346,9 +346,7 @@ void ScreeniePixmapItem::updatePixmap(const QPixmap &pixmap)
 
 void ScreeniePixmapItem::updatePixmap()
 {
-    QPixmap pixmap;
-    pixmap.convertFromImage(d->screenieModel.readImage());
-    updatePixmap(pixmap);
+    updatePixmap(d->screenieModel.readImage());
 }
 
 void ScreeniePixmapItem::updateItem()

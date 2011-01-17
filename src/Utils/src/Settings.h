@@ -93,10 +93,22 @@ public:
 
     UTILS_API qreal getDistanceGestureSensitivity() const;
 
+    UTILS_API void setRecentFiles(const QStringList &newRecentFiles);
+    UTILS_API void addRecentFile(const QString &filePath);
+    UTILS_API void removeRecentFile(const QString &filePath);
+    UTILS_API QStringList getRecentFiles() const;
+
     /*!
      * \sa #changed()
      */
     UTILS_API void setDistanceGestureSensitivity(qreal distanceGestureSensitivity);
+
+    UTILS_API int getMaxRecentFiles() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setMaxRecentFiles(int maxRecentFiles);
 
     UTILS_API WindowGeometry getWindowGeometry() const;
 
@@ -109,6 +121,8 @@ public:
      *        the WindowGeometry containing the values of the last MainWindow geometry
      */
     UTILS_API void setWindowGeometry(const WindowGeometry windowGeometry);
+
+
 
 public slots:
     /*!

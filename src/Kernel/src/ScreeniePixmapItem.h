@@ -28,6 +28,7 @@
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QGraphicsSceneDragDropEvent;
+class QImage;
 
 #include "KernelLib.h"
 
@@ -81,7 +82,7 @@ private:
 
 private slots:
     void updateReflection();
-    void updatePixmap(const QPixmap &pixmap);
+    void updatePixmap(const QImage &image);
     void updatePixmap();
     void updateItem();
     void updatePosition();
