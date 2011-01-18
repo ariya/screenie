@@ -56,17 +56,20 @@ const int ScreenieTemplateModel::Unordered = std::numeric_limits<int>::max();
 ScreenieTemplateModel::ScreenieTemplateModel()
     : d(new ScreenieTemplateModelPrivate(QSize(640, 640), ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
     : d(new ScreenieTemplateModelPrivate(size, ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
     : AbstractScreenieModel(other),
       d(new ScreenieTemplateModelPrivate(*other.d))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::~ScreenieTemplateModel()

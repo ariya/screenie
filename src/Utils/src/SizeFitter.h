@@ -8,6 +8,8 @@
 
 #include "UtilsLib.h"
 
+class SizeFitterPrivate;
+
 /*!
  * Calculates the size of the scaled and fitted source size. The size
  * is fitted and clipped according to FitMode.
@@ -60,14 +62,13 @@ public:
      * \param size
      *        the QSize to be fit into the \em target size
      * \param fittedSize
-     *        a reference to the fitted QSize
-     * \param clippedArea
-     *        a pointer to the QRect which contains the visible area which has been clipped;
-     *        the QRect refers to the original image \c size
-     *        may be set to 0
+     *        the resulting fitted QSize
+     * \param clippedRect
+     *        the QRect which contains the visible area which has been clipped;
+     *        the QRect refers to the original image \c size; may be set to 0
      * \return \c true if the \c size has been changed to the \em target size; \c false else
      */
-    UTILS_API bool fit(QSize size, QSize &fittedSize, QRect *clippedArea = 0) const;
+    UTILS_API bool fit(QSize size, QSize &fittedSize, QRect *clippedRect = 0) const;
 
     UTILS_API SizeFitter operator=(const SizeFitter &other);
 
@@ -75,9 +76,7 @@ signals:
     void changed();
 
 private:
-    QSize     m_targetSize;
-    FitMode   m_fitMode;
-    QBitArray m_fitOptions;
+    SizeFitterPrivate *d;
 
     void setDefaultFitOptions();
     // returns the oriented target size, that is with the same orientation as the 'size' (portrait or landscape),
@@ -88,8 +87,6 @@ private:
     bool fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) const;
     bool fitToHeight(QSize size, QSize &fittedSize, QRect *clippedArea) const;
     bool exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) const;
-
-    inline void copy(const SizeFitter &other);
 };
 
 #endif // SIZEFITTER_H

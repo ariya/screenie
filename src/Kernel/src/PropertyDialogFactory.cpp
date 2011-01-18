@@ -18,7 +18,9 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QObject>
 #include <QtGui/QDialog>
+#include <QtGui/QIcon>
 
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieFilePathModel.h"
@@ -61,10 +63,12 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     QDialog *result = 0;
     if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
         ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        result = new TemplateModelPropertyDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint);
+        result = new TemplateModelPropertyDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result->setWindowTitle(QObject::tr("Template Properties"));
     }
     if (result != 0) {
         result->setAttribute(Qt::WA_DeleteOnClose);
+        result->setWindowIcon(QIcon(":/img/application-icon.png"));
     }
     return result;
 }

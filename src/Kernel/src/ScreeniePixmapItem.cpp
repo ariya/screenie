@@ -52,7 +52,9 @@ public:
           screenieControl(theScreenieControl),
           reflection(theReflection),
           transformPixmap(true),
-          ignoreUpdates(false)
+          ignoreUpdates(false),
+          itemTransformed(false),
+          propertyDialog(0)
     {}
 
     ScreenieModelInterface &screenieModel;
@@ -60,6 +62,8 @@ public:
     Reflection &reflection;
     bool transformPixmap;
     bool ignoreUpdates;
+    bool itemTransformed;
+    QDialog *propertyDialog;
 };
 
 // public
@@ -101,26 +105,30 @@ int ScreeniePixmapItem::type() const
 
 void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-#ifdef DEBUG
-    qDebug("ScreeniePixmapItem::contextMenuEvent: called.");
-#endif
-    // for now we only allow properties of a single item to be modified at the same time
-    selectExclusive();
-    QWidget *parent;
-    if (scene() != 0) {
-        parent = scene()->views().first()->viewport();
-    } else {
-        parent = 0;
-    }
-    QDialog *propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
-    if (propertyDialog != 0) {
-        propertyDialog->show();
+    if (!d->itemTransformed) {
+        // for now we only allow properties of a single item to be modified at the same time
+        selectExclusive();
+        QWidget *parent;
+        if (scene() != 0) {
+            parent = scene()->views().first()->viewport();
+        } else {
+            parent = 0;
+        }
+        if (d->propertyDialog == 0) {
+            d->propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
+            if (d->propertyDialog != 0) {
+                connect(d->propertyDialog, SIGNAL(destroyed()),
+                        this, SLOT(handlePropertyDialogDestroyed()));
+                d->propertyDialog->show();
+            }
+        }
     }
 }
 
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
    d->transformPixmap = isInsidePixmap(event->pos());
+   d->itemTransformed = false;
    event->accept();
 }
 
@@ -131,6 +139,8 @@ void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     } else if (!d->transformPixmap) {
         changeReflection(event);
     }
+    /*!\todo Maybe define some pixel threshold before we consider this item to be transformed? */
+    d->itemTransformed = true;
 }
 
 void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -402,4 +412,8 @@ void ScreeniePixmapItem::updateSelection()
         setSelected(d->screenieModel.isSelected());
     }
     d->ignoreUpdates = false;
+}
+
+void ScreeniePixmapItem::handlePropertyDialogDestroyed(){
+    d->propertyDialog = 0;
 }

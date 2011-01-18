@@ -78,7 +78,7 @@ public:
     ScreenieGraphicsScene &screenieGraphicsScene;
     QBrush checkerBoardBrush;
     QTimer qualityTimer;
-    Reflection *reflection; /*! \todo The Reflection effect does not belong here. Add an "FX Manager" which keeps track of effects instead */
+    Reflection *reflection; /*!\todo The Reflection effect does not belong here. Add an "FX Manager" which keeps track of effects instead */
     DefaultScreenieModel defaultScreenieModel;
     TemplateOrganizer templateOrganizer;
 };
@@ -129,7 +129,6 @@ void ScreenieControl::updateModel(const QMimeData *mimeData, ScreenieModelInterf
 {
     // prefer image data over file paths (URLs)
     if (mimeData->hasImage()) {
-        /*!\todo Convert to QImage instead, as not to loose any information (on screens with fewer capabilities!) */
         QImage image = qvariant_cast<QImage>(mimeData->imageData());
         updateImageModel(image, screenieModel);
     } else {
@@ -435,9 +434,16 @@ QImage ScreenieControl::scaleToTemplate(const ScreenieTemplateModel &templateMod
     QImage result;
     const SizeFitter &sizeFitter = templateModel.getSizeFitter();
     QSize fittedSize;
-    bool doResize = sizeFitter.fit(image.size(), fittedSize);
+    QRect clippedRect;
+    bool doResize = sizeFitter.fit(image.size(), fittedSize, &clippedRect);
     if (doResize) {
-        result = image.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        if (needsClipping(image.size(), clippedRect.size())) {
+            result = image.copy(clippedRect);
+            result = result.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        }
+        else {
+            result = image.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        }
     } else {
         result = image;
     }
@@ -500,6 +506,22 @@ void ScreenieControl::updateFilePathModel(const QString &filePath, ScreenieModel
         d->screenieScene.removeModel(&screenieModel);
         d->screenieScene.addModel(screenieFilePathModel);
     }
+}
+
+bool ScreenieControl::needsClipping(const QSize &originalSize, const QSize &clippedSize)
+{
+    int dw, dh;  // difference of original and clipped size (width/height)
+    float pw, ph; // percentage of original size (width/height)
+    bool result;
+
+    dw = originalSize.width()  - clippedSize.width();
+    dh = originalSize.height() - clippedSize.height();
+    pw = (100.0f * dw) / originalSize.width();
+    ph = (100.0f * dh) / originalSize.height();
+
+    /*!\todo Make threshold (currently 2%) an (advanced) user setting? */
+    result = qMax(pw, ph) > 2.0;
+    return result;
 }
 
 // private slots

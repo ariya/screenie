@@ -46,6 +46,16 @@ private:
 
 private slots:
     void updateUi();
+
+    void on_widthLineEdit_editingFinished();
+    void on_heightLineEdit_editingFinished();
+    void on_positionXLineEdit_editingFinished();
+    void on_positionYLineEdit_editingFinished();
+    void on_rotationLineEdit_editingFinished();
+    void on_distanceLineEdit_editingFinished();
+    void on_fitModeComboBox_activated(int index);
+    void on_respectOrientationCheckBox_toggled(bool checked);
+    void on_enlargeCheckBox_toggled(bool checked);
 };
 
 #endif // TEMPLATEMODELPROPERTYDIALOG_H

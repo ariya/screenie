@@ -59,10 +59,21 @@ public:
     virtual QSize getSize() const = 0;
 
     virtual QPointF getPosition() const = 0;
+
     /*!
      * \sa #positionChanged()
      */
     virtual void setPosition(QPointF position) = 0;
+
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void setPositionX(qreal x) = 0;
+
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void setPositionY(qreal y) = 0;
 
     /*!
      * \sa #positionChanged()

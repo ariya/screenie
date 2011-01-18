@@ -87,6 +87,7 @@ private slots:
     void updateItem();
     void updatePosition();
     void updateSelection();
+    void handlePropertyDialogDestroyed();
 };
 
 #endif // SCREENIEPIXMAPITEM_H

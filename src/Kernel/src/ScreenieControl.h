@@ -123,6 +123,8 @@ private:
     void updateImageModel(const QImage &image, ScreenieModelInterface &screenieModel);
     void updateFilePathModel(const QString &filePath, ScreenieModelInterface &screenieModel);
 
+    bool needsClipping(const QSize &originalSize, const QSize &clippedSize);
+
 private slots:
     void handleFilePathsDrop(QStringList filePaths, QPointF centerPosition);
     void handleImageDrop(QList<QImage> images, QPointF centerPosition);
