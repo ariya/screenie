@@ -455,36 +455,30 @@ void MainWindow::on_saveAsAction_triggered()
     QString filter = sceneFilter + ";;" + templateFilter;
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter, &selectedFilter);
+    bool ok = false;
     if (!filePath.isNull()) {
         if (selectedFilter == sceneFilter) {
             /*!\todo Error handling, show a nice error message to the user ;) */
             m_screenieScene->setTemplate(false);
-            bool ok = writeScene(filePath);
-#ifdef DEBUG
-            qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
-#endif
-            if (ok) {
-                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-                FileUtils::addToSystemRecentFiles(filePath);
-                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            }
+            ok = writeScene(filePath);
         } else if (selectedFilter == templateFilter) {
             /*!\todo Error handling, show a nice error message to the user ;) */
             m_screenieScene->setTemplate(true);
-            bool ok = writeTemplate(filePath);
-#ifdef DEBUG
-            qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
-#endif
-            if (ok) {
-                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            }
+            ok = writeTemplate(filePath);
         }
 #ifdef DEBUG
         else {
             qWarning("MainWindow::on_saveAsAction_triggered: UNSUPPORTED FILTER: %s", qPrintable(selectedFilter));
         }
 #endif
+#ifdef DEBUG
+        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
+#endif
+        if (ok) {
+            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            FileUtils::addToSystemRecentFiles(filePath);
+            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+        }
     }
 }
 
