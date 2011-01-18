@@ -42,6 +42,7 @@
 
 #include "../../Utils/src/Settings.h"
 #include "../../Utils/src/Version.h"
+#include "../../Utils/src/FileUtils.h"
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
@@ -406,9 +407,13 @@ void MainWindow::on_openAction_triggered()
     if (proceedWithModifiedScene()) {
         Settings &settings = Settings::getInstance();
         QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-        QString allFilter = tr("Screenie Scenes (*.xsc *.xst)", "Open dialog filter");
-        QString sceneFilter = tr("Screenie Scene (*.xsc)", "Open dialog filter");
-        QString templateFilter = tr("Screenie Template (*.xst)", "Open dialog filter");
+        QString allFilter = tr("Screenie Scenes (*.%1 *.%2)", "Open dialog filter")
+                            .arg(FileUtils::SceneExtension)
+                            .arg(FileUtils::TemplateExtension);
+        QString sceneFilter = tr("Screenie Scene (*.%1)", "Open dialog filter")
+                              .arg(FileUtils::SceneExtension);
+        QString templateFilter = tr("Screenie Template (*.%1)", "Open dialog filter")
+                                 .arg(FileUtils::TemplateExtension);
         QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
         QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
         if (!filePath.isNull()) {
@@ -443,8 +448,10 @@ void MainWindow::on_saveAsAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-    QString sceneFilter = tr("Screenie Scene (*.xsc)", "Save As dialog filter");
-    QString templateFilter = tr("Screenie Template (*.xst)", "Save As dialog filter");
+    QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
+                          .arg(FileUtils::SceneExtension);
+    QString templateFilter = tr("Screenie Template (*.%1)", "Save As dialog filter")
+                             .arg(FileUtils::TemplateExtension);
     QString filter = sceneFilter + ";;" + templateFilter;
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter, &selectedFilter);
@@ -458,6 +465,7 @@ void MainWindow::on_saveAsAction_triggered()
 #endif
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                FileUtils::addToSystemRecentFiles(filePath);
                 settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
             }
         } else if (selectedFilter == templateFilter) {
