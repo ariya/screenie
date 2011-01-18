@@ -89,11 +89,41 @@ public:
     MODEL_API void setBackgroundColor(QColor colour);
 
     /*!
-     * Returns whether this ScreenieScene has any template models.
+     * Returns whether this ScreenieScene has at least one template model. Note
+     * that when \c true is returned this does \em not imply that this ScreenieScene
+     * is a \em template scene.
      *
-     * \sa ScreenieModelInterface#isTemplate
+     * \sa ScreenieModelInterface#isTemplate()
+     * \sa #hasTemplatesExclusively()
+     * \sa #isTemplate()
      */
     MODEL_API bool hasTemplates() const;
+
+    /*!
+     * Returns whether this ScreenieScene has \em only template models. Note
+     * that when \c true is returned this does \em not imply that this ScreenieScene
+     * is a \em template scene.
+     *
+     * \sa ScreenieModelInterface#isTemplate()
+     * \sa #hasTemplates()
+     * \sa #isTemplate()
+     */
+    MODEL_API bool hasTemplatesExclusively() const;
+
+    /*!
+     * Returns whether this ScreenieScene is a \em template scene, that is it
+     * has been explicitly saved as such. Note that when \c true is returned this does
+     * \em not imply that this ScreenieScene has any \em template models. This is typically the case
+     * when all \em template items have already been replaced by ScreenieFilePathModel
+     * or ScreenieImageModel items.
+     *
+     * \sa ScreenieModelInterface#isTemplate()
+     * \sa #hasTemplatesExclusively()
+     * \sa #hasTemplates()
+     */
+    MODEL_API bool isTemplate() const;
+
+    MODEL_API void setTemplate(bool enable);
 
     /*!
      * Returns whether this ScreenieScene has been modified since creation or the last save.

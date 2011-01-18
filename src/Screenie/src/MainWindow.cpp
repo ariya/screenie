@@ -22,6 +22,7 @@
 #include <QtCore/QPointF>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
@@ -43,7 +44,7 @@
 #include "../../Utils/src/Version.h"
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
-#include "../../Model/src/ScreenieFilePathModel.h"
+#include "../../Model/src/ScreenieTemplateModel.h"
 #include "../../Model/src/Dao/ScreenieSceneDao.h"
 #include "../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
 #include "../../Kernel/src/ExportImage.h"
@@ -163,7 +164,7 @@ void MainWindow::newScene(ScreenieScene &screenieScene)
     updateTitle();
 }
 
-bool MainWindow::write(const QString &filePath)
+bool MainWindow::writeScene(const QString &filePath)
 {
     bool result;
     QFile file(filePath);
@@ -175,6 +176,12 @@ bool MainWindow::write(const QString &filePath)
         updateTitle();
     }
     return result;
+}
+
+bool MainWindow::writeTemplate(const QString &filePath)
+{
+    m_screenieControl->convertItemsToTemplate(*m_screenieScene);
+    return writeScene(filePath);
 }
 
 void MainWindow::updateTransformationUi()
@@ -399,7 +406,10 @@ void MainWindow::on_openAction_triggered()
     if (proceedWithModifiedScene()) {
         Settings &settings = Settings::getInstance();
         QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-        QString filter = tr("Screenie Scene (*.xsc)");
+        QString allFilter = tr("Screenie Scenes (*.xsc *.xst)", "Open dialog filter");
+        QString sceneFilter = tr("Screenie Scene (*.xsc)", "Open dialog filter");
+        QString templateFilter = tr("Screenie Template (*.xst)", "Open dialog filter");
+        QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
         QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
         if (!filePath.isNull()) {
             /*!\todo Error handling, show a nice error message to the user ;) */
@@ -417,9 +427,10 @@ void MainWindow::on_openAction_triggered()
 
 void MainWindow::on_saveAction_triggered()
 {
-    if (!m_documentFilePath.isNull()) {
+    // save with given 'm_documentFilePath', if scene is not a template or if so, has only template items
+    if (!m_documentFilePath.isNull() && (!m_screenieScene->isTemplate() || m_screenieScene->hasTemplatesExclusively())) {
         /*!\todo Error handling, show a nice error message to the user ;) */
-        bool ok = write(m_documentFilePath);
+        bool ok = writeScene(m_documentFilePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
 #endif
@@ -432,18 +443,40 @@ void MainWindow::on_saveAsAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-    QString filter = tr("Screenie Scene (*.xsc)");
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter);
+    QString sceneFilter = tr("Screenie Scene (*.xsc)", "Save As dialog filter");
+    QString templateFilter = tr("Screenie Template (*.xst)", "Save As dialog filter");
+    QString filter = sceneFilter + ";;" + templateFilter;
+    QString selectedFilter;
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter, &selectedFilter);
     if (!filePath.isNull()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
-        bool ok = write(filePath);
+        if (selectedFilter == sceneFilter) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(false);
+            bool ok = writeScene(filePath);
 #ifdef DEBUG
-        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
+            qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
 #endif
-        if (ok) {
-            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            if (ok) {
+                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            }
+        } else if (selectedFilter == templateFilter) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(true);
+            bool ok = writeTemplate(filePath);
+#ifdef DEBUG
+            qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
+#endif
+            if (ok) {
+                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
+            }
         }
+#ifdef DEBUG
+        else {
+            qWarning("MainWindow::on_saveAsAction_triggered: UNSUPPORTED FILTER: %s", qPrintable(selectedFilter));
+        }
+#endif
     }
 }
 

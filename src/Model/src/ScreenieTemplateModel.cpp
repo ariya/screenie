@@ -85,6 +85,18 @@ const QImage &ScreenieTemplateModel::readImage() const
     return d->image;
 }
 
+QSize ScreenieTemplateModel::getSize() const
+{
+    return d->sizeFitter.getTargetSize();
+}
+
+void ScreenieTemplateModel::convert(ScreenieModelInterface &source)
+{
+    AbstractScreenieModel::convert(source);
+    d->sizeFitter.setTargetSize(source.getSize());
+    d->image = QImage();
+}
+
 ScreenieModelInterface *ScreenieTemplateModel::copy() const
 {
     ScreenieTemplateModel *result = new ScreenieTemplateModel(*this);
@@ -105,11 +117,6 @@ QString ScreenieTemplateModel::getOverlayText() const
 SizeFitter &ScreenieTemplateModel::getSizeFitter() const
 {
     return d->sizeFitter;
-}
-
-QSize ScreenieTemplateModel::getSize() const
-{
-    return d->sizeFitter.getTargetSize();
 }
 
 int ScreenieTemplateModel::getOrder() const

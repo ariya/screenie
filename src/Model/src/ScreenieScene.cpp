@@ -31,13 +31,15 @@ public:
     ScreenieScenePrivate()
         : backgroundEnabled(true),
           backgroundColor(QColor(255, 255, 255)),
-          modified(false)
+          modified(false),
+          isTemplate(false)
     {}
 
     bool backgroundEnabled;
     QColor backgroundColor;
     QList<ScreenieModelInterface *> screenieModels;
     bool modified;
+    bool isTemplate;
 };
 
 // public
@@ -160,6 +162,28 @@ bool ScreenieScene::hasTemplates() const
         }
     }
     return result;
+}
+
+bool ScreenieScene::hasTemplatesExclusively() const
+{
+    bool result = true;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (!screenieModel->isTemplate()) {
+            result = false;
+            break;
+        }
+    }
+    return result;
+}
+
+bool ScreenieScene::isTemplate() const
+{
+    return d->isTemplate;
+}
+
+void ScreenieScene::setTemplate(bool enable)
+{
+    d->isTemplate = enable;
 }
 
 bool ScreenieScene::isModified() const
