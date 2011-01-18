@@ -36,6 +36,7 @@ public:
     static Settings *instance;
 
     static const QSize DefaultMaximumImageSize;
+    static const QSize DefaultTemplateSize;
     static const QString DefaultLastImageDirectoryPath;
     static const QString DefaultLastExportDirectoryPath;
     static const QString DefaultLastDocumentDirectoryPath;
@@ -48,6 +49,7 @@ public:
 
     Version version;
     QSize maximumImageSize;
+    QSize templateSize;
     QString lastImageDirectoryPath;
     QString lastExportDirectoryPath;
     QString lastDocumentFilePath;
@@ -75,7 +77,8 @@ public:
 
 Settings *SettingsPrivate::instance = 0;
 
-const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
+const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(1024, 1024);
+const QSize SettingsPrivate::DefaultTemplateSize = QSize(400, 300);
 // workaround for http://bugreports.qt.nokia.com/browse/QTBUG-3239: use fromNativeSeparators
 const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::PicturesLocation));
 const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
@@ -112,6 +115,18 @@ void Settings::setMaximumImageSize(const QSize &maximumImageSize)
 {
     if (d->maximumImageSize != maximumImageSize) {
         d->maximumImageSize = maximumImageSize;
+        emit changed();
+    }
+}
+
+const QSize &Settings::getTemplateSize() const {
+    return d->templateSize;
+}
+
+void Settings::setTemplateSize(const QSize &templateSize)
+{
+    if (d->templateSize != templateSize) {
+        d->templateSize = templateSize;
         emit changed();
     }
 }
@@ -263,6 +278,7 @@ void Settings::store()
 {
     d->settings->setValue("Version", d->version.toString());
     d->settings->setValue("Scene/MaximumImageSize", d->maximumImageSize);
+    d->settings->setValue("Scene/TemplateSize", d->templateSize);
     d->settings->beginGroup("Paths");
     {
         d->settings->setValue("LastImageDirectoryPath", d->lastImageDirectoryPath);
@@ -291,12 +307,13 @@ void Settings::restore()
     Version settingsVersion(version);
     if (settingsVersion < appVersion) {
 #ifdef DEBUG
-        qDebug("Settings::restore: app version: %s, settings version: %s, conversion necessary!",
+        qDebug("Settings::restore: app version: %s, settings version: %s, conversion might be necessary!",
                qPrintable(appVersion.toString()), qPrintable(settingsVersion.toString()));
         /*!\todo Settings conversion as necessary */
 #endif
     }
-    d->maximumImageSize = d->settings->value("Scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
+    d->maximumImageSize = d->settings->value("Scene/MaximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
+    d->templateSize = d->settings->value("Scene/TemplateSize", SettingsPrivate::DefaultTemplateSize).toSize();
     d->settings->beginGroup("Paths");
     {
         d->lastImageDirectoryPath = d->settings->value("LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();

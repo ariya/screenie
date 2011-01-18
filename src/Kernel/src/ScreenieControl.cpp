@@ -38,6 +38,7 @@
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Utils/src/SizeFitter.h"
+#include "../../Utils/src/Settings.h"
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieFilePathModel.h"
@@ -189,8 +190,7 @@ void ScreenieControl::addImages(QList<QImage> images, QPointF centerPosition)
 
 void ScreenieControl::addTemplate(QPointF centerPosition)
 {
-    /*!\todo Make the template size configurable in some UI dialog */
-    QSize size(400, 400);
+    QSize size = Settings::getInstance().getTemplateSize();
     ScreenieTemplateModel *screenieModel = new ScreenieTemplateModel(size);
     applyDefaultValues(*screenieModel);
     screenieModel->setPosition(centerPosition);

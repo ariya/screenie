@@ -63,6 +63,13 @@ public:
      */
     UTILS_API void setMaximumImageSize(const QSize &maximumImageSize);
 
+    UTILS_API const QSize &getTemplateSize() const;
+
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setTemplateSize(const QSize &templateSize);
+
     UTILS_API const QString &getLastImageDirectoryPath() const;
 
     /*!
