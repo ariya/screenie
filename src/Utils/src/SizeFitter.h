@@ -46,12 +46,24 @@ public:
     UTILS_API virtual ~SizeFitter();
 
     UTILS_API QSize getTargetSize() const;
+
+    /*!
+     * Adjusts the \em maximum target size, if necessary.
+     *
+     * \sa #setMaxTargetSize(QSize)
+     */
     UTILS_API void setTargetSize(QSize targetSize);
 
     UTILS_API void setTargetWidth(int targetWidth);
     UTILS_API void setTargetHeight(int targetHeight);
 
     UTILS_API QSize getMaxTargetSize() const;
+
+    /*!
+     * Adjusts the \em target size, if necessary.
+     *
+     * \sa #setTargetSize(QSize)
+     */
     UTILS_API void setMaxTargetSize(QSize maxTargetSize);
 
     UTILS_API void setFitMode(FitMode fitMode);

@@ -213,8 +213,10 @@ void ScreeniePixmapItem::frenchConnection()
             this, SLOT(updateItem()));
     connect(&d->screenieModel, SIGNAL(positionChanged()),
             this, SLOT(updatePosition()));
+    connect(&d->screenieModel, SIGNAL(rotationChanged()),
+            this, SLOT(updateItemGeometry()));
     connect(&d->screenieModel, SIGNAL(distanceChanged()),
-            this, SLOT(updateItem()));
+            this, SLOT(updateItemGeometry()));
     connect(&d->screenieModel, SIGNAL(reflectionChanged()),
             this, SLOT(updateReflection()));
     connect(&d->screenieModel, SIGNAL(imageChanged(const QImage &)),
@@ -364,7 +366,7 @@ void ScreeniePixmapItem::updatePixmap(const QImage &image)
     pixmap.convertFromImage(image);
     setPixmap(pixmap);
     updateReflection();
-    updateItem();
+    updateItemGeometry();
 }
 
 void ScreeniePixmapItem::updatePixmap()
@@ -372,7 +374,7 @@ void ScreeniePixmapItem::updatePixmap()
     updatePixmap(d->screenieModel.readImage());
 }
 
-void ScreeniePixmapItem::updateItem()
+void ScreeniePixmapItem::updateItemGeometry()
 {
     QTransform transform;
     QTransform scale;
@@ -394,6 +396,11 @@ void ScreeniePixmapItem::updateItem()
     translateBack.translate(-dx, -dy);
     transform = translateBack * scale * transform;
     setTransform(transform, false);
+}
+
+void ScreeniePixmapItem::updateItem()
+{
+    update();
 }
 
 void ScreeniePixmapItem::updatePosition()

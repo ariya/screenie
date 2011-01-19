@@ -152,6 +152,7 @@ public:
 signals:
     void reflectionChanged();
     void distanceChanged();
+    void rotationChanged();
     void positionChanged();
     void changed();
     void imageChanged(const QImage &image);

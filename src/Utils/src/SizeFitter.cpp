@@ -77,6 +77,37 @@ void SizeFitter::setTargetSize(QSize targetSize)
 {
     if (d->targetSize != targetSize) {
         d->targetSize = targetSize;
+        // adjust maxTargetSize
+        if (d->maxTargetSize.width() < d->targetSize.width()) {
+            d->maxTargetSize.setWidth(d->targetSize.width());
+        }
+        if (d->maxTargetSize.height() < d->targetSize.height()) {
+            d->maxTargetSize.setHeight(d->targetSize.height());
+        }
+        emit changed();
+    }
+}
+
+void SizeFitter::setTargetWidth(int targetWidth)
+{
+    if (d->targetSize.width() != targetWidth) {
+        d->targetSize.setWidth(targetWidth);
+        // adjust maxTargetSize
+        if (d->maxTargetSize.width() < d->targetSize.width()) {
+            d->maxTargetSize.setWidth(d->targetSize.width());
+        }
+        emit changed();
+    }
+}
+
+void SizeFitter::setTargetHeight(int targetHeight)
+{
+    if (d->targetSize.height() != targetHeight) {
+        d->targetSize.setHeight(targetHeight);
+        // adjust maxTargetSize
+        if (d->maxTargetSize.height() < d->targetSize.height()) {
+            d->maxTargetSize.setHeight(d->targetSize.height());
+        }
         emit changed();
     }
 }
@@ -90,22 +121,13 @@ void SizeFitter::setMaxTargetSize(QSize maxTargetSize)
 {
     if (d->maxTargetSize != maxTargetSize) {
         d->maxTargetSize = maxTargetSize;
-        emit changed();
-    }
-}
-
-void SizeFitter::setTargetWidth(int targetWidth)
-{
-    if (d->targetSize.width() != targetWidth) {
-        d->targetSize.setWidth(targetWidth);
-        emit changed();
-    }
-}
-
-void SizeFitter::setTargetHeight(int targetHeight)
-{
-    if (d->targetSize.height() != targetHeight) {
-        d->targetSize.setHeight(targetHeight);
+        // adjust targetSize
+        if (d->targetSize.width() > d->maxTargetSize.width()) {
+            d->targetSize.setWidth(d->maxTargetSize.width());
+        }
+        if (d->targetSize.height() > d->maxTargetSize.height()) {
+            d->targetSize.setHeight(d->maxTargetSize.height());
+        }
         emit changed();
     }
 }
@@ -204,19 +226,19 @@ void SizeFitter::setDefaultFitOptions()
 
 QSize SizeFitter::getOrientedTargetSize(const QSize &size) const
 {
-    QSize orientedTargetSize;
+    QSize result;
 
-    if (isFitOptionEnabled(RespectOrientation) == true &&
+    if (isFitOptionEnabled(RespectOrientation) &&
         size.width() < size.height() &&
         d->targetSize.width() > d->targetSize.height()) {
         // make 'size' and 'target' have the same orientation
-        orientedTargetSize.setWidth(d->targetSize.height());
-        orientedTargetSize.setHeight(d->targetSize.width());
+        result.setWidth(d->targetSize.height());
+        result.setHeight(d->targetSize.width());
     } else {
-        orientedTargetSize = d->targetSize;
+        result = d->targetSize;
     }
 
-    return orientedTargetSize;
+    return result;
 }
 
 bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedRect) const

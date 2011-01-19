@@ -161,7 +161,7 @@ bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
 {
     bool result = true;
-    this->updateGestureCursor(gesture, Qt::SizeAllCursor);
+    updateGestureCursor(gesture, Qt::SizeAllCursor);
     QPointF delta = gesture->delta();
     qreal x = delta.x();
     qreal y = delta.y();

@@ -24,6 +24,7 @@
 #include <QtCore/QString>
 
 #include "../../Utils/src/SizeFitter.h"
+#include "../../Utils/src/Settings.h"
 #include "../../Utils/src/PaintTools.h"
 #include "ScreenieTemplateModel.h"
 
@@ -36,6 +37,7 @@ public:
     {
           sizeFitter.setFitMode(SizeFitter::Fit);
           sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+          sizeFitter.setMaxTargetSize(Settings::getInstance().getMaximumImageSize());
           sizeFitter.setFitOptionEnabled(SizeFitter::RespectMaxTargetSize, true);
     }
 
@@ -115,6 +117,27 @@ bool ScreenieTemplateModel::isTemplate() const
 QString ScreenieTemplateModel::getOverlayText() const
 {
     QString result = tr("ID: %1").arg(d->order);
+    QString fitMode;
+    switch (d->sizeFitter.getFitMode()) {
+    case SizeFitter::NoFit:
+        fitMode = tr("No Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::Fit:
+        fitMode = tr("Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToWidth:
+        fitMode = tr("Fit To Width", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToHeight:
+        fitMode = tr("Fit To Height", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::ExactFit:
+        fitMode = tr("Exact Fit", "Size Fitter fit mode option");
+        break;
+    default:
+        break;
+    }
+    result.append(QString("\n") + tr("Fit Mode: %1").arg(fitMode));
     return result;
 }
 

@@ -157,7 +157,7 @@ int AbstractScreenieModel::getRotation() const
 void AbstractScreenieModel::setRotation(int rotation) {
     if (d->rotation != rotation) {
         d->rotation = rotation;
-        emit changed();
+        emit rotationChanged();
     }
 }
 
@@ -167,7 +167,7 @@ void AbstractScreenieModel::rotate(int angle) {
         while (d->rotation < 0) {
             d->rotation += 360;
         }
-        emit changed();
+        emit rotationChanged();
     }
 }
 

@@ -78,6 +78,8 @@ void TemplateModelPropertyDialog::frenchConnection()
             this, SLOT(updateUi()));
     connect(&d->screenieTemplateModel, SIGNAL(positionChanged()),
             this, SLOT(updateUi()));
+    connect(&d->screenieTemplateModel, SIGNAL(rotationChanged()),
+            this, SLOT(updateUi()));
     connect(&d->screenieTemplateModel, SIGNAL(distanceChanged()),
             this, SLOT(updateUi()));
     connect(&d->screenieTemplateModel, SIGNAL(destroyed()),

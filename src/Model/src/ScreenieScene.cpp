@@ -70,6 +70,8 @@ void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(positionChanged()),
             this, SIGNAL(changed()));
+    connect(screenieModel, SIGNAL(rotationChanged()),
+            this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(reflectionChanged()),
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(changed()),
