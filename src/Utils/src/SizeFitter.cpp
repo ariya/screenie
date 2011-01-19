@@ -317,7 +317,7 @@ bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedRect) const
 
 }
 
-bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) const
+bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
     float aspectRatio;
     bool result;
@@ -326,29 +326,30 @@ bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) c
     if (!isFitOptionEnabled(Enlarge) &&
         size.width() <= d->targetSize.width()) {
         fittedSize = size;
-        if (clippedArea != 0) {
-            clippedArea->setTopLeft(QPoint(0, 0));
-            clippedArea->setSize(fittedSize);
+        if (clippedRect != 0) {
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(fittedSize);
         }
         return false;
     }
 
     if (size.width() != d->targetSize.width()) {
-        result = true;
         aspectRatio = (float)size.width() / (float)size.height();
         fittedSize.setWidth(d->targetSize.width());
         fittedSize.setHeight(qRound(d->targetSize.width() / aspectRatio));
+        result = true;
     } else {
         result = false;
     }
 
-    if (clippedArea != 0) {
-        if (isFitOptionEnabled(RespectMaxTargetSize)) {
-
+    if (clippedRect != 0) {
+        if (isFitOptionEnabled(RespectMaxTargetSize) && fittedSize.height() > d->maxTargetSize.height()) {
+            fittedSize.setHeight(d->maxTargetSize.height());
+            clip(size, fittedSize, clippedRect);
         } else {
             // no clipping
-            clippedArea->setTopLeft(QPoint(0, 0));
-            clippedArea->setSize(size);
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(size);
         }
     }
 
@@ -358,7 +359,7 @@ bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) c
 bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
     float aspectRatio;
-    bool  result;
+    bool result;
 
     // enlarge?
     if (isFitOptionEnabled(Enlarge) == false &&
@@ -372,18 +373,23 @@ bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedRect) 
     }
 
     if (size.height() != d->targetSize.height()) {
-        result = true;
         aspectRatio = (float)size.height() / (float)size.width();
         fittedSize.setWidth(qRound(d->targetSize.height() / aspectRatio));
         fittedSize.setHeight(d->targetSize.height());
+        result = true;
     } else {
         result = false;
     }
 
     if (clippedRect != 0) {
-        // no clipping, select entire image
-        clippedRect->setTopLeft(QPoint(0, 0));
-        clippedRect->setSize(size);
+        if (isFitOptionEnabled(RespectMaxTargetSize) && fittedSize.width() > d->maxTargetSize.width()) {
+            fittedSize.setWidth(d->maxTargetSize.width());
+            clip(size, fittedSize, clippedRect);
+        } else {
+            // no clipping, select entire image
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(size);
+        }
     }
 
     return result;
@@ -392,14 +398,13 @@ bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedRect) 
 bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
     bool result;
-    QSize orientedTargetSize = getOrientedTargetSize(size);
-    
-    fittedSize = orientedTargetSize;
+
+    fittedSize = d->targetSize;
     
     // enlarge?
     if (!isFitOptionEnabled(Enlarge) &&
-        size.width() <= orientedTargetSize.width() &&
-        size.height() <= orientedTargetSize.height()) {
+        size.width() <= d->targetSize.width() &&
+        size.height() <= d->targetSize.height()) {
         fittedSize = size;
         if (clippedRect != 0) {
             clippedRect->setTopLeft(QPoint(0, 0));
@@ -408,14 +413,14 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) con
         return false;
     }
     
-    if (size != orientedTargetSize) {
+    if (size != d->targetSize) {
         result = true;
     } else {
         result = false;
     }
 
     if (clippedRect != 0) {
-        clip(size, orientedTargetSize, clippedRect);
+        clip(size, d->targetSize, clippedRect);
     }
     return result;
 }
