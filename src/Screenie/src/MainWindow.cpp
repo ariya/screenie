@@ -373,7 +373,6 @@ void MainWindow::showFullScreen()
     /*!\todo Settings which control what becomes invisible in fullscreen mode */
     ui->toolBar->setVisible(false);
     ui->sidePanel->setVisible(false);
-    ui->statusbar->setVisible(false);
     // Note: Qt crashes when we don't disable the unified toolbar before going
     // fullscreen (when we switch back to normal view, that is)!
     // But since for now we hide it anyway that does not make any visible difference.
@@ -388,7 +387,6 @@ void MainWindow::showNormal()
     QMainWindow::showNormal();
     ui->toolBar->setVisible(true);
     ui->sidePanel->setVisible(true);
-    ui->statusbar->setVisible(true);
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
