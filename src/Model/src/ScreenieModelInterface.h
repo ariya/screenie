@@ -125,6 +125,7 @@ public:
     virtual void setReflectionOpacity(int reflectionOpacity) = 0;
     virtual void addReflectionOpacity(int reflectionOpacity) = 0;
 
+    /*!\ Emit signals? */
     virtual void convert(ScreenieModelInterface &source) = 0;
 
     /*!

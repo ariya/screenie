@@ -349,6 +349,26 @@ void ScreenieControl::setBlueBackgroundComponent(int blue)
     d->screenieScene.setBackgroundColor(backgroundColor);
 }
 
+void ScreenieControl::convertItemsToTemplate(ScreenieScene &screenieScene)
+{
+    QList<ScreenieModelInterface *> templateItems;
+    QList<ScreenieModelInterface *> nonTemplateItems;
+    foreach (ScreenieModelInterface *screenieModel, screenieScene.getModels()) {
+        if (!screenieModel->inherits(ScreenieTemplateModel::staticMetaObject.className())) {
+            ScreenieTemplateModel *templateModel = new ScreenieTemplateModel();
+            templateModel->convert(*screenieModel);
+            templateItems.append(templateModel);
+            nonTemplateItems.append(screenieModel);
+        }
+    }
+    foreach (ScreenieModelInterface *screenieModel, nonTemplateItems) {
+        screenieScene.removeModel(screenieModel);
+    }
+    foreach (ScreenieModelInterface *screenieModel, templateItems) {
+        screenieScene.addModel(screenieModel);
+    }
+}
+
 // private
 
 void ScreenieControl::frenchConnection()

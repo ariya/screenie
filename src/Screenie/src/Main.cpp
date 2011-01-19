@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
     // Note that the command line argument -graphicssystem still takes precedence (which is good)
 // #if defined Q_OS_MAC || defined Q_OS_LINUX
 #ifdef Q_OS_LINUX
-    /*!\todo File bug report on this in Qt issue tracker */
     // Doh! This uncovers another Qt bug, at least on Mac with Qt 4.7.1
     // (Linux with Qt 4.7.0 seems to work though): the selection borders in the
     // QGraphicsView are not always properly drawn/updated with multiple
@@ -40,6 +39,9 @@ int main(int argc, char *argv[])
     // properply as selected, the 4th no, the 5th yes (again rendering all
     // selected items so far correct)... (note that the model itself is always
     // marked selected properly).
+    // UPDATE: Cannot reproduce the selection problem anymore. However the
+    // widgets are sometimes painted "upside down" on Mac with Raster graphics engine,
+    // see http://bugreports.qt.nokia.com/browse/QTBUG-16590
     //
     // So for now we live with the graphical artifact when rotating images,
     // which is less serious than broken selection.

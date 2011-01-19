@@ -143,14 +143,13 @@ void ScreenieGraphicsScene::frenchConnection()
 
 bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 {
-    bool result;
+    bool result = false;
     if (selectedItems().size() > 0) {
         if (QGesture *pan = event->gesture(Qt::PanGesture)) {
             result = panTriggered(static_cast<QPanGesture *>(pan));
-        } else if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
+        }
+        if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
             result = pinchTriggered(static_cast<QPinchGesture *>(pinch));
-        } else {
-            result = false;
         }
     } else {
         result = false;
@@ -197,7 +196,7 @@ void ScreenieGraphicsScene::updateGestureCursor(const QGesture *gesture, const Q
 {
     QCursor cursor;
     switch (gesture->state()) {
-        case Qt::GestureStarted:
+        case Qt::GestureStarted: // fall-thru intended
         case Qt::GestureUpdated:
             cursor = gestureCursor;
             d->cursorTimer.start();

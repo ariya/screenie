@@ -69,7 +69,8 @@ private:
     void frenchConnection();
 
     void newScene(ScreenieScene &screenieScene);
-    bool write(const QString &filePath);
+    bool writeScene(const QString &filePath);
+    bool writeTemplate(const QString &filePath);
 
     void updateTransformationUi();
     void updateReflectionUi();

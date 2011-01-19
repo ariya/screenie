@@ -107,6 +107,8 @@ public slots:
     KERNEL_API void setGreenBackgroundComponent(int green);
     KERNEL_API void setBlueBackgroundComponent(int blue);
 
+    KERNEL_API void convertItemsToTemplate(ScreenieScene &screenieScene);
+
 private:
     ScreenieControlPrivate *d;
 

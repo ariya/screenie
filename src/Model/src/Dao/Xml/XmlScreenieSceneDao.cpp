@@ -88,7 +88,8 @@ ScreenieScene *XmlScreenieSceneDao::read() const
         while ((tokenType = d->streamReader->readNext()) != QXmlStreamReader::EndDocument) {
             if (tokenType == QXmlStreamReader::StartElement) {
                 if (d->streamReader->name() == "screeniescene") {
-                    QString versionString = d->streamReader->attributes().value("version").toString();
+                    QXmlStreamAttributes sceneAttributes = d->streamReader->attributes();
+                    QString versionString = sceneAttributes.value("version").toString();
                     Version documentVersion(versionString);
                     if (documentVersion < d->version) {
                         /*!\todo Convert file to current version */
@@ -134,7 +135,11 @@ bool XmlScreenieSceneDao::writeScreenieScene(const ScreenieScene &screenieScene,
     bool result = true;
     d->streamWriter->writeDTD("<!DOCTYPE screenie>");
     d->streamWriter->writeStartElement("screeniescene");
-    d->streamWriter->writeAttribute("version", d->version.toString());
+
+    QXmlStreamAttributes sceneAttributes;
+    sceneAttributes.append("version", d->version.toString());
+    sceneAttributes.append("template", screenieScene.isTemplate() ? "true" : "false");
+    d->streamWriter->writeAttributes(sceneAttributes);
     {
         switch (mode) {
         case ScreenieSceneSerializer::FullScene:
@@ -246,6 +251,9 @@ bool XmlScreenieSceneDao::writeTemplateModel(const ScreenieTemplateModel &screen
 ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
 {
     ScreenieScene *result = new ScreenieScene();
+    QXmlStreamAttributes sceneAttributes = d->streamReader->attributes();
+    bool isTemplate = sceneAttributes.value("isTemplate") == "true" ? true : false;
+    result->setTemplate(isTemplate);
     bool ok = true;
     while (ok && d->streamReader->readNextStartElement()) {
 

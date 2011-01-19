@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>720</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,13 +38,13 @@
      <widget class="QWidget" name="sidePanel" native="true">
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>240</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>240</width>
         <height>16777215</height>
        </size>
       </property>
@@ -154,6 +154,9 @@
           <bool>true</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="margin">
+           <number>4</number>
+          </property>
           <item>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
@@ -237,6 +240,12 @@
             </item>
             <item row="3" column="1">
              <widget class="QLineEdit" name="htmlBGColorLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string notr="true"/>
               </property>
@@ -273,8 +282,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>20</height>
+     <width>720</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

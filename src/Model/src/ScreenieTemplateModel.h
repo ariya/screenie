@@ -62,11 +62,6 @@ public:
     virtual ~ScreenieTemplateModel();
 
     virtual const QImage &readImage() const;
-    virtual ScreenieModelInterface *copy() const;
-    virtual bool isTemplate() const;
-    virtual QString getOverlayText() const;
-
-    SizeFitter &getSizeFitter() const;
 
     /*!
      * Returns the requested size.
@@ -74,6 +69,12 @@ public:
      * \sa ScreenieTemplateModel(const QSize &)
      */
     virtual QSize getSize() const;
+    virtual void convert(ScreenieModelInterface &source);
+    virtual ScreenieModelInterface *copy() const;
+    virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
+
+    SizeFitter &getSizeFitter() const;
 
     /*!
      * \return the order of this ScreenieTemplateModel.
