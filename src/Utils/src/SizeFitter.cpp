@@ -11,6 +11,7 @@ class SizeFitterPrivate
 public:
     SizeFitterPrivate(QSize theTargetSize, SizeFitter::FitMode theFitMode)
         : targetSize(theTargetSize),
+          maxTargetSize(theTargetSize),
           fitMode(theFitMode)
     {}
 
@@ -26,15 +27,17 @@ public:
     }
 
     QSize targetSize;
+    QSize maxTargetSize;
     SizeFitter::FitMode fitMode;
     QBitArray fitOptions;
 
 private:
     void copy(const SizeFitterPrivate &other)
     {
+        targetSize = other.targetSize;
+        maxTargetSize = other.maxTargetSize;
         fitMode = other.fitMode;
         fitOptions = other.fitOptions;
-        targetSize = other.targetSize;
     }
 };
 
@@ -65,39 +68,44 @@ SizeFitter::~SizeFitter()
     delete d;
 }
 
-void SizeFitter::setTargetSize(QSize newTargetSize)
-{
-    if (d->targetSize != newTargetSize) {
-        d->targetSize = newTargetSize;
-        emit changed();
-    }
-}
-
 QSize SizeFitter::getTargetSize() const
 {
     return d->targetSize;
 }
 
-void SizeFitter::setTargetWidth(int newTargetWidth)
+void SizeFitter::setTargetSize(QSize targetSize)
 {
-    if (d->targetSize.width() != newTargetWidth) {
-        d->targetSize.setWidth(newTargetWidth);
+    if (d->targetSize != targetSize) {
+        d->targetSize = targetSize;
         emit changed();
     }
 }
 
-void SizeFitter::setTargetHeight(int newTargetHeight)
+QSize SizeFitter::getMaxTargetSize() const
 {
-    if (d->targetSize.height() != newTargetHeight) {
-        d->targetSize.setHeight(newTargetHeight);
+    return d->maxTargetSize;
+}
+
+void SizeFitter::setMaxTargetSize(QSize maxTargetSize)
+{
+    if (d->maxTargetSize != maxTargetSize) {
+        d->maxTargetSize = maxTargetSize;
         emit changed();
     }
 }
 
-void SizeFitter::setFitMode(FitMode newFitMode)
+void SizeFitter::setTargetWidth(int targetWidth)
 {
-    if (d->fitMode != newFitMode) {
-        d->fitMode = newFitMode;
+    if (d->targetSize.width() != targetWidth) {
+        d->targetSize.setWidth(targetWidth);
+        emit changed();
+    }
+}
+
+void SizeFitter::setTargetHeight(int targetHeight)
+{
+    if (d->targetSize.height() != targetHeight) {
+        d->targetSize.setHeight(targetHeight);
         emit changed();
     }
 }
@@ -107,10 +115,10 @@ SizeFitter::FitMode SizeFitter::getFitMode() const
     return d->fitMode;
 }
 
-void SizeFitter::setFitOptionEnabled(FitOption fitOption, bool enable)
+void SizeFitter::setFitMode(FitMode fitMode)
 {
-    if (d->fitOptions.testBit(fitOption) != enable) {
-        d->fitOptions.setBit(fitOption, enable);
+    if (d->fitMode != fitMode) {
+        d->fitMode = fitMode;
         emit changed();
     }
 }
@@ -123,6 +131,14 @@ bool SizeFitter::isFitOptionEnabled(FitOption fitOption) const
 QBitArray SizeFitter::getFitOptions() const
 {
     return d->fitOptions;
+}
+
+void SizeFitter::setFitOptionEnabled(FitOption fitOption, bool enable)
+{
+    if (d->fitOptions.testBit(fitOption) != enable) {
+        d->fitOptions.setBit(fitOption, enable);
+        emit changed();
+    }
 }
 
 void SizeFitter::setFitOptions(const QBitArray &fitOptions)
@@ -142,19 +158,19 @@ bool SizeFitter::fit(QSize size, QSize &fittedSize, QRect *clippedRect) const
 
         switch (d->fitMode) {
         case Fit:
-            result = this->fitIt(size, fittedSize, clippedRect);
+            result = fitIt(size, fittedSize, clippedRect);
             break;
 
         case FitToWidth:
-            result = this->fitToWidth(size, fittedSize, clippedRect);
+            result = fitToWidth(size, fittedSize, clippedRect);
             break;
 
         case FitToHeight:
-            result = this->fitToHeight(size, fittedSize, clippedRect);
+            result = fitToHeight(size, fittedSize, clippedRect);
             break;
 
         case ExactFit:
-            result = this->exactFit(size, fittedSize, clippedRect);
+            result = exactFit(size, fittedSize, clippedRect);
             break;
 
         default:
@@ -190,7 +206,7 @@ QSize SizeFitter::getOrientedTargetSize(const QSize &size) const
 {
     QSize orientedTargetSize;
 
-    if (this->isFitOptionEnabled(RespectOrientation) == true &&
+    if (isFitOptionEnabled(RespectOrientation) == true &&
         size.width() < size.height() &&
         d->targetSize.width() > d->targetSize.height()) {
         // make 'size' and 'target' have the same orientation
@@ -203,22 +219,22 @@ QSize SizeFitter::getOrientedTargetSize(const QSize &size) const
     return orientedTargetSize;
 }
 
-bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedArea) const
+bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
     float scaleFactor;
     bool  result;
-    QSize orientedTargetSize = this->getOrientedTargetSize(size);
+    QSize orientedTargetSize = getOrientedTargetSize(size);
 
-    orientedTargetSize = this->getOrientedTargetSize(size);
+    orientedTargetSize = getOrientedTargetSize(size);
 
     // enlarge?
-    if (this->isFitOptionEnabled(Enlarge) == false &&
+    if (isFitOptionEnabled(Enlarge) == false &&
         size.width() <= orientedTargetSize.width() &&
         size.height() <= orientedTargetSize.height()) {
         fittedSize = size;
-        if (clippedArea != 0) {
-            clippedArea->setTopLeft(QPoint(0, 0));
-            clippedArea->setSize(fittedSize);
+        if (clippedRect != 0) {
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(fittedSize);
         }
         return false;
     }
@@ -269,10 +285,10 @@ bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedArea) const
         }
     }
 
-    if (clippedArea != 0) {
+    if (clippedRect != 0) {
         // no clipping, select entire image
-        clippedArea->setTopLeft(QPoint(0, 0));
-        clippedArea->setSize(size);
+        clippedRect->setTopLeft(QPoint(0, 0));
+        clippedRect->setSize(size);
     }
 
     return result;
@@ -282,10 +298,10 @@ bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedArea) const
 bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) const
 {
     float aspectRatio;
-    bool  result;
+    bool result;
 
     // enlarge?
-    if (this->isFitOptionEnabled(Enlarge) == false &&
+    if (!isFitOptionEnabled(Enlarge) &&
         size.width() <= d->targetSize.width()) {
         fittedSize = size;
         if (clippedArea != 0) {
@@ -305,26 +321,30 @@ bool SizeFitter::fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) c
     }
 
     if (clippedArea != 0) {
-        // no clipping, select entire image
-        clippedArea->setTopLeft(QPoint(0, 0));
-        clippedArea->setSize(size);
+        if (isFitOptionEnabled(RespectMaxTargetSize)) {
+
+        } else {
+            // no clipping
+            clippedArea->setTopLeft(QPoint(0, 0));
+            clippedArea->setSize(size);
+        }
     }
 
     return result;
 }
 
-bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedArea) const
+bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
     float aspectRatio;
     bool  result;
 
     // enlarge?
-    if (this->isFitOptionEnabled(Enlarge) == false &&
+    if (isFitOptionEnabled(Enlarge) == false &&
         size.height() <= d->targetSize.height()) {
         fittedSize = size;
-        if (clippedArea != 0) {
-            clippedArea->setTopLeft(QPoint(0, 0));
-            clippedArea->setSize(fittedSize);
+        if (clippedRect != 0) {
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(fittedSize);
         }
         return false;
     }
@@ -338,33 +358,30 @@ bool SizeFitter::fitToHeight(QSize size, QSize &fittedSize, QRect *clippedArea) 
         result = false;
     }
 
-    if (clippedArea != 0) {
+    if (clippedRect != 0) {
         // no clipping, select entire image
-        clippedArea->setTopLeft(QPoint(0, 0));
-        clippedArea->setSize(size);
+        clippedRect->setTopLeft(QPoint(0, 0));
+        clippedRect->setSize(size);
     }
 
     return result;
 }
 
-bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) const
+bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) const
 {
-    bool  result;
-    float aspectRatio, targetAspectRatio;
-    int   newWidth, newHeight;
-    QSize newSize;
-    QSize orientedTargetSize = this->getOrientedTargetSize(size);
+    bool result;
+    QSize orientedTargetSize = getOrientedTargetSize(size);
     
     fittedSize = orientedTargetSize;
     
     // enlarge?
-    if (this->isFitOptionEnabled(Enlarge) == false &&
+    if (!isFitOptionEnabled(Enlarge) &&
         size.width() <= orientedTargetSize.width() &&
         size.height() <= orientedTargetSize.height()) {
         fittedSize = size;
-        if (clippedArea != 0) {
-            clippedArea->setTopLeft(QPoint(0, 0));
-            clippedArea->setSize(fittedSize);
+        if (clippedRect != 0) {
+            clippedRect->setTopLeft(QPoint(0, 0));
+            clippedRect->setSize(fittedSize);
         }
         return false;
     }
@@ -375,27 +392,36 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) con
         result = false;
     }
 
-    if (clippedArea != 0) {
-        // center the visible area
-        /*!\todo Implement CENTER, N, NE, E, SE etc. gravity */
-        aspectRatio       = (float)size.width() / (float)size.height();
-        targetAspectRatio = (float)orientedTargetSize.width() / (float)orientedTargetSize.height();
-        if (aspectRatio < targetAspectRatio) {
-            // height too large
-            newHeight = qRound(size.width() / targetAspectRatio);
-            clippedArea->setTopLeft(QPoint(0, qRound((size.height() - newHeight) / 2.0f)));
-            newSize.setWidth(size.width());
-            newSize.setHeight(newHeight);
-            clippedArea->setSize(newSize);
-        } else {
-            // width too large
-            newWidth = qRound(size.height() * targetAspectRatio);
-            clippedArea->setTopLeft(QPoint(qRound((size.width() - newWidth) / 2.0f), 0));
-            newSize.setWidth(newWidth);
-            newSize.setHeight(size.height());
-            clippedArea->setSize(newSize);
-        }
+    if (clippedRect != 0) {
+        clip(size, orientedTargetSize, clippedRect);
     }
     return result;
+}
+
+void SizeFitter::clip(const QSize &size, const QSize &targetSize, QRect *clippedRect) const
+{
+    float aspectRatio, targetAspectRatio;
+    int   newWidth, newHeight;
+    QSize newSize;
+
+    // center the visible area
+    /*!\todo Implement CENTER, N, NE, E, SE etc. gravity */
+    aspectRatio       = (float)size.width() / (float)size.height();
+    targetAspectRatio = (float)targetSize.width() / (float)targetSize.height();
+    if (aspectRatio < targetAspectRatio) {
+        // height too large
+        newHeight = qRound(size.width() / targetAspectRatio);
+        clippedRect->setTopLeft(QPoint(0, qRound((size.height() - newHeight) / 2.0f)));
+        newSize.setWidth(size.width());
+        newSize.setHeight(newHeight);
+        clippedRect->setSize(newSize);
+    } else {
+        // width too large
+        newWidth = qRound(size.height() * targetAspectRatio);
+        clippedRect->setTopLeft(QPoint(qRound((size.width() - newWidth) / 2.0f), 0));
+        newSize.setWidth(newWidth);
+        newSize.setHeight(size.height());
+        clippedRect->setSize(newSize);
+    }
 }
 

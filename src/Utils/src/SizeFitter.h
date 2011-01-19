@@ -30,8 +30,9 @@ public:
     };
 
     enum FitOption {
-        RespectOrientation = 0,
-        Enlarge            = 1,
+        RespectOrientation   = 0,
+        Enlarge              = 1,
+        RespectMaxTargetSize = 2, /*!< Respects the values as set by #setMaxTargetSize() by clipping the resulting image as needed. */
         NofFitOptions
     };
 
@@ -44,18 +45,21 @@ public:
     UTILS_API SizeFitter();
     UTILS_API virtual ~SizeFitter();
 
-    UTILS_API void setTargetSize(QSize newTargetSize);
     UTILS_API QSize getTargetSize() const;
+    UTILS_API void setTargetSize(QSize targetSize);
 
-    UTILS_API void setTargetWidth(int newTargetWidth);
-    UTILS_API void setTargetHeight(int newTargetHeight);
+    UTILS_API void setTargetWidth(int targetWidth);
+    UTILS_API void setTargetHeight(int targetHeight);
 
-    UTILS_API void setFitMode(FitMode newFitMode);
+    UTILS_API QSize getMaxTargetSize() const;
+    UTILS_API void setMaxTargetSize(QSize maxTargetSize);
+
+    UTILS_API void setFitMode(FitMode fitMode);
     UTILS_API FitMode getFitMode() const;
 
-    UTILS_API void setFitOptionEnabled(FitOption fitOption, bool enable);
     UTILS_API bool isFitOptionEnabled(FitOption fitOption) const;
     UTILS_API QBitArray getFitOptions() const;
+    UTILS_API void setFitOptionEnabled(FitOption fitOption, bool enable);
     UTILS_API void setFitOptions(const QBitArray &fitOptions);
 
     /*!
@@ -65,7 +69,7 @@ public:
      *        the resulting fitted QSize
      * \param clippedRect
      *        the QRect which contains the visible area which has been clipped;
-     *        the QRect refers to the original image \c size; may be set to 0
+     *        the QRect coordinates refer to the original image \c size; may be set to 0
      * \return \c true if the \c size has been changed to the \em target size; \c false else
      */
     UTILS_API bool fit(QSize size, QSize &fittedSize, QRect *clippedRect = 0) const;
@@ -80,13 +84,15 @@ private:
 
     void setDefaultFitOptions();
     // returns the oriented target size, that is with the same orientation as the 'size' (portrait or landscape),
-    // IF the 'RespectOrientation' option is set; else the returned target size is simply 'm_targetSize'
+    // IF the 'RespectOrientation' option is set; else the returned target size is simply 'targetSize'
     QSize getOrientedTargetSize(const QSize &size) const;
 
-    bool fitIt(QSize size, QSize &fittedSize, QRect *clippedArea) const;
-    bool fitToWidth(QSize size, QSize &fittedSize, QRect *clippedArea) const;
-    bool fitToHeight(QSize size, QSize &fittedSize, QRect *clippedArea) const;
-    bool exactFit(QSize size, QSize &fittedSize, QRect *clippedArea) const;
+    bool fitIt(QSize size, QSize &fittedSize, QRect *clippedRect) const;
+    bool fitToWidth(QSize size, QSize &fittedSize, QRect *clippedRect) const;
+    bool fitToHeight(QSize size, QSize &fittedSize, QRect *clippedRect) const;
+    bool exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) const;
+
+    void clip(const QSize &size, const QSize &targetSize, QRect *clippedRect) const;
 };
 
 #endif // SIZEFITTER_H

@@ -36,6 +36,7 @@ public:
     {
           sizeFitter.setFitMode(SizeFitter::Fit);
           sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+          sizeFitter.setFitOptionEnabled(SizeFitter::RespectMaxTargetSize, true);
     }
 
     ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
