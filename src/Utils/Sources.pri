@@ -13,11 +13,3 @@ SOURCES += $$PWD/src/PaintTools.cpp \
            $$PWD/src/Version.cpp \
            $$PWD/src/SizeFitter.cpp \
            $$PWD/src/FileUtils.cpp
-
-unix {
-  SOURCES += $$PWD/src/FileUtils_Unix.cpp
-}
-
-win32 {
-  SOURCES += $$PWD/src/FileUtils_Windows.cpp
-}

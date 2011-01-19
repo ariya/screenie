@@ -492,7 +492,6 @@ void MainWindow::on_saveAsAction_triggered()
 #endif
         if (ok) {
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-            FileUtils::addToSystemRecentFiles(filePath);
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
             settings.addRecentFile(filePath);
         }
