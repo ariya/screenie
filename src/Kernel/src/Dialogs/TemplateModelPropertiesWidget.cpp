@@ -27,8 +27,7 @@ class TemplateModelPropertiesWidgetPrivate
 {
 public:
     TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel)
-        : screenieTemplateModel(templateModel),
-          ignoreUpdateSignals(false)
+        : screenieTemplateModel(templateModel)
     {}
 
     ScreenieTemplateModel &screenieTemplateModel;
@@ -74,38 +73,36 @@ void TemplateModelPropertiesWidget::frenchConnection()
 
 void TemplateModelPropertiesWidget::updateUi()
 {
-    if (!d->ignoreUpdateSignals) {
-        int width = d->screenieTemplateModel.getSize().width();
-        int height = d->screenieTemplateModel.getSize().height();
-        ui->widthLineEdit->setText(QString::number(width));
-        ui->heightLineEdit->setText(QString::number(height));
-        SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
-        switch (sizeFitter.getFitMode()) {
-        case SizeFitter::NoFit:
-            ui->fitModeComboBox->setCurrentIndex(0);
-            break;
-        case SizeFitter::Fit:
-            ui->fitModeComboBox->setCurrentIndex(1);
-            break;
-        case SizeFitter::FitToWidth:
-            ui->fitModeComboBox->setCurrentIndex(2);
-            break;
-        case SizeFitter::FitToHeight:
-            ui->fitModeComboBox->setCurrentIndex(3);
-            break;
-        case SizeFitter::ExactFit:
-            ui->fitModeComboBox->setCurrentIndex(4);
-            break;
-        default:
+    int width = d->screenieTemplateModel.getSize().width();
+    int height = d->screenieTemplateModel.getSize().height();
+    ui->widthLineEdit->setText(QString::number(width));
+    ui->heightLineEdit->setText(QString::number(height));
+    SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
+    switch (sizeFitter.getFitMode()) {
+    case SizeFitter::NoFit:
+        ui->fitModeComboBox->setCurrentIndex(0);
+        break;
+    case SizeFitter::Fit:
+        ui->fitModeComboBox->setCurrentIndex(1);
+        break;
+    case SizeFitter::FitToWidth:
+        ui->fitModeComboBox->setCurrentIndex(2);
+        break;
+    case SizeFitter::FitToHeight:
+        ui->fitModeComboBox->setCurrentIndex(3);
+        break;
+    case SizeFitter::ExactFit:
+        ui->fitModeComboBox->setCurrentIndex(4);
+        break;
+    default:
 #ifdef DEBUG
-            qCritical("TemplateModelPropertiesDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
+        qCritical("TemplateModelPropertiesDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
 #endif
-            break;
-        }
-        ui->respectOrientationCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::RespectOrientation));
-        ui->enlargeCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::Enlarge));
-        ui->idLineEdit->setText(QString::number(d->screenieTemplateModel.getOrder()));
+        break;
     }
+    ui->respectOrientationCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::RespectOrientation));
+    ui->enlargeCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::Enlarge));
+    ui->idLineEdit->setText(QString::number(d->screenieTemplateModel.getOrder()));
 }
 
 void TemplateModelPropertiesWidget::on_widthLineEdit_editingFinished()

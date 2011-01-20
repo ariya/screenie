@@ -26,13 +26,10 @@ class BaseGeometryPropertiesWidgetPrivate
 {
 public:
     BaseGeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel),
-          ignoreUpdateSignals(false)
+        : screenieModel(theScreenieModel)
     {}
 
     ScreenieModelInterface &screenieModel;
-    BaseGeometryPropertiesWidget *baseGeometryPropertiesWidget;
-    bool ignoreUpdateSignals;
 };
 
 // public
@@ -52,6 +49,8 @@ BaseGeometryPropertiesWidget::~BaseGeometryPropertiesWidget()
 #ifdef DEBUG
     qDebug("BaseGeometryPropertiesWidget::~BaseGeometryPropertiesWidget(): called.");
 #endif
+    delete ui;
+    delete d;
 }
 
 // private
@@ -70,16 +69,14 @@ void BaseGeometryPropertiesWidget::frenchConnection()
 
 void BaseGeometryPropertiesWidget::updateUi()
 {
-    if (!d->ignoreUpdateSignals) {
-        qreal x = d->screenieModel.getPosition().x();
-        qreal y = d->screenieModel.getPosition().y();
-        qreal z = d->screenieModel.getDistance();
-        ui->positionXLineEdit->setText(QString::number(x));
-        ui->positionYLineEdit->setText(QString::number(y));
-        ui->distanceLineEdit->setText(QString::number(z));
-        int rotation = d->screenieModel.getRotation();
-        ui->rotationLineEdit->setText(QString::number(rotation));
-    }
+    qreal x = d->screenieModel.getPosition().x();
+    qreal y = d->screenieModel.getPosition().y();
+    qreal z = d->screenieModel.getDistance();
+    ui->positionXLineEdit->setText(QString::number(x));
+    ui->positionYLineEdit->setText(QString::number(y));
+    ui->distanceLineEdit->setText(QString::number(z));
+    int rotation = d->screenieModel.getRotation();
+    ui->rotationLineEdit->setText(QString::number(rotation));
 }
 
 void BaseGeometryPropertiesWidget::on_positionXLineEdit_editingFinished()

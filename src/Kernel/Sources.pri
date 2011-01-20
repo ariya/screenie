@@ -19,7 +19,8 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.h \
            $$PWD/src/Dialogs/BaseGeometryPropertiesWidget.h \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.h \
-           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.h
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.h \
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -34,8 +35,10 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.cpp \
            $$PWD/src/Dialogs/BaseGeometryPropertiesWidget.cpp \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.cpp \
-           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.cpp
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.cpp \
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.cpp
 
 FORMS += $$PWD/ui/ScreenieModelPropertiesDialog.ui \
          $$PWD/ui/BaseGeometryPropertiesWidget.ui \
-         $$PWD/ui/TemplateModelPropertiesWidget.ui
+         $$PWD/ui/TemplateModelPropertiesWidget.ui \
+         $$PWD/ui/ReflectionPropertiesWidget.ui

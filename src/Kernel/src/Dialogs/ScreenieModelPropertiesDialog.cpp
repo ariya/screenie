@@ -27,6 +27,7 @@
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
 #include "BaseGeometryPropertiesWidget.h"
+#include "ReflectionPropertiesWidget.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
 #include "ScreenieModelPropertiesDialog.h"
 
@@ -37,12 +38,10 @@ class ScreenieModelPropertiesDialogPrivate
 {
 public:
     ScreenieModelPropertiesDialogPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel),
-          ignoreUpdateSignals(false)
+        : screenieModel(theScreenieModel)
     {}
 
     ScreenieModelInterface &screenieModel;
-    bool ignoreUpdateSignals;
 };
 
 // public
@@ -71,6 +70,8 @@ void ScreenieModelPropertiesDialog::initializeUi()
 {
     BaseGeometryPropertiesWidget *baseGeometryPropertiesWidget = new BaseGeometryPropertiesWidget(d->screenieModel, this);
     ui->propertiesTabWidget->addTab(baseGeometryPropertiesWidget, tr("&Geometry"));
+    ReflectionPropertiesWidget *reflectionPropertiesWidget = new ReflectionPropertiesWidget(d->screenieModel, this);
+    ui->propertiesTabWidget->addTab(reflectionPropertiesWidget, tr("&Reflection"));
 }
 
 // private
