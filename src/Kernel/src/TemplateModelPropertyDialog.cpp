@@ -122,7 +122,7 @@ void TemplateModelPropertyDialog::updateUi()
             break;
         default:
 #ifdef DEBUG
-            qWarning("TemplateModelPropertyDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
+            qCritical("TemplateModelPropertyDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
 #endif
             break;
         }
@@ -133,12 +133,20 @@ void TemplateModelPropertyDialog::updateUi()
 
 void TemplateModelPropertyDialog::on_widthLineEdit_editingFinished()
 {
-    /*!\todo Implement this */
+    bool ok;
+    int width = ui->widthLineEdit->text().toInt(&ok);
+    if (ok) {
+        d->screenieTemplateModel.getSizeFitter().setTargetWidth(width);
+    }
 }
 
 void TemplateModelPropertyDialog::on_heightLineEdit_editingFinished()
 {
-    /*!\todo Implement this */
+    bool ok;
+    int height = ui->heightLineEdit->text().toInt(&ok);
+    if (ok) {
+        d->screenieTemplateModel.getSizeFitter().setTargetHeight(height);
+    }
 }
 
 void TemplateModelPropertyDialog::on_positionXLineEdit_editingFinished()
@@ -198,7 +206,7 @@ void TemplateModelPropertyDialog::on_fitModeComboBox_activated(int index)
         break;
     default:
 #ifdef DEBUG
-        qWarning("TemplateModelPropertyDialog::on_fitModeComboBox_activated: UNSUPPORTED FIT MODE: %d", index);
+        qCritical("TemplateModelPropertyDialog::on_fitModeComboBox_activated: UNSUPPORTED FIT MODE: %d", index);
 #endif
         break;
     }

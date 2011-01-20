@@ -164,6 +164,17 @@ void ScreenieTemplateModel::setOrder(int order)
 void ScreenieTemplateModel::frenchConnection()
 {
     connect(&d->sizeFitter, SIGNAL(changed()),
-            this, SIGNAL(changed()));
+            this, SLOT(handleSizeFitterChanged()));
+}
+
+// private slots
+
+void ScreenieTemplateModel::handleSizeFitterChanged()
+{
+    if (d->image.size() != d->sizeFitter.getTargetSize()) {
+        d->image = QImage();
+        emit imageChanged(readImage());
+    }
+    emit changed();
 }
 
