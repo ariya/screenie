@@ -84,6 +84,7 @@ void ReflectionPropertiesWidget::updateUi()
     ui->opacitySlider->setEnabled(enableReflection);
 }
 
+/*!\todo Use ScreenieControl to manipulate the model values! */
 void ReflectionPropertiesWidget::on_reflectionCheckBox_toggled(bool checked)
 {
     d->screenieModel.setReflectionEnabled(checked);

@@ -18,6 +18,11 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtGui/QSlider>
+#include <QtGui/QLineEdit>
+
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
 #include "TemplateModelPropertiesWidget.h"
@@ -71,6 +76,7 @@ void TemplateModelPropertiesWidget::frenchConnection()
 
 // private slots
 
+/*!\todo Use ScreenieControl to manipulate the model values! */
 void TemplateModelPropertiesWidget::updateUi()
 {
     int width = d->screenieTemplateModel.getSize().width();

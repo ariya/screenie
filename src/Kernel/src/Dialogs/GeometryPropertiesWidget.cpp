@@ -18,14 +18,18 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "../../../Model/src/ScreenieModelInterface.h"
-#include "BaseGeometryPropertiesWidget.h"
-#include "ui_BaseGeometryPropertiesWidget.h"
+#include <QtCore/QString>
+#include <QtGui/QSlider>
+#include <QtGui/QLineEdit>
 
-class BaseGeometryPropertiesWidgetPrivate
+#include "../../../Model/src/ScreenieModelInterface.h"
+#include "GeometryPropertiesWidget.h"
+#include "ui_GeometryPropertiesWidget.h"
+
+class GeometryPropertiesWidgetPrivate
 {
 public:
-    BaseGeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
+    GeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
         : screenieModel(theScreenieModel)
     {}
 
@@ -34,20 +38,21 @@ public:
 
 // public
 
-BaseGeometryPropertiesWidget::BaseGeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent) :
+GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::BaseGeometryPropertiesWidget),
-    d(new BaseGeometryPropertiesWidgetPrivate(screenieModel))
+    ui(new Ui::GeometryPropertiesWidget),
+    d(new GeometryPropertiesWidgetPrivate(screenieModel))
 {
     ui->setupUi(this);
+    initializeUi();
     updateUi();
     frenchConnection();
 }
 
-BaseGeometryPropertiesWidget::~BaseGeometryPropertiesWidget()
+GeometryPropertiesWidget::~GeometryPropertiesWidget()
 {
 #ifdef DEBUG
-    qDebug("BaseGeometryPropertiesWidget::~BaseGeometryPropertiesWidget(): called.");
+    qDebug("GeometryPropertiesWidget::~GeometryPropertiesWidget(): called.");
 #endif
     delete ui;
     delete d;
@@ -55,7 +60,12 @@ BaseGeometryPropertiesWidget::~BaseGeometryPropertiesWidget()
 
 // private
 
-void BaseGeometryPropertiesWidget::frenchConnection()
+void GeometryPropertiesWidget::initializeUi()
+{
+    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+}
+
+void GeometryPropertiesWidget::frenchConnection()
 {
     connect(&d->screenieModel, SIGNAL(positionChanged()),
             this, SLOT(updateUi()));
@@ -67,7 +77,7 @@ void BaseGeometryPropertiesWidget::frenchConnection()
 
 // private slots
 
-void BaseGeometryPropertiesWidget::updateUi()
+void GeometryPropertiesWidget::updateUi()
 {
     qreal x = d->screenieModel.getPosition().x();
     qreal y = d->screenieModel.getPosition().y();
@@ -75,11 +85,14 @@ void BaseGeometryPropertiesWidget::updateUi()
     ui->positionXLineEdit->setText(QString::number(x));
     ui->positionYLineEdit->setText(QString::number(y));
     ui->distanceLineEdit->setText(QString::number(z));
+    ui->distanceSlider->setValue(z);
     int rotation = d->screenieModel.getRotation();
     ui->rotationLineEdit->setText(QString::number(rotation));
+    ui->rotationSlider->setValue(rotation);
 }
 
-void BaseGeometryPropertiesWidget::on_positionXLineEdit_editingFinished()
+/*!\todo Use ScreenieControl to manipulate the model values! */
+void GeometryPropertiesWidget::on_positionXLineEdit_editingFinished()
 {
     bool ok;
     qreal x = ui->positionXLineEdit->text().toFloat(&ok);
@@ -88,7 +101,7 @@ void BaseGeometryPropertiesWidget::on_positionXLineEdit_editingFinished()
     }
 }
 
-void BaseGeometryPropertiesWidget::on_positionYLineEdit_editingFinished()
+void GeometryPropertiesWidget::on_positionYLineEdit_editingFinished()
 {
     bool ok;
     qreal y = ui->positionYLineEdit->text().toFloat(&ok);
@@ -97,7 +110,7 @@ void BaseGeometryPropertiesWidget::on_positionYLineEdit_editingFinished()
     }
 }
 
-void BaseGeometryPropertiesWidget::on_rotationLineEdit_editingFinished()
+void GeometryPropertiesWidget::on_rotationLineEdit_editingFinished()
 {
     bool ok;
     int angle = ui->rotationLineEdit->text().toInt(&ok);
@@ -106,11 +119,21 @@ void BaseGeometryPropertiesWidget::on_rotationLineEdit_editingFinished()
     }
 }
 
-void BaseGeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
+void GeometryPropertiesWidget::on_rotationSlider_valueChanged(int value)
+{
+    d->screenieModel.setRotation(value);
+}
+
+void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
 {
     bool ok;
     qreal distance = ui->distanceLineEdit->text().toFloat(&ok);
     if (ok) {
         d->screenieModel.setDistance(distance);
     }
+}
+
+void GeometryPropertiesWidget::on_distanceSlider_valueChanged(int value)
+{
+    d->screenieModel.setDistance(value);
 }

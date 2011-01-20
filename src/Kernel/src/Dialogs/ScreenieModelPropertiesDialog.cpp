@@ -18,7 +18,6 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <QtCore/QStringList>
 #include <QtCore/QString>
 #include <QtGui/QWidget>
 #include <QtGui/QDialog>
@@ -26,7 +25,7 @@
 
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
-#include "BaseGeometryPropertiesWidget.h"
+#include "GeometryPropertiesWidget.h"
 #include "ReflectionPropertiesWidget.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
 #include "ScreenieModelPropertiesDialog.h"
@@ -68,8 +67,8 @@ ScreenieModelPropertiesDialog::~ScreenieModelPropertiesDialog()
 
 void ScreenieModelPropertiesDialog::initializeUi()
 {
-    BaseGeometryPropertiesWidget *baseGeometryPropertiesWidget = new BaseGeometryPropertiesWidget(d->screenieModel, this);
-    ui->propertiesTabWidget->addTab(baseGeometryPropertiesWidget, tr("&Geometry"));
+    GeometryPropertiesWidget *geometryPropertiesWidget = new GeometryPropertiesWidget(d->screenieModel, this);
+    ui->propertiesTabWidget->addTab(geometryPropertiesWidget, tr("&Geometry"));
     ReflectionPropertiesWidget *reflectionPropertiesWidget = new ReflectionPropertiesWidget(d->screenieModel, this);
     ui->propertiesTabWidget->addTab(reflectionPropertiesWidget, tr("&Reflection"));
 }

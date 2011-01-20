@@ -18,28 +18,28 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef BASEGEOMETRYPROPERTIESWIDGET_H
-#define BASEGEOMETRYPROPERTIESWIDGET_H
+#ifndef GEOMETRYPROPERTIESWIDGET_H
+#define GEOMETRYPROPERTIESWIDGET_H
 
 #include <QtGui/QWidget>
 
 class ScreenieModelInterface;
-class BaseGeometryPropertiesWidgetPrivate;
+class GeometryPropertiesWidgetPrivate;
 
 namespace Ui {
-    class BaseGeometryPropertiesWidget;
+    class GeometryPropertiesWidget;
 }
 
-class BaseGeometryPropertiesWidget : public QWidget
+class GeometryPropertiesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BaseGeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
-    virtual ~BaseGeometryPropertiesWidget();
+    explicit GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
+    virtual ~GeometryPropertiesWidget();
 
 private:
-    Ui::BaseGeometryPropertiesWidget *ui;
-    BaseGeometryPropertiesWidgetPrivate *d;
+    Ui::GeometryPropertiesWidget *ui;
+    GeometryPropertiesWidgetPrivate *d;
 
     void initializeUi();
     void frenchConnection();
@@ -50,7 +50,9 @@ private slots:
     void on_positionXLineEdit_editingFinished();
     void on_positionYLineEdit_editingFinished();
     void on_rotationLineEdit_editingFinished();
+    void on_rotationSlider_valueChanged(int value);
     void on_distanceLineEdit_editingFinished();
+    void on_distanceSlider_valueChanged(int value);
 };
 
-#endif // BASEGEOMETRYPROPERTIESWIDGET_H
+#endif // GEOMETRYPROPERTIESWIDGET_H
