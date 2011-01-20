@@ -26,7 +26,7 @@
 #include "../../Model/src/ScreenieFilePathModel.h"
 #include "../../Model/src/ScreenieImageModel.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
-#include "TemplateModelPropertyDialog.h"
+#include "Dialogs/TemplateModelPropertiesDialog.h"
 #include "PropertyDialogFactory.h"
 
 class PropertyDialogFactoryPrivate
@@ -63,7 +63,7 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     QDialog *result = 0;
     if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
         ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        result = new TemplateModelPropertyDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result = new TemplateModelPropertiesDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         result->setWindowTitle(QObject::tr("Template Properties"));
     }
     if (result != 0) {

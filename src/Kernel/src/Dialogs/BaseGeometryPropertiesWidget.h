@@ -18,28 +18,28 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef TEMPLATEMODELPROPERTYDIALOG_H
-#define TEMPLATEMODELPROPERTYDIALOG_H
+#ifndef BASEGEOMETRYPROPERTIESWIDGET_H
+#define BASEGEOMETRYPROPERTIESWIDGET_H
 
-#include <QtGui/QDialog>
+#include <QtGui/QWidget>
 
-class ScreenieTemplateModel;
-class TemplateModelPropertyDialogPrivate;
+class ScreenieModelInterface;
+class BaseGeometryPropertiesWidgetPrivate;
 
 namespace Ui {
-    class TemplateModelPropertyDialog;
+    class BaseGeometryPropertiesWidget;
 }
 
-class TemplateModelPropertyDialog : public QDialog
+class BaseGeometryPropertiesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TemplateModelPropertyDialog(ScreenieTemplateModel &templateModel, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~TemplateModelPropertyDialog();
+    explicit BaseGeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
+    virtual ~BaseGeometryPropertiesWidget();
 
 private:
-    Ui::TemplateModelPropertyDialog *ui;
-    TemplateModelPropertyDialogPrivate *d;
+    Ui::BaseGeometryPropertiesWidget *ui;
+    BaseGeometryPropertiesWidgetPrivate *d;
 
     void initializeUi();
     void frenchConnection();
@@ -47,15 +47,10 @@ private:
 private slots:
     void updateUi();
 
-    void on_widthLineEdit_editingFinished();
-    void on_heightLineEdit_editingFinished();
     void on_positionXLineEdit_editingFinished();
     void on_positionYLineEdit_editingFinished();
     void on_rotationLineEdit_editingFinished();
     void on_distanceLineEdit_editingFinished();
-    void on_fitModeComboBox_activated(int index);
-    void on_respectOrientationCheckBox_toggled(bool checked);
-    void on_enlargeCheckBox_toggled(bool checked);
 };
 
-#endif // TEMPLATEMODELPROPERTYDIALOG_H
+#endif // BASEGEOMETRYPROPERTIESWIDGET_H

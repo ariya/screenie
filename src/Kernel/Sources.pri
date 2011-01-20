@@ -16,7 +16,10 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/Clipboard/ScreenieMimeData.h \
            $$PWD/src/Clipboard/MimeHelper.h \
            $$PWD/src/PropertyDialogFactory.h \
-           src/TemplateModelPropertyDialog.h
+           $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.h \
+           $$PWD/src/Dialogs/BaseGeometryPropertiesWidget.h \
+           $$PWD/src/Dialogs/TemplateModelPropertiesWidget.h \
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -28,6 +31,11 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Clipboard/ScreenieMimeData.cpp \
            $$PWD/src/Clipboard/MimeHelper.cpp \
            $$PWD/src/PropertyDialogFactory.cpp \
-           $$PWD/src/TemplateModelPropertyDialog.cpp
+           $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.cpp \
+           $$PWD/src/Dialogs/BaseGeometryPropertiesWidget.cpp \
+           $$PWD/src/Dialogs/TemplateModelPropertiesWidget.cpp \
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.cpp
 
-FORMS += $$PWD/ui/TemplateModelPropertyDialog.ui
+FORMS += $$PWD/ui/ScreenieModelPropertiesDialog.ui \
+         $$PWD/ui/BaseGeometryPropertiesWidget.ui \
+         $$PWD/ui/TemplateModelPropertiesWidget.ui

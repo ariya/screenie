@@ -18,22 +18,16 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <QtCore/QStringList>
-#include <QtCore/QString>
-#include <QtGui/QDialog>
-#include <QtGui/QComboBox>
-#include <QtGui/QCheckBox>
+#include "../../../Utils/src/SizeFitter.h"
+#include "../../../Model/src/ScreenieTemplateModel.h"
+#include "TemplateModelPropertiesWidget.h"
+#include "ui_TemplateModelPropertiesWidget.h"
 
-#include "../../Utils/src/SizeFitter.h"
-#include "../../Model/src/ScreenieTemplateModel.h"
-#include "TemplateModelPropertyDialog.h"
-#include "ui_TemplateModelPropertyDialog.h"
-
-class TemplateModelPropertyDialogPrivate
+class TemplateModelPropertiesWidgetPrivate
 {
 public:
-    TemplateModelPropertyDialogPrivate(ScreenieTemplateModel &theScreenieTemplateModel)
-        : screenieTemplateModel(theScreenieTemplateModel),
+    TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel)
+        : screenieTemplateModel(templateModel),
           ignoreUpdateSignals(false)
     {}
 
@@ -41,12 +35,10 @@ public:
     bool ignoreUpdateSignals;
 };
 
-// public
-
-TemplateModelPropertyDialog::TemplateModelPropertyDialog(ScreenieTemplateModel &screenieTemplateModel, QWidget *parent, Qt::WindowFlags flags) :
-    QDialog(parent, flags),
-    ui(new Ui::TemplateModelPropertyDialog),
-    d(new TemplateModelPropertyDialogPrivate(screenieTemplateModel))
+TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::TemplateModelPropertiesWidget),
+    d(new TemplateModelPropertiesWidgetPrivate(templateModel))
 {
     ui->setupUi(this);
     initializeUi();
@@ -54,55 +46,39 @@ TemplateModelPropertyDialog::TemplateModelPropertyDialog(ScreenieTemplateModel &
     frenchConnection();
 }
 
-TemplateModelPropertyDialog::~TemplateModelPropertyDialog()
+TemplateModelPropertiesWidget::~TemplateModelPropertiesWidget()
 {
 #ifdef DEBUG
-    qDebug("TemplateModelPropertyDialog::~TemplateModelPropertyDialog(): called.");
+    qDebug("TemplateModelPropertiesWidget::~TemplateModelPropertiesWidget(): called.");
 #endif
-    delete d;
     delete ui;
+    delete d;
 }
 
 // private
 
-void TemplateModelPropertyDialog::initializeUi()
+void TemplateModelPropertiesWidget::initializeUi()
 {
     QStringList items;
     items << tr("No Fit") << tr("Fit") << tr("Fit To Width") << tr("Fit To Height") << tr("Exact Fit");
     ui->fitModeComboBox->addItems(items);
 }
 
-void TemplateModelPropertyDialog::frenchConnection()
+void TemplateModelPropertiesWidget::frenchConnection()
 {
     connect(&d->screenieTemplateModel, SIGNAL(changed()),
             this, SLOT(updateUi()));
-    connect(&d->screenieTemplateModel, SIGNAL(positionChanged()),
-            this, SLOT(updateUi()));
-    connect(&d->screenieTemplateModel, SIGNAL(rotationChanged()),
-            this, SLOT(updateUi()));
-    connect(&d->screenieTemplateModel, SIGNAL(distanceChanged()),
-            this, SLOT(updateUi()));
-    connect(&d->screenieTemplateModel, SIGNAL(destroyed()),
-            this, SLOT(close()));
 }
 
 // private slots
 
-void TemplateModelPropertyDialog::updateUi()
+void TemplateModelPropertiesWidget::updateUi()
 {
     if (!d->ignoreUpdateSignals) {
         int width = d->screenieTemplateModel.getSize().width();
         int height = d->screenieTemplateModel.getSize().height();
         ui->widthLineEdit->setText(QString::number(width));
         ui->heightLineEdit->setText(QString::number(height));
-        qreal x = d->screenieTemplateModel.getPosition().x();
-        qreal y = d->screenieTemplateModel.getPosition().y();
-        qreal z = d->screenieTemplateModel.getDistance();
-        ui->positionXLineEdit->setText(QString::number(x));
-        ui->positionYLineEdit->setText(QString::number(y));
-        ui->distanceLineEdit->setText(QString::number(z));
-        int rotation = d->screenieTemplateModel.getRotation();
-        ui->rotationLineEdit->setText(QString::number(rotation));
         SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
         switch (sizeFitter.getFitMode()) {
         case SizeFitter::NoFit:
@@ -122,16 +98,17 @@ void TemplateModelPropertyDialog::updateUi()
             break;
         default:
 #ifdef DEBUG
-            qCritical("TemplateModelPropertyDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
+            qCritical("TemplateModelPropertiesDialog::updateUi: UNSUPPORTED FIT MODE: %d", d->screenieTemplateModel.getSizeFitter().getFitMode());
 #endif
             break;
         }
         ui->respectOrientationCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::RespectOrientation));
         ui->enlargeCheckBox->setChecked(sizeFitter.isFitOptionEnabled(SizeFitter::Enlarge));
+        ui->idLineEdit->setText(QString::number(d->screenieTemplateModel.getOrder()));
     }
 }
 
-void TemplateModelPropertyDialog::on_widthLineEdit_editingFinished()
+void TemplateModelPropertiesWidget::on_widthLineEdit_editingFinished()
 {
     bool ok;
     int width = ui->widthLineEdit->text().toInt(&ok);
@@ -140,7 +117,7 @@ void TemplateModelPropertyDialog::on_widthLineEdit_editingFinished()
     }
 }
 
-void TemplateModelPropertyDialog::on_heightLineEdit_editingFinished()
+void TemplateModelPropertiesWidget::on_heightLineEdit_editingFinished()
 {
     bool ok;
     int height = ui->heightLineEdit->text().toInt(&ok);
@@ -149,43 +126,7 @@ void TemplateModelPropertyDialog::on_heightLineEdit_editingFinished()
     }
 }
 
-void TemplateModelPropertyDialog::on_positionXLineEdit_editingFinished()
-{
-    bool ok;
-    qreal x = ui->positionXLineEdit->text().toFloat(&ok);
-    if (ok) {
-        d->screenieTemplateModel.setPositionX(x);
-    }
-}
-
-void TemplateModelPropertyDialog::on_positionYLineEdit_editingFinished()
-{
-    bool ok;
-    qreal y = ui->positionYLineEdit->text().toFloat(&ok);
-    if (ok) {
-        d->screenieTemplateModel.setPositionY(y);
-    }
-}
-
-void TemplateModelPropertyDialog::on_rotationLineEdit_editingFinished()
-{
-    bool ok;
-    int angle = ui->rotationLineEdit->text().toInt(&ok);
-    if (ok) {
-        d->screenieTemplateModel.setRotation(angle);
-    }
-}
-
-void TemplateModelPropertyDialog::on_distanceLineEdit_editingFinished()
-{
-    bool ok;
-    qreal distance = ui->distanceLineEdit->text().toFloat(&ok);
-    if (ok) {
-        d->screenieTemplateModel.setDistance(distance);
-    }
-}
-
-void TemplateModelPropertyDialog::on_fitModeComboBox_activated(int index)
+void TemplateModelPropertiesWidget::on_fitModeComboBox_activated(int index)
 {
     SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
     switch (index) {
@@ -206,22 +147,20 @@ void TemplateModelPropertyDialog::on_fitModeComboBox_activated(int index)
         break;
     default:
 #ifdef DEBUG
-        qCritical("TemplateModelPropertyDialog::on_fitModeComboBox_activated: UNSUPPORTED FIT MODE: %d", index);
+        qCritical("TemplateModelPropertiesDialog::on_fitModeComboBox_activated: UNSUPPORTED FIT MODE: %d", index);
 #endif
         break;
     }
 }
 
-void TemplateModelPropertyDialog::on_respectOrientationCheckBox_toggled(bool checked)
+void TemplateModelPropertiesWidget::on_respectOrientationCheckBox_toggled(bool checked)
 {
     SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
     sizeFitter.setFitOptionEnabled(SizeFitter::RespectOrientation, checked);
 }
 
-void TemplateModelPropertyDialog::on_enlargeCheckBox_toggled(bool checked)
+void TemplateModelPropertiesWidget::on_enlargeCheckBox_toggled(bool checked)
 {
     SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
     sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, checked);
 }
-
-

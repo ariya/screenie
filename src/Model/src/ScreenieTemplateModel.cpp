@@ -116,7 +116,7 @@ bool ScreenieTemplateModel::isTemplate() const
 
 QString ScreenieTemplateModel::getOverlayText() const
 {
-    QString result = tr("ID: %1").arg(d->order);
+    QString result = tr("Order: %1").arg(d->order);
     QString fitMode;
     switch (d->sizeFitter.getFitMode()) {
     case SizeFitter::NoFit:
