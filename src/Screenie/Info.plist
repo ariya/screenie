@@ -23,6 +23,8 @@
 			<string>Screenie Scene</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>ApplicationIcon.icns</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>xsc</string>
@@ -35,6 +37,8 @@
 			<string>Screenie Template</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>ApplicationIcon.icns</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>xst</string>
