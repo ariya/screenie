@@ -77,7 +77,7 @@ public:
      */
     UTILS_API void setLastExportDirectoryPath(const QString &lastExportDirectoryPath);
 
-    UTILS_API const QString &getLastDocumentFilePath() const;
+    UTILS_API const QString &getLastDocumentDirectoryPath() const;
 
     /*!
      * \sa #changed()

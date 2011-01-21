@@ -137,9 +137,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (proceedWithModifiedScene()) {
         Settings::WindowGeometry windowGeometry;
-        windowGeometry.fullScreen = this->isFullScreen();
-        windowGeometry.position = this->pos();
-        windowGeometry.size = this->size();
+        windowGeometry.fullScreen = isFullScreen();
+        windowGeometry.position = pos();
+        windowGeometry.size = size();
         Settings::getInstance().setWindowGeometry(windowGeometry);
         event->accept();
     } else {
@@ -330,7 +330,7 @@ bool MainWindow::proceedWithModifiedScene()
     bool result;
     if (m_screenieScene->isModified()) {
         switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
-                                      tr("The scene has been modified! Save now?"),
+                                      tr("Scene Modified - ") + Version::getApplicationName(),
                                       QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
         {
         case QMessageBox::Save:
@@ -351,6 +351,20 @@ bool MainWindow::proceedWithModifiedScene()
         result = true;
     }
     return result;
+}
+
+void MainWindow::proceedWithModifiedScene(const char *slot)
+{
+    QMessageBox *messageBox = new QMessageBox(tr("Scene Modified - ") + Version::getApplicationName(),
+                                    tr("Scene Modified - ") + Version::getApplicationName(),
+                                    QMessageBox::Warning,
+                                    QMessageBox::Save | QMessageBox::Default,
+                                    QMessageBox::Discard,
+                                    QMessageBox::Cancel | QMessageBox::Escape,
+                                    this, Qt::Sheet);
+    messageBox->setAttribute(Qt::WA_DeleteOnClose);
+    messageBox->open(this, slot);
+
 }
 
 void MainWindow::showFullScreen()
@@ -393,20 +407,41 @@ void MainWindow::restoreWindowGeometry()
 
 // private slots
 
+bool MainWindow::proceed(int answer, const char *followUpAction) {
+    bool result;
+    switch (answer) {
+    case QMessageBox::Save:
+        //saveBefore(followUpAction);
+        result = true;
+        break;
+    case QMessageBox::Cancel:
+        result = false;
+        break;
+    case QMessageBox::Discard:
+        if (followUpAction != 0) {
+            QMetaObject::invokeMethod(this, followUpAction);
+        }
+        result = true;
+        break;
+    default:
+        result = false;
+        break;
+    }
+    return result;
+}
+
 void MainWindow::on_newAction_triggered()
 {
-    if (proceedWithModifiedScene()) {
-        m_documentFilePath = QString();
-        ScreenieScene *screenieScene = new ScreenieScene();
-        newScene(*screenieScene);
-    }
+    MainWindow *mainWindow = new MainWindow();
+    mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+    mainWindow->show();
 }
 
 void MainWindow::on_openAction_triggered()
 {
     if (proceedWithModifiedScene()) {
         Settings &settings = Settings::getInstance();
-        QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+        QString lastDocumentDirectoryPath = settings.getLastDocumentDirectoryPath();
         QString allFilter = tr("Screenie Scenes (*.%1 *.%2)", "Open dialog filter")
                             .arg(FileUtils::SceneExtension)
                             .arg(FileUtils::TemplateExtension);
@@ -415,20 +450,21 @@ void MainWindow::on_openAction_triggered()
         QString templateFilter = tr("Screenie Template (*.%1)", "Open dialog filter")
                                  .arg(FileUtils::TemplateExtension);
         QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
-        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
-        if (!filePath.isNull()) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            bool ok = read(filePath);
-            if (ok) {
-                lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-                settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            }
-#ifdef DEBUG
-            qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
-#endif
-        }
+
+        QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
+        fileDialog->setNameFilter(filter);
+        fileDialog->setWindowTitle(tr("Open"));
+        fileDialog->setDirectory(lastDocumentDirectoryPath);
+        fileDialog->setWindowModality(Qt::WindowModal);
+        fileDialog->setAcceptMode(QFileDialog::AcceptOpen);
+        fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+        fileDialog->open(this, SLOT(handleFileOpenSelected(const QString &)));
     }
 }
+
+//void MainWindow::saveBefore(const char *followUpAction) {
+
+//}
 
 void MainWindow::on_saveAction_triggered()
 {
@@ -446,40 +482,21 @@ void MainWindow::on_saveAction_triggered()
 
 void MainWindow::on_saveAsAction_triggered()
 {
-    Settings &settings = Settings::getInstance();
-    QString lastDocumentFilePath = settings.getLastDocumentFilePath();
+    QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
     QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
                           .arg(FileUtils::SceneExtension);
     QString templateFilter = tr("Screenie Template (*.%1)", "Save As dialog filter")
                              .arg(FileUtils::TemplateExtension);
     QString filter = sceneFilter + ";;" + templateFilter;
-    QString selectedFilter;
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter, &selectedFilter);
-    bool ok = false;
-    if (!filePath.isNull()) {
-        if (selectedFilter == sceneFilter) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(false);
-            ok = writeScene(filePath);
-        } else if (selectedFilter == templateFilter) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(true);
-            ok = writeTemplate(filePath);
-        }
-#ifdef DEBUG
-        else {
-            qWarning("MainWindow::on_saveAsAction_triggered: UNSUPPORTED FILTER: %s", qPrintable(selectedFilter));
-        }
-#endif
-#ifdef DEBUG
-        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
-#endif
-        if (ok) {
-            lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-            FileUtils::addToSystemRecentFiles(filePath);
-            settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-        }
-    }
+
+    QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
+    fileDialog->setNameFilter(filter);
+    fileDialog->setWindowTitle(tr("Save As"));
+    fileDialog->setDirectory(lastDocumentDirectoryPath);
+    fileDialog->setWindowModality(Qt::WindowModal);
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+    fileDialog->open(this, SLOT(handleFileSaveAsSelected(const QString &)));
 }
 
 void MainWindow::on_exportAction_triggered()
@@ -685,5 +702,51 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
+void MainWindow::handleFileSaveAsSelected(const QString &filePath)
+{
+
+    bool ok = false;
+    if (!filePath.isNull()) {
+        if (filePath.endsWith("." + FileUtils::SceneExtension)) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(false);
+            ok = writeScene(filePath);
+        } else if (filePath.endsWith("." + FileUtils::TemplateExtension)) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(true);
+            ok = writeTemplate(filePath);
+        }
+#ifdef DEBUG
+        else {
+            qWarning("MainWindow::handleFileSaveAsSelected: UNSUPPORTED EXTENSION: %s", qPrintable(filePath));
+        }
+#endif
+        if (ok) {
+            QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
+            FileUtils::addToSystemRecentFiles(filePath);
+            Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+        }
+    }
+}
+
+void MainWindow::handleFileOpenSelected(const QString &filePath)
+{
+    if (!filePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        bool ok = read(filePath);
+        if (ok) {
+            QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
+        }
+#ifdef DEBUG
+        qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
+#endif
+    }
+}
+
+void MainWindow::handleConfirm(int result)
+{
+
+}
 
 

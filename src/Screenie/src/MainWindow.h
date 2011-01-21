@@ -28,6 +28,7 @@
 
 class QWidget;
 class QCloseEvent;
+class QFileDialog;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -80,9 +81,12 @@ private:
     void updateScene(ScreenieScene &screenieScene);
 
     bool proceedWithModifiedScene();
+    void proceedWithModifiedScene(const char *slot);
     void restoreWindowGeometry();
 
 private slots:
+    bool proceed(int answer, const char *followUpAction);
+
     // File
     void on_newAction_triggered();
     void on_openAction_triggered();
@@ -123,6 +127,10 @@ private slots:
 
     void updateUi();
     void updateDefaultValues();
+
+    void handleFileSaveAsSelected(const QString &filePath);
+    void handleFileOpenSelected(const QString &filePath);
+    void handleConfirm(int result);
 
 };
 

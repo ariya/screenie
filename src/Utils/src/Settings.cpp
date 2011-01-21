@@ -48,7 +48,7 @@ public:
     QSize maximumImageSize;
     QString lastImageDirectoryPath;
     QString lastExportDirectoryPath;
-    QString lastDocumentFilePath;
+    QString lastDocumenDirectoryPath;
     qreal rotationGestureSensitivity;
     qreal distanceGestureSensitivity;
 
@@ -139,16 +139,16 @@ void Settings::setLastExportDirectoryPath(const QString &lastExportDirectoryPath
     }
 }
 
-const QString &Settings::getLastDocumentFilePath() const
+const QString &Settings::getLastDocumentDirectoryPath() const
 {
-    return d->lastDocumentFilePath;
+    return d->lastDocumenDirectoryPath;
 }
 
-void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentFilePath)
+void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentDirectoryPath)
 {
-    QString qtPath = QDir::fromNativeSeparators(lastDocumentFilePath);
-    if (d->lastDocumentFilePath != qtPath) {
-        d->lastDocumentFilePath = qtPath;
+    QString qtPath = QDir::fromNativeSeparators(lastDocumentDirectoryPath);
+    if (d->lastDocumenDirectoryPath != qtPath) {
+        d->lastDocumenDirectoryPath = qtPath;
         emit changed();
     }
 }
@@ -213,7 +213,7 @@ void Settings::store()
     {
         d->settings->setValue("LastImageDirectoryPath", d->lastImageDirectoryPath);
         d->settings->setValue("LastExportDirectoryPath", d->lastExportDirectoryPath);
-        d->settings->setValue("LastDocumentDirectoryPath", d->lastDocumentFilePath);
+        d->settings->setValue("LastDocumentDirectoryPath", d->lastDocumenDirectoryPath);
     }
     d->settings->endGroup();
     d->settings->beginGroup("UI/Gestures");
@@ -242,7 +242,7 @@ void Settings::restore()
     {
         d->lastImageDirectoryPath = d->settings->value("LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
         d->lastExportDirectoryPath = d->settings->value("LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
-        d->lastDocumentFilePath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
+        d->lastDocumenDirectoryPath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
 
     }
     d->settings->endGroup();
