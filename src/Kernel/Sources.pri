@@ -14,7 +14,13 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/TemplateOrganizer.h \
            $$PWD/src/Clipboard/Clipboard.h \
            $$PWD/src/Clipboard/ScreenieMimeData.h \
-           $$PWD/src/Clipboard/MimeHelper.h
+           $$PWD/src/Clipboard/MimeHelper.h \
+           $$PWD/src/PropertyDialogFactory.h \
+           $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.h \
+           $$PWD/src/Dialogs/GeometryPropertiesWidget.h \
+           $$PWD/src/Dialogs/TemplateModelPropertiesWidget.h \
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.h \
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -25,3 +31,14 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Clipboard/Clipboard.cpp \
            $$PWD/src/Clipboard/ScreenieMimeData.cpp \
            $$PWD/src/Clipboard/MimeHelper.cpp \
+           $$PWD/src/PropertyDialogFactory.cpp \
+           $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.cpp \
+           $$PWD/src/Dialogs/GeometryPropertiesWidget.cpp \
+           $$PWD/src/Dialogs/TemplateModelPropertiesWidget.cpp \
+           $$PWD/src/Dialogs/TemplateModelPropertiesDialog.cpp \
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.cpp
+
+FORMS += $$PWD/ui/ScreenieModelPropertiesDialog.ui \
+         $$PWD/ui/GeometryPropertiesWidget.ui \
+         $$PWD/ui/TemplateModelPropertiesWidget.ui \
+         $$PWD/ui/ReflectionPropertiesWidget.ui

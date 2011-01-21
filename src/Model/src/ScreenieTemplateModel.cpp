@@ -24,6 +24,7 @@
 #include <QtCore/QString>
 
 #include "../../Utils/src/SizeFitter.h"
+#include "../../Utils/src/Settings.h"
 #include "../../Utils/src/PaintTools.h"
 #include "ScreenieTemplateModel.h"
 
@@ -36,6 +37,8 @@ public:
     {
           sizeFitter.setFitMode(SizeFitter::Fit);
           sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+          sizeFitter.setMaxTargetSize(Settings::getInstance().getMaximumImageSize());
+          sizeFitter.setFitOptionEnabled(SizeFitter::RespectMaxTargetSize, true);
     }
 
     ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
@@ -56,17 +59,20 @@ const int ScreenieTemplateModel::Unordered = std::numeric_limits<int>::max();
 ScreenieTemplateModel::ScreenieTemplateModel()
     : d(new ScreenieTemplateModelPrivate(QSize(640, 640), ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
     : d(new ScreenieTemplateModelPrivate(size, ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
     : AbstractScreenieModel(other),
       d(new ScreenieTemplateModelPrivate(*other.d))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::~ScreenieTemplateModel()
@@ -110,7 +116,28 @@ bool ScreenieTemplateModel::isTemplate() const
 
 QString ScreenieTemplateModel::getOverlayText() const
 {
-    QString result = tr("ID: %1").arg(d->order);
+    QString result = tr("Order: %1").arg(d->order);
+    QString fitMode;
+    switch (d->sizeFitter.getFitMode()) {
+    case SizeFitter::NoFit:
+        fitMode = tr("No Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::Fit:
+        fitMode = tr("Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToWidth:
+        fitMode = tr("Fit To Width", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToHeight:
+        fitMode = tr("Fit To Height", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::ExactFit:
+        fitMode = tr("Exact Fit", "Size Fitter fit mode option");
+        break;
+    default:
+        break;
+    }
+    result.append(QString("\n") + tr("Fit Mode: %1").arg(fitMode));
     return result;
 }
 
@@ -137,6 +164,17 @@ void ScreenieTemplateModel::setOrder(int order)
 void ScreenieTemplateModel::frenchConnection()
 {
     connect(&d->sizeFitter, SIGNAL(changed()),
-            this, SIGNAL(changed()));
+            this, SLOT(handleSizeFitterChanged()));
+}
+
+// private slots
+
+void ScreenieTemplateModel::handleSizeFitterChanged()
+{
+    if (d->image.size() != d->sizeFitter.getTargetSize()) {
+        d->image = QImage();
+        emit imageChanged(readImage());
+    }
+    emit changed();
 }
 

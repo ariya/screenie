@@ -42,6 +42,8 @@ public:
 
     virtual QPointF getPosition() const;
     virtual void setPosition(QPointF position);
+    virtual void setPositionX(qreal x);
+    virtual void setPositionY(qreal y);
     virtual void translate(qreal dx, qreal dy);
 
     virtual qreal getDistance() const;

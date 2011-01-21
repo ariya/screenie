@@ -43,11 +43,6 @@ MimeHelper::MimeHelper()
 bool MimeHelper::accept(const QMimeData *mimeData, Mode mode)
 {
     bool result;
-#ifdef DEBUG
-    foreach (QString mime, mimeData->formats()) {
-        qDebug("MimeHelper::accept: has MIME: %s", qPrintable(mime));
-    }
-#endif
     if (mimeData != 0) {
         if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
             const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);

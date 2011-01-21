@@ -26,6 +26,8 @@
 #include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 
+#include "RecentFiles.h"
+
 class QWidget;
 class QCloseEvent;
 class QFileDialog;
@@ -63,6 +65,7 @@ private:
     bool m_ignoreUpdateSignals;
     Clipboard *m_clipboard;
     QString m_documentFilePath;
+    RecentFiles m_recentFiles;
 
     void frenchConnection();
 
@@ -127,6 +130,7 @@ private slots:
 
     void updateUi();
     void updateDefaultValues();
+    void handleRecentFile(const QString &filePath);
 
     void handleFileSaveAsSelected(const QString &filePath);
     void handleFileOpenSelected(const QString &filePath);

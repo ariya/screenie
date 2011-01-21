@@ -24,6 +24,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
 #include <QtGui/QGraphicsScene>
@@ -53,6 +55,8 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "../../Kernel/src/PropertyDialogFactory.h"
+#include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -66,6 +70,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ignoreUpdateSignals(false)
 {
     ui->setupUi(this);
+
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
     setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
@@ -113,6 +123,7 @@ MainWindow::~MainWindow()
 
     // destroy singletons
     Settings::destroyInstance();
+    PropertyDialogFactory::destroyInstance();
 }
 
 bool MainWindow::read(const QString &filePath)
@@ -157,6 +168,10 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
     connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
+
+    // recent files
+    connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
+            this, SLOT(handleRecentFile(const QString &)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -372,7 +387,6 @@ void MainWindow::showFullScreen()
     /*!\todo Settings which control what becomes invisible in fullscreen mode */
     ui->toolBar->setVisible(false);
     ui->sidePanel->setVisible(false);
-    ui->statusbar->setVisible(false);
     // Note: Qt crashes when we don't disable the unified toolbar before going
     // fullscreen (when we switch back to normal view, that is)!
     // But since for now we hide it anyway that does not make any visible difference.
@@ -387,7 +401,6 @@ void MainWindow::showNormal()
     QMainWindow::showNormal();
     ui->toolBar->setVisible(true);
     ui->sidePanel->setVisible(true);
-    ui->statusbar->setVisible(true);
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -704,7 +717,6 @@ void MainWindow::updateDefaultValues()
 
 void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 {
-
     bool ok = false;
     if (!filePath.isNull()) {
         if (filePath.endsWith("." + FileUtils::SceneExtension)) {
@@ -723,8 +735,9 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 #endif
         if (ok) {
             QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
-            FileUtils::addToSystemRecentFiles(filePath);
-            Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+            Settings &settings = Settings::getInstance();
+            settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+            settings.addRecentFile(filePath);
         }
     }
 }
@@ -748,5 +761,13 @@ void MainWindow::handleConfirm(int result)
 {
 
 }
+
+void  MainWindow::handleRecentFile(const QString &filePath)
+{
+    if (proceedWithModifiedScene()) {
+        read(filePath);
+    }
+}
+
 
 

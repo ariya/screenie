@@ -86,6 +86,9 @@ private:
     ScreenieTemplateModelPrivate *d;
 
     void frenchConnection();
+
+private slots:
+    void handleSizeFitterChanged();
 };
 
 #endif // SCREENIETEMPLATEMODEL_H

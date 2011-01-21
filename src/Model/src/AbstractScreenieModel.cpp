@@ -98,6 +98,22 @@ void AbstractScreenieModel::setPosition(QPointF position)
     }
 }
 
+void AbstractScreenieModel::setPositionX(qreal x)
+{
+    if (d->position.x() != x) {
+        d->position.setX(x);
+        emit positionChanged();
+    }
+}
+
+void AbstractScreenieModel::setPositionY(qreal y)
+{
+    if (d->position.y() != y) {
+        d->position.setY(y);
+        emit positionChanged();
+    }
+}
+
 void AbstractScreenieModel::translate(qreal dx, qreal dy)
 {
     QPointF newPosition = QPointF(d->position.x() + dx, d->position.y() + dy);
@@ -141,7 +157,7 @@ int AbstractScreenieModel::getRotation() const
 void AbstractScreenieModel::setRotation(int rotation) {
     if (d->rotation != rotation) {
         d->rotation = rotation;
-        emit changed();
+        emit rotationChanged();
     }
 }
 
@@ -151,7 +167,7 @@ void AbstractScreenieModel::rotate(int angle) {
         while (d->rotation < 0) {
             d->rotation += 360;
         }
-        emit changed();
+        emit rotationChanged();
     }
 }
 

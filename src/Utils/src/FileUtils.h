@@ -31,16 +31,6 @@ public:
 
     UTILS_API static const QString SceneExtension;
     UTILS_API static const QString TemplateExtension;
-
-    /*!
-     * Adds the \p filePath to the Recent Files menu of the system. On Windows that would
-     * be the menu "Recent files" in the \em Start menu. On Unix this method currently does
-     * nothing.
-     *
-     * \param filePath
-     *        a QString containing the file path
-     */
-    UTILS_API static void addToSystemRecentFiles(const QString &filePath);
 };
 
 #endif // FILEUTILS_H
