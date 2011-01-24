@@ -29,9 +29,9 @@
 #include <QtCore/QList>
 #include <QtGui/QBrush>
 #include <QtGui/QColor>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
-class QPixmap;
+class QImage;
 class QString;
 class QStringList;
 class QMimeData;
@@ -82,8 +82,8 @@ public:
 public slots:
     KERNEL_API void addImage(QString filePath, QPointF centerPosition = QPointF(0.0, 0.0));
     KERNEL_API void addImages(QStringList filePaths, QPointF centerPosition = QPointF(0.0, 0.0));
-    KERNEL_API void addImage(QPixmap pixmap, QPointF centerPosition = QPointF(0.0, 0.0));
-    KERNEL_API void addImages(QList<QPixmap> pixmaps, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addImage(QImage image, QPointF centerPosition = QPointF(0.0, 0.0));
+    KERNEL_API void addImages(QList<QImage> images, QPointF centerPosition = QPointF(0.0, 0.0));
     KERNEL_API void addTemplate(QPointF centerPosition = QPointF(0.0, 0.0));
 
     KERNEL_API void removeAll();
@@ -107,6 +107,8 @@ public slots:
     KERNEL_API void setGreenBackgroundComponent(int green);
     KERNEL_API void setBlueBackgroundComponent(int blue);
 
+    KERNEL_API void convertItemsToTemplate(ScreenieScene &screenieScene);
+
 private:
     ScreenieControlPrivate *d;
 
@@ -117,15 +119,17 @@ private:
     void applyDefaultValues(ScreenieModelInterface &screenieModelInterface);
     /*!\todo Put these methods in some Kernel "Geometry" class or somewhere */
     QPointF calculateItemPosition(const ScreenieModelInterface &screenieModel, const QPointF &centerPosition);
-    QPixmap scaleToTemplate(const ScreenieTemplateModel &templateModel, const QPixmap &pixmap);
+    QImage scaleToTemplate(const ScreenieTemplateModel &templateModel, const QImage &image);
     QPointF calculateItemPosition(const QPointF &sourcePosition, const QSize &sourceSize, const QSize &targetSize);
 
-    void updatePixmapModel(const QPixmap &pixmap, ScreenieModelInterface &screenieModel);
+    void updateImageModel(const QImage &image, ScreenieModelInterface &screenieModel);
     void updateFilePathModel(const QString &filePath, ScreenieModelInterface &screenieModel);
+
+    bool needsClipping(const QSize &originalSize, const QSize &clippedSize);
 
 private slots:
     void handleFilePathsDrop(QStringList filePaths, QPointF centerPosition);
-    void handlePixmapsDrop(QList<QPixmap> pixmaps, QPointF centerPosition);
+    void handleImageDrop(QList<QImage> images, QPointF centerPosition);
     void handleDistanceChanged();
     void handleModelAdded(ScreenieModelInterface &screenieModel);
     void handleModelRemoved(ScreenieModelInterface &screenieModel);

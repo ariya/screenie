@@ -18,13 +18,44 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieSceneIO.h"
+#ifndef RECENTFILES_H
+#define RECENTFILES_H
 
-// public
+#include <QtCore/QObject>
 
-ScreenieSceneIO::ScreenieSceneIO(ScreenieScene &screenieScene)
+class QActionGroup;
+class QAction;
+
+/*!
+ * \brief The recently opened files.
+ *
+ * Provides a menu with QActions which give access to the recently opened files.
+ */
+class RecentFiles : public QObject
 {
-    d = new ScreenieScenePrivate();
-}
+    Q_OBJECT
 
+public:
+    RecentFiles();
+    virtual ~RecentFiles();
 
+    QActionGroup &getRecentFilesActionGroup() const;
+
+signals:
+    void openRecentFile(const QString &filePath);
+
+private:
+    QActionGroup *m_recentFilesActionGroup;
+    bool m_ignoreUpdateSignals;
+    QAction *m_clearRecentFilesAction;
+
+    void initialise();
+    void frenchConnection();
+
+private slots:
+    void updateRecentFilesActions();
+    void handleRecentFilesAction();
+    void clearRecentFilesMenu();
+};
+
+#endif // RECENTFILES_H

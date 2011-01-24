@@ -28,12 +28,14 @@
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QGraphicsSceneDragDropEvent;
+class QImage;
 
 #include "KernelLib.h"
 
 class ScreenieModelInterface;
 class ScreenieControl;
 class Reflection;
+class ScreeniePixmapItemPrivate;
 
 /*!
  * The visual representation of a ScreenieModel in a QGraphicsView. Implements the
@@ -56,19 +58,17 @@ public:
 
 protected:
     virtual int type() const;
+    virtual void contextMenuEvent (QGraphicsSceneContextMenuEvent *event);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
-    ScreenieModelInterface &m_screenieModel;
-    ScreenieControl &m_screenieControl;
-    Reflection &m_reflection;
-    bool m_transformPixmap;
-    bool m_ignoreUpdates;
+    ScreeniePixmapItemPrivate *d;
 
     void frenchConnection();
     void moveTo(QPointF scenePosition);
@@ -78,16 +78,17 @@ private:
     void transformPixmap(QGraphicsSceneMouseEvent *event);
     void changeReflection(QGraphicsSceneMouseEvent *event);
     void addReflectionOpacity(int reflectionOpacity);
-
     void selectExclusive();
 
 private slots:
     void updateReflection();
-    void updatePixmap(const QPixmap &pixmap);
+    void updatePixmap(const QImage &image);
     void updatePixmap();
+    void updateItemGeometry();
     void updateItem();
     void updatePosition();
     void updateSelection();
+    void handlePropertyDialogDestroyed();
 };
 
 #endif // SCREENIEPIXMAPITEM_H

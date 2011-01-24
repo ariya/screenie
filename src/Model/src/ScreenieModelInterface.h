@@ -23,7 +23,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include "ModelLib.h"
 
@@ -40,29 +40,40 @@ public:
     virtual ~ScreenieModelInterface() {}
 
     /*!
-     * Returns the QPixmap.
+     * Returns the QImage.
      *
      * \sa #setFilePath(const QString &)
      */
-    virtual const QPixmap &readPixmap() const = 0;
+    virtual const QImage &readImage() const = 0;
 
     /*!
      * Returns the size of the image.
      *
-     * Implementation note: if #readPixmap has not yet been called the image is currently
+     * Implementation note: if #readImage has not yet been called the image is currently
      * read from disk first, so it might be potentially expensive, but only for the first
      * time (the image is stored in memory).
      *
      * \return the QSize of the image
-     * \sa #readPixmap()
+     * \sa #readImage()
      */
     virtual QSize getSize() const = 0;
 
     virtual QPointF getPosition() const = 0;
+
     /*!
      * \sa #positionChanged()
      */
     virtual void setPosition(QPointF position) = 0;
+
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void setPositionX(qreal x) = 0;
+
+    /*!
+     * \sa #positionChanged()
+     */
+    virtual void setPositionY(qreal y) = 0;
 
     /*!
      * \sa #positionChanged()
@@ -114,6 +125,7 @@ public:
     virtual void setReflectionOpacity(int reflectionOpacity) = 0;
     virtual void addReflectionOpacity(int reflectionOpacity) = 0;
 
+    /*!\ Emit signals? */
     virtual void convert(ScreenieModelInterface &source) = 0;
 
     /*!
@@ -132,12 +144,18 @@ public:
 
     virtual bool isTemplate() const = 0;
 
+    /*!
+     * \return a QString containing the overlay text to be drawn over the pixmap; a \em null QString if nothing to draw
+     */
+    virtual QString getOverlayText() const = 0;
+
 signals:
     void reflectionChanged();
     void distanceChanged();
+    void rotationChanged();
     void positionChanged();
     void changed();
-    void pixmapChanged(const QPixmap &pixmap);
+    void imageChanged(const QImage &image);
     void filePathChanged(const QString &filePath);
     void selectionChanged();
 };

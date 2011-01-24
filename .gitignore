@@ -1,12 +1,13 @@
 Makefile*
 *.Debug
 *.Release
+*_resource.rc
 *.o
 *.exe
 *.qm
 *.dll
 *.so
-./doc
+Doxydoc
 
 # Qt build
 ui_*.h
@@ -26,4 +27,11 @@ bin
 
 # Windows
 Thumbs.db
+
+# Installer
+*.msi
+*.wixobj
+*.wixpdb
+*.log
+
 

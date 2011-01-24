@@ -25,28 +25,52 @@
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QPainter>
-
+#include <QtGui/QPixmap>
+#include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QImage>
+#include <QtGui/QDialog>
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "Clipboard/MimeHelper.h"
 #include "Reflection.h"
 #include "ScreenieControl.h"
+#include "PropertyDialogFactory.h"
 #include "ScreeniePixmapItem.h"
 
 const int ScreeniePixmapItem::ScreeniePixmapType = QGraphicsItem::UserType + 1;
+
+class ScreeniePixmapItemPrivate
+{
+public:
+    ScreeniePixmapItemPrivate(ScreenieModelInterface &theScreenieModel, ScreenieControl &theScreenieControl, Reflection &theReflection)
+        : screenieModel(theScreenieModel),
+          screenieControl(theScreenieControl),
+          reflection(theReflection),
+          transformPixmap(true),
+          ignoreUpdates(false),
+          itemTransformed(false),
+          propertyDialog(0)
+    {}
+
+    ScreenieModelInterface &screenieModel;
+    ScreenieControl &screenieControl;
+    Reflection &reflection;
+    bool transformPixmap;
+    bool ignoreUpdates;
+    bool itemTransformed;
+    QDialog *propertyDialog;
+};
 
 // public
 
 ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, Reflection &reflection)
     : QGraphicsPixmapItem(),
-      m_screenieModel(screenieModel),
-      m_screenieControl(screenieControl),
-      m_reflection(reflection),
-      m_transformPixmap(true),
-      m_ignoreUpdates(false)
+      d(new ScreeniePixmapItemPrivate(screenieModel, screenieControl, reflection))
 {
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -55,8 +79,7 @@ ScreeniePixmapItem::ScreeniePixmapItem(ScreenieModelInterface &screenieModel, Sc
     // we also want to be able to change the reflection also in the fully translucent areas
     // of the reflection
     setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    QPixmap pixmap = m_screenieModel.readPixmap();
-    updatePixmap(pixmap);
+    updatePixmap(d->screenieModel.readImage());
     setAcceptDrops(true);
     frenchConnection();
 }
@@ -70,7 +93,7 @@ ScreeniePixmapItem::~ScreeniePixmapItem()
 
 ScreenieModelInterface &ScreeniePixmapItem::getScreenieModel() const
 {
-    return m_screenieModel;
+    return d->screenieModel;
 }
 
 // protected
@@ -80,19 +103,45 @@ int ScreeniePixmapItem::type() const
     return ScreeniePixmapType;
 }
 
+void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    Q_UNUSED(event);
+    if (!d->itemTransformed) {
+        // for now we only allow properties of a single item to be modified at the same time
+        selectExclusive();
+        QWidget *parent;
+        if (scene() != 0) {
+            parent = scene()->views().first()->viewport();
+        } else {
+            parent = 0;
+        }
+        if (d->propertyDialog == 0) {
+            d->propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
+            if (d->propertyDialog != 0) {
+                connect(d->propertyDialog, SIGNAL(destroyed()),
+                        this, SLOT(handlePropertyDialogDestroyed()));
+                d->propertyDialog->show();
+            }
+        }
+    }
+}
+
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-   m_transformPixmap = isInsidePixmap(event->pos());
+   d->transformPixmap = isInsidePixmap(event->pos());
+   d->itemTransformed = false;
    event->accept();
 }
 
 void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isInsidePixmap(event->pos()) && m_transformPixmap) {
+    if (isInsidePixmap(event->pos()) && d->transformPixmap) {
         transformPixmap(event);
-    } else if (!m_transformPixmap) {
+    } else if (!d->transformPixmap) {
         changeReflection(event);
     }
+    /*!\todo Maybe define some pixel threshold before we consider this item to be transformed? */
+    d->itemTransformed = true;
 }
 
 void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -114,7 +163,7 @@ void ScreeniePixmapItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 
 void ScreeniePixmapItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    m_screenieControl.updateModel(event->mimeData(), m_screenieModel);
+    d->screenieControl.updateModel(event->mimeData(), d->screenieModel);
     event->accept();
 }
 
@@ -122,58 +171,85 @@ QVariant ScreeniePixmapItem::itemChange(GraphicsItemChange change, const QVarian
 {
     if (change == ItemPositionChange) {
         QPointF position = value.toPointF();
-        m_screenieModel.setPosition(position);
+        d->screenieModel.setPosition(position);
     } else if (change == ItemSelectedChange) {
         QGraphicsPixmapItem::itemChange(change, value);
         // See comment below in #transformPixmap
-        m_ignoreUpdates = true;
-        m_screenieModel.setSelected(value.toBool());
+        d->ignoreUpdates = true;
+        d->screenieModel.setSelected(value.toBool());
     }
     return QGraphicsPixmapItem::itemChange(change, value);
+}
+
+void ScreeniePixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsPixmapItem::paint(painter, option, widget);
+    QString overlayText = d->screenieModel.getOverlayText();
+    if (!overlayText.isNull()) {
+        QRectF rect = boundingRect();
+        /*!\todo Optimise this; cache the font, re-calculate when overlay text changes (add signal) */
+        if (rect.width() > 100 && rect.height() > 48) {
+            rect.adjust(10.0, 10.0, -10.0, -10.0);
+            int length = overlayText.length();
+            QFont font("Arial");
+            if (length > 10) {
+                font.setPixelSize(16);
+            } else {
+                font.setPixelSize(24);
+            }
+            QFontMetrics fontMetrics(font);
+            overlayText = fontMetrics.elidedText(overlayText, Qt::ElideMiddle, rect.width());
+            painter->setPen(Qt::white);
+            painter->setFont(font);
+            painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, overlayText);
+        }
+    }
 }
 
 // private
 
 void ScreeniePixmapItem::frenchConnection()
 {
-    connect(&m_screenieModel, SIGNAL(changed()),
+    connect(&d->screenieModel, SIGNAL(changed()),
             this, SLOT(updateItem()));
-    connect(&m_screenieModel, SIGNAL(positionChanged()),
+    connect(&d->screenieModel, SIGNAL(positionChanged()),
             this, SLOT(updatePosition()));
-    connect(&m_screenieModel, SIGNAL(distanceChanged()),
-            this, SLOT(updateItem()));
-    connect(&m_screenieModel, SIGNAL(reflectionChanged()),
+    connect(&d->screenieModel, SIGNAL(rotationChanged()),
+            this, SLOT(updateItemGeometry()));
+    connect(&d->screenieModel, SIGNAL(distanceChanged()),
+            this, SLOT(updateItemGeometry()));
+    connect(&d->screenieModel, SIGNAL(reflectionChanged()),
             this, SLOT(updateReflection()));
-    connect(&m_screenieModel, SIGNAL(pixmapChanged(const QPixmap &)),
-            this, SLOT(updatePixmap(const QPixmap &)));
-    connect(&m_screenieModel, SIGNAL(filePathChanged(const QString &)),
+    connect(&d->screenieModel, SIGNAL(imageChanged(const QImage &)),
+            this, SLOT(updatePixmap(const QImage &)));
+    connect(&d->screenieModel, SIGNAL(filePathChanged(const QString &)),
             this, SLOT(updatePixmap()));
-    connect(&m_screenieModel, SIGNAL(selectionChanged()),
+    connect(&d->screenieModel, SIGNAL(selectionChanged()),
             this, SLOT(updateSelection()));
 }
 
 void ScreeniePixmapItem::moveTo(QPointF scenePosition)
 {
     selectExclusive();
-    m_screenieModel.setPosition(scenePosition);
+    d->screenieModel.setPosition(scenePosition);
 }
 
 void ScreeniePixmapItem::rotate(int angle)
 {
     selectExclusive();
-    m_screenieControl.rotate(angle);
+    d->screenieControl.rotate(angle);
 }
 
 void ScreeniePixmapItem::addDistance(int distance)
 {
     selectExclusive();
-    m_screenieControl.addDistance(distance);
+    d->screenieControl.addDistance(distance);
 }
 
 bool ScreeniePixmapItem::isInsidePixmap(QPointF itemPosition)
 {
     bool result;
-    if (m_screenieModel.isReflectionEnabled()) {
+    if (d->screenieModel.isReflectionEnabled()) {
         QRectF boundingRect = this->boundingRect();
         result = itemPosition.y() < boundingRect.height() / 2.0;
     } else {
@@ -206,7 +282,7 @@ void ScreeniePixmapItem::transformPixmap(QGraphicsSceneMouseEvent *event)
         // (see #itemChange above)
         // As we get a signal by the model nevertheless we ignore it my raising
         // a flag, because we already updated the View ourselves
-        m_ignoreUpdates = true;
+        d->ignoreUpdates = true;
         selectExclusive();
         QGraphicsPixmapItem::mouseMoveEvent(event);
         break;
@@ -230,7 +306,7 @@ void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
             percent = 100;
         }
         selectExclusive();
-        m_screenieControl.setReflectionOffset(percent);
+        d->screenieControl.setReflectionOffset(percent);
         event->accept();
         break;
 
@@ -241,7 +317,7 @@ void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
             percent = 100;
         }
         selectExclusive();
-        m_screenieControl.setReflectionOpacity(percent);
+        d->screenieControl.setReflectionOpacity(percent);
         event->accept();
         break;
 
@@ -254,7 +330,7 @@ void ScreeniePixmapItem::changeReflection(QGraphicsSceneMouseEvent *event)
 void ScreeniePixmapItem::addReflectionOpacity(int reflectionOpacity)
 {
     selectExclusive();
-    m_screenieControl.addReflectionOpacity(reflectionOpacity);
+    d->screenieControl.addReflectionOpacity(reflectionOpacity);
 }
 
 void ScreeniePixmapItem::selectExclusive()
@@ -270,72 +346,82 @@ void ScreeniePixmapItem::selectExclusive()
 void ScreeniePixmapItem::updateReflection()
 {
     QPixmap pixmap = this->pixmap();
-    if (m_screenieModel.isReflectionEnabled()) {
-        if (m_screenieModel.getSize() != pixmap.size()) {
+    if (d->screenieModel.isReflectionEnabled()) {
+        if (d->screenieModel.getSize() != pixmap.size()) {
             // the pixmap already has a reflection (height must be 2x original height),
             // so just take the upper half (the original pixmap)
             pixmap = PaintTools::upperHalf(pixmap);
         }
-        pixmap = m_reflection.addReflection(pixmap, m_screenieModel.getReflectionOpacity(), m_screenieModel.getReflectionOffset());
+        pixmap = d->reflection.addReflection(pixmap, d->screenieModel.getReflectionOpacity(), d->screenieModel.getReflectionOffset());
     } else {
-        if (m_screenieModel.getSize() != pixmap.size()) {
+        if (d->screenieModel.getSize() != pixmap.size()) {
             pixmap = PaintTools::upperHalf(pixmap);
         }
     }
     setPixmap(pixmap);
 }
 
-void ScreeniePixmapItem::updatePixmap(const QPixmap &pixmap)
+void ScreeniePixmapItem::updatePixmap(const QImage &image)
 {
+    QPixmap pixmap;
+    pixmap.convertFromImage(image);
     setPixmap(pixmap);
     updateReflection();
-    updateItem();
+    updateItemGeometry();
 }
 
 void ScreeniePixmapItem::updatePixmap()
 {
-    QPixmap pixmap = m_screenieModel.readPixmap();
-    updatePixmap(pixmap);
+    updatePixmap(d->screenieModel.readImage());
 }
 
-void ScreeniePixmapItem::updateItem()
+void ScreeniePixmapItem::updateItemGeometry()
 {
     QTransform transform;
     QTransform scale;
     QTransform translateBack;
 
-    qreal centerScale = 1.0 - 0.9 * m_screenieModel.getDistance() / ScreenieModelInterface::MaxDistance;
+    qreal centerScale = 1.0 - 0.9 * d->screenieModel.getDistance() / ScreenieModelInterface::MaxDistance;
     scale = QTransform().scale(centerScale, centerScale);
 
     QPixmap pixmap = this->pixmap();
     qreal dx = pixmap.width() / 2.0;
     qreal dy;
-    if (m_screenieModel.isReflectionEnabled()) {
+    if (d->screenieModel.isReflectionEnabled()) {
         dy =  pixmap.height() / 4.0;
     } else {
         dy = pixmap.height() / 2.0;
     }
     transform.translate(dx, dy);
-    transform.rotate(m_screenieModel.getRotation(), Qt::YAxis);
+    transform.rotate(d->screenieModel.getRotation(), Qt::YAxis);
     translateBack.translate(-dx, -dy);
     transform = translateBack * scale * transform;
     setTransform(transform, false);
 }
 
+void ScreeniePixmapItem::updateItem()
+{
+    update();
+}
+
 void ScreeniePixmapItem::updatePosition()
 {
     // see comment in #transformPixmap
-    if (!m_ignoreUpdates) {
-        setPos(m_screenieModel.getPosition());
+    if (!d->ignoreUpdates) {
+        setPos(d->screenieModel.getPosition());
     }
-    m_ignoreUpdates = false;
+    d->ignoreUpdates = false;
 }
 
 void ScreeniePixmapItem::updateSelection()
 {
     // see comment in #transformPixmap
-    if (!m_ignoreUpdates) {
-        setSelected(m_screenieModel.isSelected());
+    if (!d->ignoreUpdates) {
+        setSelected(d->screenieModel.isSelected());
     }
-    m_ignoreUpdates = false;
+    d->ignoreUpdates = false;
+}
+
+void ScreeniePixmapItem::handlePropertyDialogDestroyed(){
+    d->propertyDialog = 0;
 }

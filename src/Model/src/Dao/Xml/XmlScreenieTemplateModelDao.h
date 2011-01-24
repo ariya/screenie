@@ -26,6 +26,7 @@
 
 class QXmlStreamWriter;
 class QXmlStreamReader;
+class QIODevice;
 
 #include "../ScreenieTemplateModelDao.h"
 #include "AbstractXmlScreenieModelDao.h"
@@ -40,8 +41,9 @@ class XmlScreenieTemplateModelDaoPrivate;
 class XmlScreenieTemplateModelDao : public AbstractXmlScreenieModelDao, public ScreenieTemplateModelDao
 {
 public:
-    explicit XmlScreenieTemplateModelDao(QXmlStreamWriter *xmlStreamWriter);
-    explicit XmlScreenieTemplateModelDao(QXmlStreamReader *xmlStreamReader);
+    explicit XmlScreenieTemplateModelDao(QXmlStreamWriter &xmlStreamWriter);
+    explicit XmlScreenieTemplateModelDao(QXmlStreamReader &xmlStreamReader);
+    explicit XmlScreenieTemplateModelDao(QIODevice &device);
     virtual ~XmlScreenieTemplateModelDao();
 
     virtual bool write(const ScreenieTemplateModel &screenieTemplateModel);

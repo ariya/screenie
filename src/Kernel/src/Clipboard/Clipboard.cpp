@@ -30,6 +30,8 @@
 
 #include "../../../Model/src/ScreenieScene.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../../../Model/src/Dao/ScreenieSceneSerializer.h"
+#include "../../../Model/src/Dao/Xml/XmlScreenieSceneSerializer.h"
 #include "../ExportImage.h"
 #include "../ScreenieControl.h"
 #include "../ScreenieGraphicsScene.h"
@@ -76,49 +78,16 @@ bool Clipboard::hasData() const
 
 void Clipboard::cut()
 {
-    QList<const ScreenieModelInterface *> copies;
-    foreach (ScreenieModelInterface *screenieModel, d->screenieControl.getScreenieScene().getSelectedModels()) {
-        ScreenieModelInterface *copy = screenieModel->copy();
-        d->screenieControl.getScreenieScene().removeModel(screenieModel);
-        copies.append(copy);
-    }
-
-    if (copies.count() > 0) {
-        QClipboard *clipboard = QApplication::clipboard();
-        ScreenieMimeData *screenieMimeData = new ScreenieMimeData(copies);
-        clipboard->setMimeData(screenieMimeData);
-    }
+    storeMimeData();
+    QList<ScreenieModelInterface *> selectedItems = d->screenieControl.getScreenieScene().getSelectedModels();
+    foreach (ScreenieModelInterface *selectedItem, selectedItems) {
+        d->screenieControl.getScreenieScene().removeModel(selectedItem);
+    }    
 }
 
 void Clipboard::copy()
 {
-    QList<const ScreenieModelInterface *> copies;
-    foreach (ScreenieModelInterface *screenieModel, d->screenieControl.getScreenieScene().getSelectedModels()) {
-        ScreenieModelInterface *copy = screenieModel->copy();
-        copies.append(copy);
-    }
-
-    if (copies.count() > 0) {
-        QClipboard *clipboard = QApplication::clipboard();
-        ScreenieMimeData *screenieMimeData = new ScreenieMimeData(copies);
-
-        // Image data
-        QImage image = d->exportImage.exportImage(ExportImage::Selected);
-
-        /*!\todo Make copy/paste into Gimp work. And what about alpha channel support?
-                 E.g. copy/past from OpenOffice Draw into Gimp works. But nowhere (on Windows so far)
-                 I have seen proper alpha support, always the background of the originating application is set */
-
-//        QByteArray data;
-//        QBuffer buffer(&data);
-//        buffer.open(QIODevice::WriteOnly);
-//        image.save(&buffer, "PNG");
-//        buffer.close();
-//        screenieMimeData->setData("application/x-qt-windows-mime/png", data);
-
-        screenieMimeData->setImageData(image);
-        clipboard->setMimeData(screenieMimeData);
-    }
+    storeMimeData();
 }
 
 void Clipboard::paste()
@@ -132,23 +101,37 @@ void Clipboard::paste()
 #endif
 
     if (MimeHelper::accept(mimeData, MimeHelper::Relaxed)) {
+        // in order of preference
         if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
+            // inside the same application instance
             const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);
             const QList<const ScreenieModelInterface *> copies = screenieMimeData->getScreenieModels();
             foreach (const ScreenieModelInterface *clipboardModel, copies) {
                 ScreenieModelInterface *copy = clipboardModel->copy();
                 d->screenieControl.getScreenieScene().addModel(copy);
             }
+        } else if (mimeData->hasFormat(MimeHelper::ScreenieMimeType)) {
+            // across application instance boundaries
+            ScreenieSceneSerializer *screenieSceneSerializer = new XmlScreenieSceneSerializer();
+            QByteArray data = mimeData->data(MimeHelper::ScreenieMimeType);
+            ScreenieScene *clipboardScreenieScene = screenieSceneSerializer->deserialize(data);
+            if (clipboardScreenieScene != 0) {
+                const QList<ScreenieModelInterface *> copies = clipboardScreenieScene->getModels();
+                foreach (const ScreenieModelInterface *clipboardModel, copies) {
+                    ScreenieModelInterface *copy = clipboardModel->copy();
+                    d->screenieControl.getScreenieScene().addModel(copy);
+                }
+                delete clipboardScreenieScene;
+            }
         } else if (mimeData->hasImage()) {
-            QPixmap pixmap = qvariant_cast<QPixmap>(mimeData->imageData());
-            d->screenieControl.addImage(pixmap);
+            // from different image application
+            QImage image = qvariant_cast<QImage>(mimeData->imageData());
+            d->screenieControl.addImage(image);
         } else if (mimeData->hasUrls()) {
+            // from different file application
             QList<QUrl> urls = mimeData->urls();
             foreach(QUrl url, urls) {
                 QString filePath = url.toLocalFile();
-#ifdef DEBUG
-                qDebug("Clipboard::paste: filepath: %s", qPrintable(filePath));
-#endif
                 if (!filePath.isNull()) {
                     d->screenieControl.addImage(filePath);
                 }
@@ -164,6 +147,29 @@ void Clipboard::frenchConnection()
     QClipboard *clipboard = QApplication::clipboard();
     connect(clipboard, SIGNAL(dataChanged()),
             this, SIGNAL(dataChanged()));
+}
+
+void Clipboard::storeMimeData()
+{
+    QList<const ScreenieModelInterface *> copies;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieControl.getScreenieScene().getSelectedModels()) {
+        ScreenieModelInterface *copy = screenieModel->copy();
+        copies.append(copy);
+    }
+    if (copies.count() > 0) {
+        QClipboard *clipboard = QApplication::clipboard();
+        ScreenieMimeData *screenieMimeData = new ScreenieMimeData(copies);
+        // Image data
+        QImage image = d->exportImage.exportImage(ExportImage::Selected);
+        screenieMimeData->setImageData(image);
+        ScreenieSceneSerializer *screenieSceneSerializer = new XmlScreenieSceneSerializer();
+        // Serialized XML data
+        QByteArray data = screenieSceneSerializer->serialize(d->screenieControl.getScreenieScene(), ScreenieSceneSerializer::SelectedItems);
+        screenieMimeData->setData(MimeHelper::ScreenieMimeType, data);
+        screenieMimeData->setData(MimeHelper::XmlMimeType, data);
+        screenieMimeData->setData(MimeHelper::TextMimeType, data);
+        clipboard->setMimeData(screenieMimeData);
+    }
 }
 
 

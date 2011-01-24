@@ -19,10 +19,13 @@
  */
 
 #include <QtCore/QSize>
+#include <QtCore/QSize>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QSettings>
 #include <QtCore/QDir>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QMainWindow>
 
 #include "Version.h"
 #include "Settings.h"
@@ -33,15 +36,27 @@ public:
     static Settings *instance;
 
     static const QSize DefaultMaximumImageSize;
+    static const QSize DefaultTemplateSize;
     static const QString DefaultLastImageDirectoryPath;
     static const QString DefaultLastExportDirectoryPath;
     static const QString DefaultLastDocumentDirectoryPath;
+    static const qreal DefaultRotationGestureSensitivity;
+    static const qreal DefaultDistanceGestureSensitivity;
+    static const int DefaultMaxRecentFiles;
+    static const bool DefaultFullScreen;
+    static const QPoint DefaultMainWindowPosition;
+    static const QSize DefaultMainWindowSize;
 
+    Version version;
     QSize maximumImageSize;
+    QSize templateSize;
     QString lastImageDirectoryPath;
     QString lastExportDirectoryPath;
     QString lastDocumentFilePath;
-    Version version;
+    qreal rotationGestureSensitivity;
+    qreal distanceGestureSensitivity;
+    int maxRecentFiles;
+    QStringList recentFiles;
 
     QSettings *settings;
 
@@ -62,10 +77,18 @@ public:
 
 Settings *SettingsPrivate::instance = 0;
 
-const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(640, 640);
-const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+const QSize SettingsPrivate::DefaultMaximumImageSize = QSize(1024, 1024);
+const QSize SettingsPrivate::DefaultTemplateSize = QSize(400, 300);
+// workaround for http://bugreports.qt.nokia.com/browse/QTBUG-3239: use fromNativeSeparators
+const QString SettingsPrivate::DefaultLastImageDirectoryPath = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::PicturesLocation));
 const QString SettingsPrivate::DefaultLastExportDirectoryPath = SettingsPrivate::DefaultLastImageDirectoryPath;
-const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
+const qreal SettingsPrivate::DefaultRotationGestureSensitivity = 2.0; // these values work well on a MacBook Pro ;)
+const qreal SettingsPrivate::DefaultDistanceGestureSensitivity = 10.0;
+const int SettingsPrivate::DefaultMaxRecentFiles = 8;
+const bool SettingsPrivate::DefaultFullScreen = false;
+const QPoint SettingsPrivate::DefaultMainWindowPosition = QPoint();
+const QSize SettingsPrivate::DefaultMainWindowSize = QSize(800, 600);
 
 // public
 
@@ -92,6 +115,18 @@ void Settings::setMaximumImageSize(const QSize &maximumImageSize)
 {
     if (d->maximumImageSize != maximumImageSize) {
         d->maximumImageSize = maximumImageSize;
+        emit changed();
+    }
+}
+
+const QSize &Settings::getTemplateSize() const {
+    return d->templateSize;
+}
+
+void Settings::setTemplateSize(const QSize &templateSize)
+{
+    if (d->templateSize != templateSize) {
+        d->templateSize = templateSize;
         emit changed();
     }
 }
@@ -138,15 +173,130 @@ void Settings::setLastDocumentDirectoryPath(const QString &lastDocumentFilePath)
     }
 }
 
+qreal Settings::getRotationGestureSensitivity() const
+{
+   return d->rotationGestureSensitivity;
+}
+
+void Settings::setRotationGestureSensitivity(qreal rotationGestureSensitivity)
+{
+    if (d->rotationGestureSensitivity != rotationGestureSensitivity) {
+        d->rotationGestureSensitivity = rotationGestureSensitivity;
+        emit changed();
+    }
+}
+
+qreal Settings::getDistanceGestureSensitivity() const
+{
+   return d->distanceGestureSensitivity;
+}
+
+void Settings::setDistanceGestureSensitivity(qreal distanceGestureSensitivity)
+{
+    if (d->distanceGestureSensitivity != distanceGestureSensitivity) {
+        d->distanceGestureSensitivity = distanceGestureSensitivity;
+        emit changed();
+    }
+}
+
+int Settings::getMaxRecentFiles() const {
+    return d->maxRecentFiles;
+}
+
+void Settings::setMaxRecentFiles(int maxRecentFiles)
+{
+    if (d->maxRecentFiles != maxRecentFiles) {
+        if (d->maxRecentFiles > maxRecentFiles) {
+            while (d->recentFiles.count() > maxRecentFiles) {
+                d->recentFiles.removeLast();
+            }
+        }
+        d->maxRecentFiles = maxRecentFiles;
+        emit changed();
+    }
+}
+
+void Settings::setRecentFiles(const QStringList &recentFiles) {
+    if (d->recentFiles != recentFiles) {
+        d->recentFiles = recentFiles;
+        emit changed();
+    }
+}
+
+void Settings::addRecentFile(const QString &filePath)
+{
+    if (d->recentFiles.contains(filePath) == false) {
+        d->recentFiles.prepend(filePath);
+        if (d->recentFiles.count() > d->maxRecentFiles) {
+            d->recentFiles.removeLast();
+        }
+        emit changed();
+    }
+}
+
+void Settings::removeRecentFile(const QString &filePath)
+{
+    int index = d->recentFiles.indexOf(filePath);
+    if (index != -1) {
+        d->recentFiles.removeAt(index);
+        emit changed();
+    }
+}
+
+QStringList Settings::getRecentFiles() const
+{
+    return d->recentFiles;
+}
+
+Settings::WindowGeometry Settings::getWindowGeometry() const
+{
+    WindowGeometry result;
+    d->settings->beginGroup("UI/MainWindow");
+    {
+        result.fullScreen = d->settings->value("FullScreen", SettingsPrivate::DefaultFullScreen).toBool();
+        result.position = d->settings->value("Position", SettingsPrivate::DefaultMainWindowPosition).toPoint();
+        result.size = d->settings->value("Size", SettingsPrivate::DefaultMainWindowSize).toSize();
+    }
+    d->settings->endGroup();
+    return result;
+}
+
+void Settings::setWindowGeometry(const WindowGeometry windowGeometry)
+{
+    d->settings->beginGroup("UI/MainWindow");
+    {
+        d->settings->setValue("FullScreen", windowGeometry.fullScreen);
+        d->settings->setValue("Position", windowGeometry.position);
+        d->settings->setValue("Size", windowGeometry.size);
+    }
+    d->settings->endGroup();
+}
+
 // public slots
 
 void Settings::store()
 {
     d->settings->setValue("Version", d->version.toString());
     d->settings->setValue("Scene/MaximumImageSize", d->maximumImageSize);
-    d->settings->setValue("Paths/LastImageDirectoryPath", d->lastImageDirectoryPath);
-    d->settings->setValue("Paths/LastExportDirectoryPath", d->lastExportDirectoryPath);
-    d->settings->setValue("Paths/LastDocumentDirectoryPath", d->lastDocumentFilePath);
+    d->settings->setValue("Scene/TemplateSize", d->templateSize);
+    d->settings->beginGroup("Paths");
+    {
+        d->settings->setValue("LastImageDirectoryPath", d->lastImageDirectoryPath);
+        d->settings->setValue("LastExportDirectoryPath", d->lastExportDirectoryPath);
+        d->settings->setValue("LastDocumentDirectoryPath", d->lastDocumentFilePath);
+        d->settings->beginGroup("Recent");
+        {
+            d->settings->setValue("MaxRecentFiles", d->maxRecentFiles);
+            d->settings->setValue("RecentFiles", d->recentFiles);
+        }
+    }
+    d->settings->endGroup();
+    d->settings->beginGroup("UI/Gestures");
+    {
+        d->settings->setValue("RotationSensitivity", d->rotationGestureSensitivity);
+        d->settings->setValue("DistanceSensitivity", d->distanceGestureSensitivity);
+    }
+    d->settings->endGroup();
 }
 
 void Settings::restore()
@@ -157,15 +307,32 @@ void Settings::restore()
     Version settingsVersion(version);
     if (settingsVersion < appVersion) {
 #ifdef DEBUG
-        qDebug("Settings::restore: app version: %s, settings version: %s, conversion necessary!",
+        qDebug("Settings::restore: app version: %s, settings version: %s, conversion might be necessary!",
                qPrintable(appVersion.toString()), qPrintable(settingsVersion.toString()));
         /*!\todo Settings conversion as necessary */
 #endif
     }
-    d->maximumImageSize = d->settings->value("Scene/maximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
-    d->lastImageDirectoryPath = d->settings->value("Paths/LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
-    d->lastExportDirectoryPath = d->settings->value("Paths/LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
-    d->lastDocumentFilePath = d->settings->value("Paths/LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
+    d->maximumImageSize = d->settings->value("Scene/MaximumImageSize", SettingsPrivate::DefaultMaximumImageSize).toSize();
+    d->templateSize = d->settings->value("Scene/TemplateSize", SettingsPrivate::DefaultTemplateSize).toSize();
+    d->settings->beginGroup("Paths");
+    {
+        d->lastImageDirectoryPath = d->settings->value("LastImageDirectoryPath", SettingsPrivate::DefaultLastImageDirectoryPath).toString();
+        d->lastExportDirectoryPath = d->settings->value("LastExportDirectoryPath", SettingsPrivate::DefaultLastExportDirectoryPath).toString();
+        d->lastDocumentFilePath = d->settings->value("LastDocumentDirectoryPath", SettingsPrivate::DefaultLastDocumentDirectoryPath).toString();
+        d->settings->beginGroup("Recent");
+        {
+            d->maxRecentFiles = d->settings->value("MaxRecentFiles", SettingsPrivate::DefaultMaxRecentFiles).toInt();
+            d->recentFiles = d->settings->value("RecentFiles", QStringList()).toStringList();
+        }
+        d->settings->endGroup();
+    }
+    d->settings->endGroup();
+    d->settings->beginGroup("UI/Gestures");
+    {
+        d->rotationGestureSensitivity = d->settings->value("RotationSensitivity", SettingsPrivate::DefaultRotationGestureSensitivity).toReal();
+        d->distanceGestureSensitivity = d->settings->value("DistanceSensitivity", SettingsPrivate::DefaultDistanceGestureSensitivity).toReal();
+    }
+    d->settings->endGroup();
 }
 
 // protected

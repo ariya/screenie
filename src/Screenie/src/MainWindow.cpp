@@ -20,8 +20,12 @@
 
 #include <QtCore/QString>
 #include <QtCore/QPointF>
+#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QList>
 #include <QtGui/QMainWindow>
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
 #include <QtGui/QGraphicsScene>
@@ -29,6 +33,8 @@
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QFileDialog>
 #include <QtGui/QSlider>
+#include <QtGui/QSpinBox>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMessageBox>
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
@@ -38,9 +44,10 @@
 
 #include "../../Utils/src/Settings.h"
 #include "../../Utils/src/Version.h"
+#include "../../Utils/src/FileUtils.h"
 #include "../../Model/src/ScreenieScene.h"
 #include "../../Model/src/ScreenieModelInterface.h"
-#include "../../Model/src/ScreenieFilePathModel.h"
+#include "../../Model/src/ScreenieTemplateModel.h"
 #include "../../Model/src/Dao/ScreenieSceneDao.h"
 #include "../../Model/src/Dao/Xml/XmlScreenieSceneDao.h"
 #include "../../Kernel/src/ExportImage.h"
@@ -49,10 +56,10 @@
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "../../Kernel/src/DocumentManager.h"
+#include "../../Kernel/src/PropertyDialogFactory.h"
+#include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-
-#include "../../Kernel/src/ScreeniePixmapItem.h"
 
 // public
 
@@ -62,11 +69,16 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ignoreUpdateSignals(false)
 {
     ui->setupUi(this);
+
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
     setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
-    /*!\todo Move shortcut assignment to separate class, make use of "standard platform shortcuts",
-             as provided by Qt: http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
+    /*!\todo Move shortcut assignment to separate class, see http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
 #ifdef Q_OS_MAC
     // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
     // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
@@ -75,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Note: by default on Mac Qt swaps CTRL and META
     ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 #endif
+
     QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
     connect(shortcut, SIGNAL(activated()),
             ui->deleteAction, SIGNAL(triggered()));
@@ -96,7 +109,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initializeUi();
     updateUi();
-    setUnifiedTitleAndToolBarOnMac(true);
+    setUnifiedTitleAndToolBarOnMac(true);    
+    restoreWindowGeometry();
     frenchConnection();
 }
 
@@ -109,6 +123,23 @@ MainWindow::~MainWindow()
     // destroy singletons
     Settings::destroyInstance();
     DocumentManager::destroyInstance();
+    PropertyDialogFactory::destroyInstance();
+}
+
+bool MainWindow::read(const QString &filePath)
+{
+    bool result;
+    QFile file(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
+    ScreenieScene *screenieScene = screenieSceneDao->read();
+    if (screenieScene != 0) {
+        m_documentFilePath = filePath;
+        newScene(*screenieScene);
+        result = true;
+    } else {
+        result = false;
+    }
+    return result;
 }
 
 // protected
@@ -116,6 +147,11 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (proceedWithModifiedScene()) {
+        Settings::WindowGeometry windowGeometry;
+        windowGeometry.fullScreen = this->isFullScreen();
+        windowGeometry.position = this->pos();
+        windowGeometry.size = this->size();
+        Settings::getInstance().setWindowGeometry(windowGeometry);
         event->accept();
     } else {
         event->ignore();
@@ -132,6 +168,10 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
     connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
+
+    // recent files
+    connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
+            this, SLOT(handleRecentFile(const QString &)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -140,29 +180,24 @@ void MainWindow::newScene(ScreenieScene &screenieScene)
     updateTitle();
 }
 
-bool MainWindow::read(const QString &filePath)
+bool MainWindow::writeScene(const QString &filePath)
 {
     bool result;
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    ScreenieScene *screenieScene = screenieSceneDao->read();
-    if (screenieScene != 0) {
-        newScene(*screenieScene);
-        result = true;
-    } else {
-        result = false;
+    QFile file(filePath);
+    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(file);
+    result = screenieSceneDao->write(*m_screenieScene);
+    if (result) {
+        m_screenieScene->setModified(false);
+        m_documentFilePath = filePath;
+        updateTitle();
     }
     return result;
 }
 
-bool MainWindow::write(const QString &filePath)
+bool MainWindow::writeTemplate(const QString &filePath)
 {
-    bool result;
-    ScreenieSceneDao *screenieSceneDao = new XmlScreenieSceneDao(filePath);
-    result = screenieSceneDao->write(*m_screenieScene);
-    if (result) {
-        updateTitle();
-    }
-    return result;
+    m_screenieControl->convertItemsToTemplate(*m_screenieScene);
+    return writeScene(filePath);
 }
 
 void MainWindow::updateTransformationUi()
@@ -223,6 +258,7 @@ void MainWindow::updateColorUi()
     ui->backgroundColorGroupBox->setChecked(m_screenieScene->isBackgroundEnabled());
     ui->backgroundColorGroupBox->blockSignals(false);
     QColor backgroundColor = m_screenieScene->getBackgroundColor();
+    // sliders
     ui->redSlider->blockSignals(true);
     ui->redSlider->setValue(backgroundColor.red());
     ui->redSlider->blockSignals(false);
@@ -232,6 +268,18 @@ void MainWindow::updateColorUi()
     ui->blueSlider->blockSignals(true);
     ui->blueSlider->setValue(backgroundColor.blue());
     ui->blueSlider->blockSignals(false);
+    // spinboxes
+    ui->redSpinBox->blockSignals(true);
+    ui->redSpinBox->setValue(backgroundColor.red());
+    ui->redSpinBox->blockSignals(false);
+    ui->greenSpinBox->blockSignals(true);
+    ui->greenSpinBox->setValue(backgroundColor.green());
+    ui->greenSpinBox->blockSignals(false);
+    ui->blueSpinBox->blockSignals(true);
+    ui->blueSpinBox->setValue(backgroundColor.blue());
+    ui->blueSpinBox->blockSignals(false);
+    // html colour (without # prepended)
+    ui->htmlBGColorLineEdit->setText(backgroundColor.name().right(6));
 }
 
 void MainWindow::updateEditActions()
@@ -320,6 +368,42 @@ bool MainWindow::proceedWithModifiedScene()
     return result;
 }
 
+void MainWindow::showFullScreen()
+{
+    /*!\todo Settings which control what becomes invisible in fullscreen mode */
+    ui->toolBar->setVisible(false);
+    ui->sidePanel->setVisible(false);
+    // Note: Qt crashes when we don't disable the unified toolbar before going
+    // fullscreen (when we switch back to normal view, that is)!
+    // But since for now we hide it anyway that does not make any visible difference.
+    // The Qt documentation recommends anyway to do so.
+    // Also refer to: http://bugreports.qt.nokia.com/browse/QTBUG-16274
+    setUnifiedTitleAndToolBarOnMac(false);
+    QMainWindow::showFullScreen();
+}
+
+void MainWindow::showNormal()
+{
+    QMainWindow::showNormal();
+    ui->toolBar->setVisible(true);
+    ui->sidePanel->setVisible(true);
+    setUnifiedTitleAndToolBarOnMac(true);
+}
+
+void MainWindow::restoreWindowGeometry()
+{
+    Settings::WindowGeometry windowGeometry = Settings::getInstance().getWindowGeometry();
+    if (windowGeometry.fullScreen) {
+        showFullScreen();
+    } else {
+        showNormal();
+        if (!windowGeometry.position.isNull()) {
+            move(windowGeometry.position);
+        }
+        resize(windowGeometry.size);
+    }
+}
+
 // private slots
 
 void MainWindow::on_newAction_triggered()
@@ -336,13 +420,22 @@ void MainWindow::on_openAction_triggered()
     if (proceedWithModifiedScene()) {
         Settings &settings = Settings::getInstance();
         QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, tr("*.xsc"));
+        QString allFilter = tr("Screenie Scenes (*.%1 *.%2)", "Open dialog filter")
+                            .arg(FileUtils::SceneExtension)
+                            .arg(FileUtils::TemplateExtension);
+        QString sceneFilter = tr("Screenie Scene (*.%1)", "Open dialog filter")
+                              .arg(FileUtils::SceneExtension);
+        QString templateFilter = tr("Screenie Template (*.%1)", "Open dialog filter")
+                                 .arg(FileUtils::TemplateExtension);
+        QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
+        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentFilePath, filter);
         if (!filePath.isNull()) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
             bool ok = read(filePath);
             if (ok) {
                 lastDocumentFilePath = QFileInfo(filePath).absolutePath();
                 settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-                m_documentFilePath = filePath;
+                settings.addRecentFile(filePath);
             }
 #ifdef DEBUG
             qDebug("MainWindow::on_openAction_triggered: ok: %d", ok);
@@ -353,8 +446,10 @@ void MainWindow::on_openAction_triggered()
 
 void MainWindow::on_saveAction_triggered()
 {
-    if (!m_documentFilePath.isNull()) {
-        bool ok = write(m_documentFilePath);
+    // save with given 'm_documentFilePath', if scene is not a template or if so, has only template items
+    if (!m_documentFilePath.isNull() && (!m_screenieScene->isTemplate() || m_screenieScene->hasTemplatesExclusively())) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        bool ok = writeScene(m_documentFilePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
 #endif
@@ -367,16 +462,36 @@ void MainWindow::on_saveAsAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastDocumentFilePath = settings.getLastDocumentFilePath();
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, tr("*.xsc"));
+    QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
+                          .arg(FileUtils::SceneExtension);
+    QString templateFilter = tr("Screenie Template (*.%1)", "Save As dialog filter")
+                             .arg(FileUtils::TemplateExtension);
+    QString filter = sceneFilter + ";;" + templateFilter;
+    QString selectedFilter;
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save As"), lastDocumentFilePath, filter, &selectedFilter);
+    bool ok = false;
     if (!filePath.isNull()) {
-        bool ok = write(filePath);
+        if (selectedFilter == sceneFilter) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(false);
+            ok = writeScene(filePath);
+        } else if (selectedFilter == templateFilter) {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            m_screenieScene->setTemplate(true);
+            ok = writeTemplate(filePath);
+        }
 #ifdef DEBUG
-        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d", ok);
+        else {
+            qWarning("MainWindow::on_saveAsAction_triggered: UNSUPPORTED FILTER: %s", qPrintable(selectedFilter));
+        }
+#endif
+#ifdef DEBUG
+        qDebug("MainWindow::on_saveAsAction_triggered: ok: %d, selectedFilter: %s", ok, qPrintable(selectedFilter));
 #endif
         if (ok) {
             lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             settings.setLastDocumentDirectoryPath(lastDocumentFilePath);
-            m_documentFilePath = filePath;
+            settings.addRecentFile(filePath);
         }
     }
 }
@@ -389,6 +504,7 @@ void MainWindow::on_exportAction_triggered()
     QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
+        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = exportImage.exportImage(filePath);
         if (ok) {
             lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
@@ -426,10 +542,12 @@ void MainWindow::on_addImageAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastImageDirectoryPath = settings.getLastImageDirectoryPath();
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Add Image"), lastImageDirectoryPath);
-    if (!filePath.isNull()) {
-        m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
-        lastImageDirectoryPath = QFileInfo(filePath).absolutePath();
+    QStringList filePaths = QFileDialog::getOpenFileNames(this, tr("Add Image"), lastImageDirectoryPath);
+    if (filePaths.count() > 0) {
+        foreach(QString filePath, filePaths) {
+            m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));
+        }
+        lastImageDirectoryPath = QFileInfo(filePaths.last()).absolutePath();
         settings.setLastImageDirectoryPath(lastImageDirectoryPath);
     }
 }
@@ -437,22 +555,9 @@ void MainWindow::on_addImageAction_triggered()
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
     if (!isFullScreen()) {
-        /*!\todo Settings which control what becomes invisible in fullscreen mode */
-        ui->toolBar->setVisible(false);
-        ui->sidePanel->setVisible(false);
-        ui->statusbar->setVisible(false);
-        // Note: Qt crashes when we don't disable the unified toolbar before going
-        // fullscreen (when we switch back to normal view, that is)!
-        // But since for now we hide it anyway that does not make any visible difference.
-        // The Qt documentation recommends anyway to do so.
-        setUnifiedTitleAndToolBarOnMac(false);
         showFullScreen();
     } else {
         showNormal();
-        ui->toolBar->setVisible(true);
-        ui->sidePanel->setVisible(true);
-        ui->statusbar->setVisible(true);
-        setUnifiedTitleAndToolBarOnMac(true);
     }
 }
 
@@ -508,6 +613,7 @@ void MainWindow::on_redSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setRedBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
 }
 
 void MainWindow::on_greenSlider_valueChanged(int value)
@@ -515,6 +621,7 @@ void MainWindow::on_greenSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setGreenBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
 }
 
 void MainWindow::on_blueSlider_valueChanged(int value)
@@ -522,6 +629,48 @@ void MainWindow::on_blueSlider_valueChanged(int value)
     m_ignoreUpdateSignals = true;
     m_screenieControl->setBlueBackgroundComponent(value);
     m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+
+void MainWindow::on_redSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setRedBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_greenSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setGreenBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_blueSpinBox_valueChanged(int value)
+{
+    m_ignoreUpdateSignals = true;
+    m_screenieControl->setBlueBackgroundComponent(value);
+    m_ignoreUpdateSignals = false;
+    updateColorUi();
+}
+
+void MainWindow::on_htmlBGColorLineEdit_editingFinished()
+{
+    QString htmlNotation = QString("#") + ui->htmlBGColorLineEdit->text();
+    QColor color(htmlNotation);
+    qDebug("Foreground role: %d", ui->htmlBGColorLineEdit->foregroundRole());
+    QPalette palette;
+    if (color.isValid()) {
+        m_screenieControl->setBackgroundColor(color);
+        palette.setColor(ui->htmlBGColorLineEdit->foregroundRole(), Qt::black);
+
+    } else {
+        palette.setColor(ui->htmlBGColorLineEdit->foregroundRole(), Qt::red);
+    }
+    ui->htmlBGColorLineEdit->setPalette(palette);
 }
 
 void MainWindow::on_aboutQtAction_triggered() {
@@ -550,5 +699,11 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
+void  MainWindow::handleRecentFile(const QString &filePath)
+{
+    if (proceedWithModifiedScene()) {
+        read(filePath);
+    }
+}
 
 

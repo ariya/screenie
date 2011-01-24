@@ -31,13 +31,15 @@ public:
     ScreenieScenePrivate()
         : backgroundEnabled(true),
           backgroundColor(QColor(255, 255, 255)),
-          modified(false)
+          modified(false),
+          isTemplate(false)
     {}
 
     bool backgroundEnabled;
     QColor backgroundColor;
     QList<ScreenieModelInterface *> screenieModels;
     bool modified;
+    bool isTemplate;
 };
 
 // public
@@ -68,6 +70,8 @@ void ScreenieScene::addModel(ScreenieModelInterface *screenieModel)
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(positionChanged()),
             this, SIGNAL(changed()));
+    connect(screenieModel, SIGNAL(rotationChanged()),
+            this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(reflectionChanged()),
             this, SIGNAL(changed()));
     connect(screenieModel, SIGNAL(changed()),
@@ -88,7 +92,7 @@ void ScreenieScene::removeModel(int index)
     ScreenieModelInterface *screenieModel = d->screenieModels.at(index);
     d->screenieModels.removeAt(index);
     emit modelRemoved(*screenieModel);
-    delete screenieModel;    
+    delete screenieModel;
 }
 
 ScreenieModelInterface *ScreenieScene::getModel(int index) const
@@ -103,12 +107,12 @@ ScreenieModelInterface *ScreenieScene::getModel(int index) const
     return result;
 }
 
-const QList<ScreenieModelInterface *> ScreenieScene::getModels() const
+const QList<ScreenieModelInterface *> &ScreenieScene::getModels() const
 {
     return d->screenieModels;
 }
 
-const QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
+QList<ScreenieModelInterface *> ScreenieScene::getSelectedModels() const
 {
     QList<ScreenieModelInterface *> result;
     foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
@@ -160,6 +164,28 @@ bool ScreenieScene::hasTemplates() const
         }
     }
     return result;
+}
+
+bool ScreenieScene::hasTemplatesExclusively() const
+{
+    bool result = true;
+    foreach (ScreenieModelInterface *screenieModel, d->screenieModels) {
+        if (!screenieModel->isTemplate()) {
+            result = false;
+            break;
+        }
+    }
+    return result;
+}
+
+bool ScreenieScene::isTemplate() const
+{
+    return d->isTemplate;
+}
+
+void ScreenieScene::setTemplate(bool enable)
+{
+    d->isTemplate = enable;
 }
 
 bool ScreenieScene::isModified() const

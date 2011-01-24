@@ -1,10 +1,10 @@
 include(../Common.pri)
-include(../Platforms.pri)
 include(../External.pri)
 include(Sources.pri)
 
 TARGET = $${APP_NAME}
 TEMPLATE = app
+
 # OpenGL support later
 # QT += opengl
 
@@ -22,13 +22,21 @@ macx {
     LIBS += -L$${DESTDIR}
 }
 
-LIBS += -lUtils \
-        -lModel \
-        -lResources \
-        -lKernel
+win32 {
+  LIBS += -lUtils$${VERSION_MAJ} \
+          -lModel$${VERSION_MAJ} \
+          -lResources$${VERSION_MAJ} \
+          -lKernel$${VERSION_MAJ}
+} else {
+  LIBS += -lUtils \
+          -lModel \
+          -lResources \
+          -lKernel
+}
 
 macx {
    ICON = res/ApplicationIcon.icns
+   QMAKE_INFO_PLIST = Info.plist
 }
 
 win32 {

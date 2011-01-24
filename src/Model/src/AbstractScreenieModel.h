@@ -22,7 +22,7 @@
 #define ABSTRACTSCREENIEMODEL_H
 
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 class AbstractScreenieModelPrivate;
 
@@ -42,6 +42,8 @@ public:
 
     virtual QPointF getPosition() const;
     virtual void setPosition(QPointF position);
+    virtual void setPositionX(qreal x);
+    virtual void setPositionY(qreal y);
     virtual void translate(qreal dx, qreal dy);
 
     virtual qreal getDistance() const;
@@ -68,7 +70,7 @@ public:
     virtual void convert(ScreenieModelInterface &source);
 
 protected:
-    QPixmap fitToMaximumSize(const QPixmap &pixmap) const;
+    QImage fitToMaximumSize(const QImage &image) const;
 
 private:
     AbstractScreenieModelPrivate *d;

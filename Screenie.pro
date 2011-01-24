@@ -1,3 +1,5 @@
+include(Distribution.pri)
+
 TEMPLATE = subdirs
 SUBDIRS = Utils Resources Model Kernel Screenie
 

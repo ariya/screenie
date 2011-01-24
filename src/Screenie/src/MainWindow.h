@@ -26,6 +26,8 @@
 #include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 
+#include "RecentFiles.h"
+
 class QWidget;
 class QCloseEvent;
 
@@ -43,13 +45,16 @@ namespace Ui {
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
+    bool read(const QString &filePath);
+
 protected:
     void closeEvent(QCloseEvent *event);
+    void showFullScreen();
+    void showNormal();
 
 private:
     Ui::MainWindow *ui;
@@ -59,12 +64,13 @@ private:
     bool m_ignoreUpdateSignals;
     Clipboard *m_clipboard;
     QString m_documentFilePath;
+    RecentFiles m_recentFiles;
 
     void frenchConnection();
 
     void newScene(ScreenieScene &screenieScene);
-    bool read(const QString &filePath);
-    bool write(const QString &filePath);
+    bool writeScene(const QString &filePath);
+    bool writeTemplate(const QString &filePath);
 
     void updateTransformationUi();
     void updateReflectionUi();
@@ -77,6 +83,7 @@ private:
     void updateScene(ScreenieScene &screenieScene);
 
     bool proceedWithModifiedScene();
+    void restoreWindowGeometry();
 
 private slots:
     // File
@@ -105,15 +112,22 @@ private slots:
     void on_reflectionGroupBox_toggled(bool enable);
     void on_reflectionOffsetSlider_valueChanged(int value);
     void on_reflectionOpacitySlider_valueChanged(int value);
+
     void on_backgroundColorGroupBox_toggled(bool enable);
     void on_redSlider_valueChanged(int value);
     void on_greenSlider_valueChanged(int value);
     void on_blueSlider_valueChanged(int value);
+    void on_redSpinBox_valueChanged(int value);
+    void on_greenSpinBox_valueChanged(int value);
+    void on_blueSpinBox_valueChanged(int value);
+    void on_htmlBGColorLineEdit_editingFinished();
 
     void on_aboutQtAction_triggered();
 
     void updateUi();
     void updateDefaultValues();
+    void handleRecentFile(const QString &filePath);
+
 };
 
 #endif // MAINWINDOW_H

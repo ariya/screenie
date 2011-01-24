@@ -20,7 +20,8 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
-#include <QtGui/QPixmap>
+#include <QtCore/QDir>
+#include <QtGui/QImage>
 
 #include "../../Utils/src/SizeFitter.h"
 #include "../../Utils/src/PaintTools.h"
@@ -30,19 +31,22 @@ class ScreenieFilePathModelPrivate
 {
 public:
     ScreenieFilePathModelPrivate(const QString &theFilePath, const SizeFitter *theSizeFitter)
-        : filePath(theFilePath),
-          sizeFitter(theSizeFitter) {}
+        : valid(false),
+          filePath(theFilePath),
+          sizeFitter(theSizeFitter)
+    {}
 
     ScreenieFilePathModelPrivate(const ScreenieFilePathModelPrivate &other)
-        : filePath(other.filePath),
-          pixmap(other.pixmap),
+        : valid(other.valid),
+          filePath(other.filePath),
+          image(other.image),
           sizeFitter(other.sizeFitter)
-    {
-    }
+    {}
 
+    bool valid;
     QString filePath;
-    QPixmap pixmap;
-    const SizeFitter *sizeFitter;
+    QImage image;
+    const SizeFitter *sizeFitter;    
 };
 
 ScreenieFilePathModel::ScreenieFilePathModel(const QString &filePath, const SizeFitter *sizeFitter)
@@ -64,33 +68,35 @@ ScreenieFilePathModel::~ScreenieFilePathModel()
 #endif
 }
 
-const QPixmap &ScreenieFilePathModel::readPixmap() const
+const QImage &ScreenieFilePathModel::readImage() const
 {
-    d->pixmap.load(d->filePath);
-    if (!d->pixmap.isNull()) {
+    d->image.load(d->filePath);
+    if (!d->image.isNull()) {
         if (d->sizeFitter != 0) {
             QSize fittedSize;
-            bool doResize = d->sizeFitter->fit(d->pixmap.size(), fittedSize);
+            bool doResize = d->sizeFitter->fit(d->image.size(), fittedSize);
             if (doResize) {
-                d->pixmap = d->pixmap.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                d->image = d->image.scaled(fittedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             }
         } else {
-            d->pixmap = fitToMaximumSize(d->pixmap);
+            d->image = fitToMaximumSize(d->image);
         }
+        d->valid = true;
     } else {
-        d->pixmap = PaintTools::createDefaultImage();
+        d->image = PaintTools::createDefaultImage();
+        d->valid = false;
     }
-    return d->pixmap;
+    return d->image;
 }
 
 QSize ScreenieFilePathModel::getSize() const
 {
     QSize result;
-    if (!d->pixmap.isNull()) {
-        result = d->pixmap.size();
+    if (!d->image.isNull()) {
+        result = d->image.size();
     } else {
-        /*!\todo Optimisation: use Exiv2 library to quickly read the image size from disk (EXIF data) */
-        result = readPixmap().size();
+        /*!\todo Optimisation: use Exiv2 (or http://www.sentex.net/~mwandel/jhead/) library to quickly read the image size from disk (EXIF data). */
+        result = readImage().size();
     }
     return result;
 }
@@ -106,11 +112,21 @@ bool ScreenieFilePathModel::isTemplate() const
     return false;
 }
 
+QString ScreenieFilePathModel::getOverlayText() const
+{
+    QString result;
+    if (!d->valid) {
+        result = QDir::convertSeparators(d->filePath);
+    }
+    return result;
+}
+
+
 void ScreenieFilePathModel::setFilePath(const QString &filePath)
 {
     if (d->filePath != filePath) {
         d->filePath = filePath;
-        d->pixmap = QPixmap();
+        d->image = QImage();
         emit filePathChanged(filePath);
     }
 }

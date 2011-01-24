@@ -28,6 +28,7 @@ class QGraphicsScene;
 #include "../KernelLib.h"
 
 class ScreenieControl;
+class ScreenieModelInterface;
 class ClipboardPrivate;
 
 /*!
@@ -60,6 +61,7 @@ private:
     ClipboardPrivate *d;
 
     void frenchConnection();
+    void storeMimeData();
 };
 
 #endif // CLIPBOARD_H

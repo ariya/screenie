@@ -23,7 +23,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
-#include <QtGui/QPixmap>
+#include <QtCore/QString>
+#include <QtGui/QImage>
 
 class QString;
 
@@ -43,24 +44,25 @@ class MODEL_API ScreenieFilePathModel : public AbstractScreenieModel
     Q_OBJECT
 public:
     /*!
-     * Creates this ScreenieFilePathModel. Call #readPixmap() after creation.
+     * Creates this ScreenieFilePathModel. Call #readImage() after creation.
      *
      * \param filePath
-     *        the file path to the pixmap to be read
+     *        the file path to the image to be read
      * \param sizeFitter
-     *        if given the pixmap is scaled with the \p sizeFitter; may be 0; ownership
+     *        if given the image is scaled with the \p sizeFitter; may be 0; ownership
      *        remains with the caller
      *
-     * \sa #readPixmap()
+     * \sa #readImage()
      */
     explicit ScreenieFilePathModel(const QString &filePath = QString(), const SizeFitter *sizeFitter = 0);
     explicit ScreenieFilePathModel(const ScreenieFilePathModel &other);
     virtual ~ScreenieFilePathModel();
 
-    virtual const QPixmap &readPixmap() const;
+    virtual const QImage &readImage() const;
     virtual QSize getSize() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
 
     virtual QString getFilePath() const;
     virtual void setFilePath(const QString &filePath);

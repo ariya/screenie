@@ -24,7 +24,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QList>
 #include <QtCore/QPointF>
-#include <QtGui/QPixmap>
+#include <QtCore/QTimer>
+#include <QtGui/QImage>
 #include <QtGui/QGraphicsSceneDragDropEvent>
 #include <QtGui/QDropEvent>
 #include <QtGui/QWidget>
@@ -32,22 +33,37 @@
 #include <QtGui/QPinchGesture>
 #include <QtGui/QGraphicsView>
 
+#include "../../Utils/src/Settings.h"
 #include "Clipboard/MimeHelper.h"
 #include "ScreenieGraphicsScene.h"
+
+class ScreenieGraphicsScenePrivate
+{
+public:
+    ScreenieGraphicsScenePrivate()
+        : itemDragDrop(false)
+    {
+        cursorTimer.setSingleShot(true);
+        cursorTimer.setInterval(1000);
+    }
+
+    bool itemDragDrop;
+    // temporary workaround for http://bugreports.qt.nokia.com/browse/QTBUG-16281
+    QTimer cursorTimer;
+};
 
 // public
 
 ScreenieGraphicsScene::ScreenieGraphicsScene(QObject *parent)
     : QGraphicsScene(parent),
-      m_itemDragDrop(false)
+      d(new ScreenieGraphicsScenePrivate())
 {
-    m_cursorTimer.setSingleShot(true);
-    m_cursorTimer.setInterval(1000);
     frenchConnection();
 }
 
 ScreenieGraphicsScene::~ScreenieGraphicsScene()
 {
+    delete d;
 #ifdef DEBUG
     qDebug("ScreenieGraphicsScene::~QGraphicsScene: called.");
 #endif
@@ -64,25 +80,25 @@ void ScreenieGraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 void ScreenieGraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
     if (this->itemAt(event->scenePos().x(), event->scenePos().y()) == 0) {
-        m_itemDragDrop = false;
+        d->itemDragDrop = false;
     } else {
         QGraphicsScene::dragMoveEvent(event);
-        m_itemDragDrop = true;
+        d->itemDragDrop = true;
     }
 }
 
 void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if (!m_itemDragDrop) {
+    if (!d->itemDragDrop) {
         QList<QUrl> urls = event->mimeData()->urls();
-        QList<QPixmap> pixmaps;
+        QList<QImage> images;
         QStringList filePaths;
 
         // prefer image data over filepaths
         if (event->mimeData()->hasImage()) {
-            QPixmap pixmap;
-            pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
-            pixmaps.append(pixmap);
+            QImage image;
+            image = qvariant_cast<QImage>(event->mimeData()->imageData());
+            images.append(image);
         } else {
             foreach (QUrl url, urls) {
                 /*!\todo Support for "http:// images"? For now we assume the paths can be converted to local paths. */
@@ -92,8 +108,8 @@ void ScreenieGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event)
                 }
             }
         }
-        if (pixmaps.size() > 0) {
-            emit pixmapsDropped(pixmaps, event->scenePos());
+        if (images.size() > 0) {
+            emit imagesDropped(images, event->scenePos());
         }
         if (filePaths.size() > 0) {
             emit filePathsDropped(filePaths, event->scenePos());
@@ -120,20 +136,19 @@ bool ScreenieGraphicsScene::event(QEvent *event)
 
 void ScreenieGraphicsScene::frenchConnection()
 {
-    connect(&m_cursorTimer, SIGNAL(timeout()),
+    connect(&d->cursorTimer, SIGNAL(timeout()),
             this, SLOT(restoreCursor()));
 }
 
 bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 {
-    bool result;
+    bool result = false;
     if (selectedItems().size() > 0) {
         if (QGesture *pan = event->gesture(Qt::PanGesture)) {
             result = panTriggered(static_cast<QPanGesture *>(pan));
-        } else if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
+        }
+        if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
             result = pinchTriggered(static_cast<QPinchGesture *>(pinch));
-        } else {
-            result = false;
         }
     } else {
         result = false;
@@ -145,7 +160,7 @@ bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
 {
     bool result = true;
-    this->updateGestureCursor(gesture, Qt::SizeAllCursor);
+    updateGestureCursor(gesture, Qt::SizeAllCursor);
     QPointF delta = gesture->delta();
     qreal x = delta.x();
     qreal y = delta.y();
@@ -156,20 +171,21 @@ bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
 bool ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
 {
     bool result;
-    /*!\todo Values 2.0 and 10.0 are magic factors - make them configurable (they work well though on a MacBook Pro ;) */
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     if (changeFlags & QPinchGesture::RotationAngleChanged) {
         qreal rotation = gesture->rotationAngle();
         qreal lastRotation = gesture->lastRotationAngle();
         qreal angle = rotation - lastRotation;
-        emit rotate(qRound(angle * 2.0));
+        qreal rotationSensitivity = Settings::getInstance().getRotationGestureSensitivity();
+        emit rotate(qRound(angle * rotationSensitivity));
         result = true;
     } else {
         result = false;
     }
     if (changeFlags & QPinchGesture::ScaleFactorChanged) {
         qreal distance = 1.0 - gesture->scaleFactor();
-        emit addDistance(qRound(distance * 10.0));
+        qreal distanceSensitivity = Settings::getInstance().getDistanceGestureSensitivity();
+        emit addDistance(qRound(distance * distanceSensitivity));
         result = true;
     }
     return result;
@@ -179,14 +195,14 @@ void ScreenieGraphicsScene::updateGestureCursor(const QGesture *gesture, const Q
 {
     QCursor cursor;
     switch (gesture->state()) {
-        case Qt::GestureStarted:
+        case Qt::GestureStarted: // fall-thru intended
         case Qt::GestureUpdated:
             cursor = gestureCursor;
-            m_cursorTimer.start();
+            d->cursorTimer.start();
             break;
         default:
             cursor = Qt::ArrowCursor;
-            m_cursorTimer.stop();
+            d->cursorTimer.stop();
             break;
     }
     updateCursor(cursor);

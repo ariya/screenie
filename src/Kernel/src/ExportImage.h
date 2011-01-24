@@ -29,7 +29,11 @@ class QString;
 #include "KernelLib.h"
 
 class ScreenieScene;
+class ExportImagePrivate;
 
+/*!
+ * Exports the QGraphicsScene by rendering images.
+ */
 class ExportImage
 {
 public:
@@ -39,13 +43,13 @@ public:
     };
 
     KERNEL_API ExportImage(const ScreenieScene &screenieScene, QGraphicsScene &graphicsScene);
+    KERNEL_API ~ExportImage();
 
     KERNEL_API bool exportImage(const QString &filePath, Selection selection = Scene) const;
     KERNEL_API QImage exportImage(Selection selection) const;
 
 private:
-    const ScreenieScene &m_screenieScene;
-    mutable QGraphicsScene &m_graphicsScene;
+    ExportImagePrivate *d;
 };
 
 #endif // EXPORTIMAGE_H

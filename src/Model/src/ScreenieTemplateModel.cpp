@@ -21,8 +21,10 @@
 #include <limits>
 
 #include <QtCore/QSize>
+#include <QtCore/QString>
 
 #include "../../Utils/src/SizeFitter.h"
+#include "../../Utils/src/Settings.h"
 #include "../../Utils/src/PaintTools.h"
 #include "ScreenieTemplateModel.h"
 
@@ -35,15 +37,17 @@ public:
     {
           sizeFitter.setFitMode(SizeFitter::Fit);
           sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, true);
+          sizeFitter.setMaxTargetSize(Settings::getInstance().getMaximumImageSize());
+          sizeFitter.setFitOptionEnabled(SizeFitter::RespectMaxTargetSize, true);
     }
 
     ScreenieTemplateModelPrivate(const ScreenieTemplateModelPrivate &other)
-        : pixmap(other.pixmap),
+        : image(other.image),
           sizeFitter(other.sizeFitter),
           order(other.order)
     {}
 
-    QPixmap pixmap;
+    QImage image;
     SizeFitter sizeFitter;
     int order;
 };
@@ -55,30 +59,48 @@ const int ScreenieTemplateModel::Unordered = std::numeric_limits<int>::max();
 ScreenieTemplateModel::ScreenieTemplateModel()
     : d(new ScreenieTemplateModelPrivate(QSize(640, 640), ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const QSize &size)
     : d(new ScreenieTemplateModelPrivate(size, ScreenieTemplateModel::Unordered))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::ScreenieTemplateModel(const ScreenieTemplateModel &other)
     : AbstractScreenieModel(other),
       d(new ScreenieTemplateModelPrivate(*other.d))
 {
+    frenchConnection();
 }
 
 ScreenieTemplateModel::~ScreenieTemplateModel()
 {
+#ifdef DEBUG
+    qDebug("ScreenieTemplateModel:~ScreenieTemplateModel: called.");
+#endif
     delete d;
 }
 
-const QPixmap &ScreenieTemplateModel::readPixmap() const
+const QImage &ScreenieTemplateModel::readImage() const
 {
-    if (d->pixmap.isNull()) {
-        d->pixmap = PaintTools::createTemplateImage(getSize());
+    if (d->image.isNull()) {
+        d->image = PaintTools::createTemplateImage(getSize());
     }
-    return d->pixmap;
+    return d->image;
+}
+
+QSize ScreenieTemplateModel::getSize() const
+{
+    return d->sizeFitter.getTargetSize();
+}
+
+void ScreenieTemplateModel::convert(ScreenieModelInterface &source)
+{
+    AbstractScreenieModel::convert(source);
+    d->sizeFitter.setTargetSize(source.getSize());
+    d->image = QImage();
 }
 
 ScreenieModelInterface *ScreenieTemplateModel::copy() const
@@ -92,14 +114,36 @@ bool ScreenieTemplateModel::isTemplate() const
     return true;
 }
 
+QString ScreenieTemplateModel::getOverlayText() const
+{
+    QString result = tr("Order: %1").arg(d->order);
+    QString fitMode;
+    switch (d->sizeFitter.getFitMode()) {
+    case SizeFitter::NoFit:
+        fitMode = tr("No Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::Fit:
+        fitMode = tr("Fit", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToWidth:
+        fitMode = tr("Fit To Width", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::FitToHeight:
+        fitMode = tr("Fit To Height", "Size Fitter fit mode option");
+        break;
+    case SizeFitter::ExactFit:
+        fitMode = tr("Exact Fit", "Size Fitter fit mode option");
+        break;
+    default:
+        break;
+    }
+    result.append(QString("\n") + tr("Fit Mode: %1").arg(fitMode));
+    return result;
+}
+
 SizeFitter &ScreenieTemplateModel::getSizeFitter() const
 {
     return d->sizeFitter;
-}
-
-QSize ScreenieTemplateModel::getSize() const
-{
-    return d->sizeFitter.getTargetSize();
 }
 
 int ScreenieTemplateModel::getOrder() const
@@ -120,6 +164,17 @@ void ScreenieTemplateModel::setOrder(int order)
 void ScreenieTemplateModel::frenchConnection()
 {
     connect(&d->sizeFitter, SIGNAL(changed()),
-            this, SIGNAL(changed()));
+            this, SLOT(handleSizeFitterChanged()));
+}
+
+// private slots
+
+void ScreenieTemplateModel::handleSizeFitterChanged()
+{
+    if (d->image.size() != d->sizeFitter.getTargetSize()) {
+        d->image = QImage();
+        emit imageChanged(readImage());
+    }
+    emit changed();
 }
 

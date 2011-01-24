@@ -3,6 +3,16 @@ APP_NAME = Screenie
 LANGUAGE = C++
 CONFIG += qt warn_on thread
 
+# Should match with Utils/src/Version.h
+VERSION=1.0.0
+
+# qmake variable VER_MAJ seems to be empty, so
+# applying the following "hack", inspired by:
+# http://www.qtcentre.org/threads/17984-qmake-how-to-extract-number-from-variable
+VERSIONS = $$split(VERSION, ".")
+VERSION_MAJ = $$member(VERSIONS, 0)
+VERSION_MIN = $$member(VERSIONS, 1)
+
 # On Mac we build 64bit Intel only
 macx {
   CONFIG += x86_64
@@ -23,3 +33,21 @@ CONFIG(debug, debug|release) {
     UI_DIR         = GeneratedFiles/release
     INCLUDEPATH   += GeneratedFiles/release
 }
+
+unix:linux* {
+    QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
+    QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes
+
+    QMAKE_LFLAGS += -Wl,--rpath=\'\$\$ORIGIN\'
+}
+
+win32-g++ {
+    QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
+    QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes
+}
+
+macx {
+    QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
+    QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes
+}
+

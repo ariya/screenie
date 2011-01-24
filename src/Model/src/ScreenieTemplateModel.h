@@ -21,6 +21,9 @@
 #ifndef SCREENIETEMPLATEMODEL_H
 #define SCREENIETEMPLATEMODEL_H
 
+#include <QtCore/QString>
+
+class QImage;
 class QSize;
 
 #include "AbstractScreenieModel.h"
@@ -31,7 +34,7 @@ class SizeFitter;
 class ScreenieTemplateModelPrivate;
 
 /*!
- * The template model acts as a placeholder for the actual pixmap to
+ * The template model acts as a placeholder for the actual image to
  * be added to the ScreenieScene. The templates have an \em order
  * which defines the order in which they are replaced by actual image
  * data. Ordering starts at 0 (highest order) and grows up to n-1,
@@ -58,11 +61,7 @@ public:
     explicit ScreenieTemplateModel(const ScreenieTemplateModel &other);
     virtual ~ScreenieTemplateModel();
 
-    virtual const QPixmap &readPixmap() const;
-    virtual ScreenieModelInterface *copy() const;
-    virtual bool isTemplate() const;
-
-    SizeFitter &getSizeFitter() const;
+    virtual const QImage &readImage() const;
 
     /*!
      * Returns the requested size.
@@ -70,6 +69,12 @@ public:
      * \sa ScreenieTemplateModel(const QSize &)
      */
     virtual QSize getSize() const;
+    virtual void convert(ScreenieModelInterface &source);
+    virtual ScreenieModelInterface *copy() const;
+    virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
+
+    SizeFitter &getSizeFitter() const;
 
     /*!
      * \return the order of this ScreenieTemplateModel.
@@ -81,6 +86,9 @@ private:
     ScreenieTemplateModelPrivate *d;
 
     void frenchConnection();
+
+private slots:
+    void handleSizeFitterChanged();
 };
 
 #endif // SCREENIETEMPLATEMODEL_H

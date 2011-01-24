@@ -1,14 +1,16 @@
 include(../CommonLibrary.pri)
-include(../Platforms.pri)
 include(../External.pri)
 include(Sources.pri)
 
 TEMPLATE = lib
 DEFINES += MODEL_EXPORT
 
-LIBS += -L$${DESTDIR} \
-        -lUtils
+win32 {
+  LIBS += -L$${DESTDIR} \
+          -lUtils$${VERSION_MAJ}
+} else {
+  LIBS += -L$${DESTDIR} \
+          -lUtils
+}
 
-HEADERS +=
 
-SOURCES +=

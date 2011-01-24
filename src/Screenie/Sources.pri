@@ -10,10 +10,13 @@ DEPENDPATH += $$PWD/../Utils/src \
               $$PWD/src
 
 HEADERS += $$PWD/src/Main.h \
-           $$PWD/src/MainWindow.h
+           $$PWD/src/MainWindow.h \
+           $$PWD/src/ScreenieApplication.h \
+           $$PWD/src/RecentFiles.h
 
 SOURCES += $$PWD/src/Main.cpp \
-           $$PWD/src/MainWindow.cpp
+           $$PWD/src/MainWindow.cpp \
+           $$PWD/src/ScreenieApplication.cpp \
+           $$PWD/src/RecentFiles.cpp
 
 FORMS += $$PWD/ui/MainWindow.ui
-

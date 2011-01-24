@@ -21,44 +21,48 @@
 #ifndef XMLSCREENIESCENEDAO_H
 #define XMLSCREENIESCENEDAO_H
 
-class QString;
+#include <QtCore/QByteArray>
+
+class QIODevice;
 
 #include "../../ModelLib.h"
 #include "../ScreenieSceneDao.h"
+#include "../ScreenieSceneSerializer.h"
 
 class ScreenieScene;
 class ScreenieFilePathModel;
-class ScreeniePixmapModel;
+class ScreenieImageModel;
 class ScreenieTemplateModel;
 class XmlScreenieSceneDaoPrivate;
 
 /*!
- * This Data Access Object (DAO) implements an XML persistence and
+ * This Data Access Object (DAO) implements an XML persistence. It
  * is the public class to use for reading and writing
- * ScreenieScene objects from/to a given file path.
+ * ScreenieScene objects from/to a given device.
  */
 class XmlScreenieSceneDao : public ScreenieSceneDao
 {
 public:
-    /*!\todo Use a QIODevice instead of filePath, so we can also serialise into a QBuffer/QByteArray for copy/paste across applications */
-    MODEL_API explicit XmlScreenieSceneDao(const QString &filePath);
+    MODEL_API explicit XmlScreenieSceneDao(QIODevice &device);
     MODEL_API virtual ~XmlScreenieSceneDao();
 
-    MODEL_API virtual bool write(ScreenieScene &screenieScene);
+    MODEL_API virtual bool write(const ScreenieScene &screenieScene);
     MODEL_API virtual ScreenieScene *read() const;
+
+    MODEL_API virtual bool write(const ScreenieScene &screenieScene, ScreenieSceneSerializer::Mode mode);
 
 private:
     XmlScreenieSceneDaoPrivate *d;
 
-    bool writeScreenieScene(ScreenieScene &screenieScene);
-    bool writeScreenieModels(const ScreenieScene &screenieScene);
+    bool writeScreenieScene(const ScreenieScene &screenieScene, ScreenieSceneSerializer::Mode mode);
+    bool writeScreenieModels(const ScreenieScene &screenieScene, ScreenieSceneSerializer::Mode mode);
     bool writeFilePathModel(const ScreenieFilePathModel &screenieFilePathModel);
-    bool writePixmapModel(const ScreeniePixmapModel &screeniePixmapModel);
+    bool writePixmapModel(const ScreenieImageModel &screeniePixmapModel);
     bool writeTemplateModel(const ScreenieTemplateModel &screenieTemplateModel);
 
     ScreenieScene *readScreenieScene() const;
     ScreenieFilePathModel *readFilePathModel() const;
-    ScreeniePixmapModel *readPixmapModel() const;
+    ScreenieImageModel *readPixmapModel() const;
     ScreenieTemplateModel *readTemplateModel() const;
 
     void cleanUp() const;

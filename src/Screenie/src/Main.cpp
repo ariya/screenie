@@ -18,14 +18,9 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <QtCore/QTranslator>
-#include <QtCore/QString>
-#include <QtCore/QLocale>
-#include <QtCore/QLibraryInfo>
-#include <QtGui/QApplication>
-#include <QtGui/QIcon>
+#include <QtCore/QtGlobal>
 
-#include "MainWindow.h"
+#include "ScreenieApplication.h"
 
 int main(int argc, char *argv[])
 {
@@ -36,7 +31,6 @@ int main(int argc, char *argv[])
     // Note that the command line argument -graphicssystem still takes precedence (which is good)
 // #if defined Q_OS_MAC || defined Q_OS_LINUX
 #ifdef Q_OS_LINUX
-    /*!\todo File bug report on this in Qt issue tracker */
     // Doh! This uncovers another Qt bug, at least on Mac with Qt 4.7.1
     // (Linux with Qt 4.7.0 seems to work though): the selection borders in the
     // QGraphicsView are not always properly drawn/updated with multiple
@@ -45,6 +39,9 @@ int main(int argc, char *argv[])
     // properply as selected, the 4th no, the 5th yes (again rendering all
     // selected items so far correct)... (note that the model itself is always
     // marked selected properly).
+    // UPDATE: Cannot reproduce the selection problem anymore. However the
+    // widgets are sometimes painted "upside down" on Mac with Raster graphics engine,
+    // see http://bugreports.qt.nokia.com/browse/QTBUG-16590
     //
     // So for now we live with the graphical artifact when rotating images,
     // which is less serious than broken selection.
@@ -52,30 +49,9 @@ int main(int argc, char *argv[])
     // there either, selection is hopefully fine).
     QApplication::setGraphicsSystem("raster");
 #endif
-    QApplication app(argc, argv);
+    ScreenieApplication app(argc, argv);
+    app.show();
 
-#ifdef Q_OS_MAC
-    // Mac apps prefer not to have icons in menus
-    QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
-#endif
-
-    /* Load translation try from /usr/share/screenie, then ./l10n/screenie then ./ */
-    QString locale = QLocale::system().name();
-    QTranslator translator;
-    if (translator.load(QString("screenie_") + locale, "/usr/share/screenie/") == false) {
-      if (translator.load(QString("l10n/screenie_") + locale) == false) {
-        translator.load(QString("screenie_") + locale);
-      }
-    }
-    app.installTranslator(&translator);
-
-    /* Load the system translator to get the Save dialog translated */
-    QTranslator qtTranslator;
-    qtTranslator.load(QString("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
-    MainWindow mainWindow;
-
-    mainWindow.show();
     return app.exec();
 }
 

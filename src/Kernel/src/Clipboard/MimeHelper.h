@@ -21,6 +21,8 @@
 #ifndef MIMEHELPER_H
 #define MIMEHELPER_H
 
+#include <QtCore/QString>
+
 class QMimeData;
 
 /*!
@@ -29,7 +31,20 @@ class QMimeData;
 class MimeHelper
 {
 public:
-    MimeHelper();
+    /*!
+     * The MIME type for the application data.
+     */
+    static const QString ScreenieMimeType;
+
+    /*!
+     * The MIME type for generic XML data: 'text/xml'
+     */
+    static const QString XmlMimeType;
+
+    /*!
+     * The MIME type for plain text: 'text/plain'
+     */
+    static const QString TextMimeType;
 
     /*!
      * The accept mode for mime data which defines when a given
@@ -41,6 +56,8 @@ public:
         Strict, /*!< Every Url must be a valid Url */
         Relaxed /*!< At least one Url must be a valid Url */
     };
+
+    MimeHelper();
 
     /*!
      * Returns whether the \p mimeData should be accepted during a

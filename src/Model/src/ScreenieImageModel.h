@@ -18,12 +18,13 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCREENIEPIXMAPMODEL_H
-#define SCREENIEPIXMAPMODEL_H
+#ifndef SCREENIEIMAGEMODEL_H
+#define SCREENIEIMAGEMODEL_H
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
-#include <QtGui/QPixmap>
+#include <QtCore/QString>
+#include <QtGui/QImage>
 
 #include "AbstractScreenieModel.h"
 #include "ModelLib.h"
@@ -35,33 +36,34 @@ class ScreeniePixmapModelPrivate;
  * we also need to export the QObject::staticMetaObject methods from
  * the QObject base class.
  */
-class MODEL_API ScreeniePixmapModel : public AbstractScreenieModel
+class MODEL_API ScreenieImageModel : public AbstractScreenieModel
 {
     Q_OBJECT
 public:
     /*!
-     * Creates this ScreeniePixmapModel. Call #readPixmap() after creation.
+     * Creates this ScreenieImageModel. Call #readImage() after creation.
      *
-     * \sa #readPixmap()
+     * \sa #readImage()
      */
-    explicit ScreeniePixmapModel(const QPixmap pixmap = QPixmap());
+    explicit ScreenieImageModel(const QImage image = QImage());
 
     /*!
      * Copy c'tor.
      */
-    explicit ScreeniePixmapModel(const ScreeniePixmapModel &other);
-    virtual ~ScreeniePixmapModel();
+    explicit ScreenieImageModel(const ScreenieImageModel &other);
+    virtual ~ScreenieImageModel();
 
-    virtual const QPixmap &readPixmap() const;
+    virtual const QImage &readImage() const;
     virtual QSize getSize() const;
     virtual ScreenieModelInterface *copy() const;
     virtual bool isTemplate() const;
+    virtual QString getOverlayText() const;
 
-    QPixmap getPixmap() const;
-    void setPixmap(QPixmap pixmap);
+    QImage getImage() const;
+    void setImage(QImage image);
 
 private:
     ScreeniePixmapModelPrivate *d;
 };
 
-#endif // SCREENIEPIXMAPMODEL_H
+#endif // SCREENIEIMAGEMODEL_H

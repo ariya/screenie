@@ -19,6 +19,7 @@
  */
 
 #include <QtCore/QString>
+#include <QtCore/QIODevice>
 #include <QtCore/QBitArray>
 #include <QtCore/QXmlStreamWriter>
 #include <QtCore/QSize>
@@ -36,14 +37,20 @@ public:
 
 //  public
 
-XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamWriter *xmlStreamWriter)
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamWriter &xmlStreamWriter)
     : AbstractXmlScreenieModelDao(xmlStreamWriter),
       d(new XmlScreenieTemplateModelDaoPrivate())
 {
 }
 
-XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamReader *xmlStreamReader)
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QXmlStreamReader &xmlStreamReader)
     : AbstractXmlScreenieModelDao(xmlStreamReader),
+      d(new XmlScreenieTemplateModelDaoPrivate())
+{
+}
+
+XmlScreenieTemplateModelDao::XmlScreenieTemplateModelDao(QIODevice &device)
+    : AbstractXmlScreenieModelDao(device),
       d(new XmlScreenieTemplateModelDaoPrivate())
 {
 }
@@ -140,8 +147,10 @@ bool XmlScreenieTemplateModelDao::readSizeFitter(SizeFitter &sizeFitter)
         sizeFitter.setFitOptions(fitOptions);
         int width = sizeFitterAttributes.value("width").toString().toInt(&result);
         if (result) {
-            int height = sizeFitterAttributes.value("width").toString().toInt(&result);
-            sizeFitter.setTargetSize(QSize(width, height));
+            int height = sizeFitterAttributes.value("height").toString().toInt(&result);
+            if (result) {
+                sizeFitter.setTargetSize(QSize(width, height));
+            }
         }
     }
     streamReader->skipCurrentElement();

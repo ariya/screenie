@@ -20,11 +20,21 @@
 
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
+#include <QtCore/QString>
 
+#include "../../../Utils/src/Version.h"
 #include "ScreenieMimeData.h"
 #include "MimeHelper.h"
 
+#ifdef DEBUG
+#include <QtCore/QStringList>
+#endif
+
 // public
+
+const QString MimeHelper::ScreenieMimeType = QString("application/x-") + Version::getApplicationName().toLower();
+const QString MimeHelper::XmlMimeType = QString("text/xml");
+const QString MimeHelper::TextMimeType = QString("text/plain");
 
 MimeHelper::MimeHelper()
 {
