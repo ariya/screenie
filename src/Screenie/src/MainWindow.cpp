@@ -48,6 +48,7 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "../../Kernel/src/DocumentManager.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -107,6 +108,7 @@ MainWindow::~MainWindow()
 
     // destroy singletons
     Settings::destroyInstance();
+    DocumentManager::destroyInstance();
 }
 
 // protected
