@@ -90,12 +90,12 @@ void ReflectionPropertiesWidget::updateUi()
 /*!\todo Use ScreenieControl to manipulate the model values! */
 void ReflectionPropertiesWidget::on_reflectionCheckBox_toggled(bool checked)
 {
-    d->screenieModel.setReflectionEnabled(checked);
+    d->screenieControl.setReflectionEnabled(checked, &d->screenieModel);
 }
 
 void ReflectionPropertiesWidget::on_offsetSlider_valueChanged(int value)
 {
-    d->screenieModel.setReflectionOffset(value);
+    d->screenieControl.setReflectionOffset(value, &d->screenieModel);
 }
 
 void ReflectionPropertiesWidget::on_offsetLineEdit_editingFinished()
@@ -103,13 +103,13 @@ void ReflectionPropertiesWidget::on_offsetLineEdit_editingFinished()
     bool ok;
     int offset = ui->offsetLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieModel.setReflectionOffset(offset);
+        d->screenieControl.setReflectionOffset(offset, &d->screenieModel);
     }
 }
 
 void ReflectionPropertiesWidget::on_opacitySlider_valueChanged(int value)
 {
-    d->screenieModel.setReflectionOpacity(value);
+    d->screenieControl.setReflectionOpacity(value, &d->screenieModel);
 }
 
 void ReflectionPropertiesWidget::on_opacityLineEdit_editingFinished()
@@ -117,7 +117,7 @@ void ReflectionPropertiesWidget::on_opacityLineEdit_editingFinished()
     bool ok;
     int opacity = ui->opacityLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieModel.setReflectionOpacity(opacity);
+        d->screenieControl.setReflectionOpacity(opacity, &d->screenieModel);
     }
 }
 

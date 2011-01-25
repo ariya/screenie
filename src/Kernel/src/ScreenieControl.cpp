@@ -112,6 +112,21 @@ QList<ScreenieModelInterface *> ScreenieControl::getSelectedScreenieModels() con
     return result;
 }
 
+QList<ScreenieTemplateModel *> ScreenieControl::getSelectedTemplateModels() const
+{
+    QList<ScreenieTemplateModel *> result;
+    foreach (QGraphicsItem *selectedItem, d->screenieGraphicsScene.selectedItems()) {
+        if (selectedItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
+            ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(selectedItem);
+            ScreenieModelInterface &screenieModel = screeniePixmapItem->getScreenieModel();
+            if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
+                result.append(&static_cast<ScreenieTemplateModel &>(screenieModel));
+            }
+        }
+    }
+    return result;
+}
+
 DefaultScreenieModel &ScreenieControl::getDefaultScreenieModel()
 {
     return d->defaultScreenieModel;
@@ -214,104 +229,131 @@ void ScreenieControl::selectAll()
     }
 }
 
-void ScreenieControl::translate(qreal dx, qreal dy)
+void ScreenieControl::setPositionX(qreal x, ScreenieModelInterface *screenieModel)
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->setPositionX(x);
+    }
+    d->qualityTimer.start();
+}
+
+void ScreenieControl::setPositionY(qreal y, ScreenieModelInterface *screenieModel)
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->setPositionY(y);
+    }
+    d->qualityTimer.start();
+}
+
+void ScreenieControl::setPosition(QPointF position, ScreenieModelInterface *screenieModel)
+{
+    setRenderQuality(Low);
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
+    foreach (ScreenieModelInterface *screenieModel, screenieModels) {
+        screenieModel->setPosition(position);
+    }
+    d->qualityTimer.start();
+}
+
+void ScreenieControl::translate(qreal dx, qreal dy, ScreenieModelInterface *screenieModel)
 {
     bool decreaseQuality = dx != 0.0 && dy != 0.0;
     if (decreaseQuality) {
         setRenderQuality(Low);
         d->qualityTimer.start();
     }
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->translate(dx, dy);
     }
-
 }
 
-void ScreenieControl::setRotation(int angle)
+void ScreenieControl::setRotation(int angle, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setRotation(angle);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::rotate(int angle)
+void ScreenieControl::rotate(int angle, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->rotate(angle);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::setDistance(int distance)
+void ScreenieControl::setDistance(int distance, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setDistance(distance);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::addDistance(int distance)
+void ScreenieControl::addDistance(int distance, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addDistance(distance);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::setReflectionEnabled(bool enable)
+void ScreenieControl::setReflectionEnabled(bool enable, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionEnabled(enable);
     }
-    d->qualityTimer.start();
 }
 
-void ScreenieControl::setReflectionOffset(int reflectionOffset)
+void ScreenieControl::setReflectionOffset(int reflectionOffset, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOffset(reflectionOffset);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::addReflectionOffset(int reflectionOffset)
+void ScreenieControl::addReflectionOffset(int reflectionOffset, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOffset(reflectionOffset);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::setReflectionOpacity(int reflectionOpacity)
+void ScreenieControl::setReflectionOpacity(int reflectionOpacity, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOpacity(reflectionOpacity);
     }
     d->qualityTimer.start();
 }
 
-void ScreenieControl::addReflectionOpacity(int reflectionOpacity)
+void ScreenieControl::addReflectionOpacity(int reflectionOpacity, ScreenieModelInterface *screenieModel)
 {
     setRenderQuality(Low);
-    QList<ScreenieModelInterface *> screenieModels = getSelectedScreenieModels();
+    QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOpacity(reflectionOpacity);
     }
@@ -347,6 +389,38 @@ void ScreenieControl::setBlueBackgroundComponent(int blue)
     QColor backgroundColor = d->screenieScene.getBackgroundColor();
     backgroundColor.setBlue(blue);
     d->screenieScene.setBackgroundColor(backgroundColor);
+}
+
+void ScreenieControl::setTargetWidth(int width, ScreenieTemplateModel *screenieTemplateModel)
+{
+    QList<ScreenieTemplateModel *> screenieTemplateModels = getEditableTemplateModels(screenieTemplateModel);
+    foreach (ScreenieTemplateModel *screenieTemplateModel, screenieTemplateModels) {
+        screenieTemplateModel->getSizeFitter().setTargetWidth(width);
+    }
+}
+
+void ScreenieControl::setTargetHeight(int height, ScreenieTemplateModel *screenieTemplateModel)
+{
+    QList<ScreenieTemplateModel *> screenieTemplateModels = getEditableTemplateModels(screenieTemplateModel);
+    foreach (ScreenieTemplateModel *screenieTemplateModel, screenieTemplateModels) {
+        screenieTemplateModel->getSizeFitter().setTargetHeight(height);
+    }
+}
+
+void ScreenieControl::setFitMode(SizeFitter::FitMode fitMode, ScreenieTemplateModel *screenieTemplateModel)
+{
+    QList<ScreenieTemplateModel *> screenieTemplateModels = getEditableTemplateModels(screenieTemplateModel);
+    foreach (ScreenieTemplateModel *screenieTemplateModel, screenieTemplateModels) {
+        screenieTemplateModel->getSizeFitter().setFitMode(fitMode);
+    }
+}
+
+void ScreenieControl::setFitOptionEnabled(SizeFitter::FitOption fitOption, bool enable, ScreenieTemplateModel *screenieTemplateModel)
+{
+    QList<ScreenieTemplateModel *> screenieTemplateModels = getEditableTemplateModels(screenieTemplateModel);
+    foreach (ScreenieTemplateModel *screenieTemplateModel, screenieTemplateModels) {
+        screenieTemplateModel->getSizeFitter().setFitOptionEnabled(fitOption, enable);
+    }
 }
 
 void ScreenieControl::convertItemsToTemplate(ScreenieScene &screenieScene)
@@ -541,6 +615,28 @@ bool ScreenieControl::needsClipping(const QSize &originalSize, const QSize &clip
 
     /*!\todo Make threshold (currently 2%) an (advanced) user setting? */
     result = qMax(pw, ph) > 2.0;
+    return result;
+}
+
+QList<ScreenieModelInterface *> ScreenieControl::getEditableModels(ScreenieModelInterface *screenieModel)
+{
+    QList<ScreenieModelInterface *> result;
+    if (screenieModel != 0) {
+        result.append(screenieModel);
+    } else {
+        result = getSelectedScreenieModels();
+    }
+    return result;
+}
+
+QList<ScreenieTemplateModel *> ScreenieControl::getEditableTemplateModels(ScreenieTemplateModel *templateModel)
+{
+    QList<ScreenieTemplateModel *> result;
+    if (templateModel != 0) {
+        result.append(templateModel);
+    } else {
+        result = getSelectedTemplateModels();
+    }
     return result;
 }
 

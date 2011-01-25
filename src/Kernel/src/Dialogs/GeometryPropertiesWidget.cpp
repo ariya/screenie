@@ -100,7 +100,7 @@ void GeometryPropertiesWidget::on_positionXLineEdit_editingFinished()
     bool ok;
     qreal x = ui->positionXLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setPositionX(x);
+        d->screenieControl.setPositionX(x, &d->screenieModel);
     }
 }
 
@@ -109,7 +109,7 @@ void GeometryPropertiesWidget::on_positionYLineEdit_editingFinished()
     bool ok;
     qreal y = ui->positionYLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setPositionY(y);
+       d->screenieControl.setPositionY(y, &d->screenieModel);
     }
 }
 
@@ -118,13 +118,13 @@ void GeometryPropertiesWidget::on_rotationLineEdit_editingFinished()
     bool ok;
     int angle = ui->rotationLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieModel.setRotation(angle);
+        d->screenieControl.setRotation(angle, &d->screenieModel);
     }
 }
 
 void GeometryPropertiesWidget::on_rotationSlider_valueChanged(int value)
 {
-    d->screenieModel.setRotation(value);
+    d->screenieControl.setRotation(value, &d->screenieModel);
 }
 
 void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
@@ -132,11 +132,11 @@ void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
     bool ok;
     qreal distance = ui->distanceLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setDistance(distance);
+        d->screenieControl.setDistance(distance, &d->screenieModel);
     }
 }
 
 void GeometryPropertiesWidget::on_distanceSlider_valueChanged(int value)
 {
-    d->screenieModel.setDistance(value);
+    d->screenieControl.setDistance(value, &d->screenieModel);
 }
