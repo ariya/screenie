@@ -395,11 +395,11 @@ void MainWindow::restoreWindowGeometry()
     if (windowGeometry.fullScreen) {
         showFullScreen();
     } else {
-        showNormal();
+        resize(windowGeometry.size);
         if (!windowGeometry.position.isNull()) {
             move(windowGeometry.position);
         }
-        resize(windowGeometry.size);
+        showNormal();
     }
 }
 
