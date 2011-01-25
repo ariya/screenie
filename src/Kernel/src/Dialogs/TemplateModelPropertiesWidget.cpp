@@ -25,24 +25,27 @@
 
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../ScreenieControl.h"
 #include "TemplateModelPropertiesWidget.h"
 #include "ui_TemplateModelPropertiesWidget.h"
 
 class TemplateModelPropertiesWidgetPrivate
 {
 public:
-    TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel)
-        : screenieTemplateModel(templateModel)
+    TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel, ScreenieControl &theScreenieControl)
+        : screenieTemplateModel(templateModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieTemplateModel &screenieTemplateModel;
+    ScreenieControl &screenieControl;
     bool ignoreUpdateSignals;
 };
 
-TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, QWidget *parent) :
+TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TemplateModelPropertiesWidget),
-    d(new TemplateModelPropertiesWidgetPrivate(templateModel))
+    d(new TemplateModelPropertiesWidgetPrivate(templateModel, screenieControl))
 {
     ui->setupUi(this);
     initializeUi();

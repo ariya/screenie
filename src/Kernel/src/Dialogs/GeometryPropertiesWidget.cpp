@@ -23,25 +23,28 @@
 #include <QtGui/QLineEdit>
 
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../ScreenieControl.h"
 #include "GeometryPropertiesWidget.h"
 #include "ui_GeometryPropertiesWidget.h"
 
 class GeometryPropertiesWidgetPrivate
 {
 public:
-    GeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel)
+    GeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel, ScreenieControl &theScreenieControl)
+        : screenieModel(theScreenieModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieModelInterface &screenieModel;
+    ScreenieControl &screenieControl;
 };
 
 // public
 
-GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent) :
+GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GeometryPropertiesWidget),
-    d(new GeometryPropertiesWidgetPrivate(screenieModel))
+    d(new GeometryPropertiesWidgetPrivate(screenieModel, screenieControl))
 {
     ui->setupUi(this);
     initializeUi();

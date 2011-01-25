@@ -24,6 +24,7 @@
 #include <QtGui/QWidget>
 
 class ScreenieModelInterface;
+class ScreenieControl;
 class GeometryPropertiesWidgetPrivate;
 
 namespace Ui {
@@ -34,7 +35,7 @@ class GeometryPropertiesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
+    explicit GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent = 0);
     virtual ~GeometryPropertiesWidget();
 
 private:

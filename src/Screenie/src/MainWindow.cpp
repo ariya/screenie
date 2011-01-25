@@ -123,7 +123,6 @@ MainWindow::~MainWindow()
     // destroy singletons
     Settings::destroyInstance();
     DocumentManager::destroyInstance();
-    PropertyDialogFactory::destroyInstance();
 }
 
 bool MainWindow::read(const QString &filePath)

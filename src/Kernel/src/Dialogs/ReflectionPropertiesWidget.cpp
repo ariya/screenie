@@ -24,25 +24,28 @@
 #include <QtGui/QLineEdit>
 
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../ScreenieControl.h"
 #include "ReflectionPropertiesWidget.h"
 #include "ui_ReflectionPropertiesWidget.h"
 
 class ReflectionPropertiesWidgetPrivate
 {
 public:
-    ReflectionPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel)
+    ReflectionPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel, ScreenieControl &theScreenieControl)
+        : screenieModel(theScreenieModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieModelInterface &screenieModel;
+    ScreenieControl &screenieControl;
 };
 
 // public
 
-ReflectionPropertiesWidget::ReflectionPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent) :
+ReflectionPropertiesWidget::ReflectionPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ReflectionPropertiesWidget),
-    d(new ReflectionPropertiesWidgetPrivate(screenieModel))
+    d(new ReflectionPropertiesWidgetPrivate(screenieModel, screenieControl))
 {
     ui->setupUi(this);
     updateUi();

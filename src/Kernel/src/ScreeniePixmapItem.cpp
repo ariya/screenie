@@ -54,8 +54,14 @@ public:
           transformPixmap(true),
           ignoreUpdates(false),
           itemTransformed(false),
+          propertyDialogFactory(new PropertyDialogFactory(screenieControl)),
           propertyDialog(0)
     {}
+
+    ~ScreeniePixmapItemPrivate()
+    {
+        delete propertyDialogFactory;
+    }
 
     ScreenieModelInterface &screenieModel;
     ScreenieControl &screenieControl;
@@ -63,6 +69,7 @@ public:
     bool transformPixmap;
     bool ignoreUpdates;
     bool itemTransformed;
+    PropertyDialogFactory *propertyDialogFactory;
     QDialog *propertyDialog;
 };
 
@@ -116,7 +123,7 @@ void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             parent = 0;
         }
         if (d->propertyDialog == 0) {
-            d->propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
+            d->propertyDialog = d->propertyDialogFactory->createDialog(d->screenieModel);
             if (d->propertyDialog != 0) {
                 connect(d->propertyDialog, SIGNAL(destroyed()),
                         this, SLOT(handlePropertyDialogDestroyed()));

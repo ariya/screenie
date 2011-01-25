@@ -26,13 +26,14 @@ class QWidget;
 #include "ScreenieModelPropertiesDialog.h"
 
 class ScreenieTemplateModel;
+class ScreenieControl;
 class TemplateModelPropertiesDialogPrivate;
 
 class TemplateModelPropertiesDialog : public ScreenieModelPropertiesDialog
 {
     Q_OBJECT
 public:
-    explicit TemplateModelPropertiesDialog(ScreenieTemplateModel &templateModel, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    TemplateModelPropertiesDialog(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~TemplateModelPropertiesDialog();
 
 protected:

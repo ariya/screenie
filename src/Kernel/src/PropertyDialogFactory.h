@@ -27,7 +27,7 @@ class QWidget;
 #include "KernelLib.h"
 
 class ScreenieModelInterface;
-
+class ScreenieControl;
 class PropertyDialogFactoryPrivate;
 
 /*!
@@ -36,8 +36,8 @@ class PropertyDialogFactoryPrivate;
 class PropertyDialogFactory
 {
 public:
-    KERNEL_API static PropertyDialogFactory &getInstance();
-    KERNEL_API static void destroyInstance();
+    PropertyDialogFactory(ScreenieControl &screenieControl);
+    ~PropertyDialogFactory();
 
     /*!
      * Creates a property dialog for the given \p screenieModel. The caller
@@ -53,13 +53,8 @@ public:
      */
     QDialog *createDialog(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
 
-protected:
-    ~PropertyDialogFactory();
-
 private:
     PropertyDialogFactoryPrivate *d;
-
-    PropertyDialogFactory();
 };
 
 #endif // PROPERTYDIALOGFACTORY_H

@@ -24,6 +24,7 @@
 #include <QtGui/QWidget>
 
 class ScreenieTemplateModel;
+class ScreenieControl;
 class TemplateModelPropertiesWidgetPrivate;
 
 namespace Ui {
@@ -33,9 +34,8 @@ namespace Ui {
 class TemplateModelPropertiesWidget : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit TemplateModelPropertiesWidget(ScreenieTemplateModel &screenieTemplateModel, QWidget *parent = 0);
+    TemplateModelPropertiesWidget(ScreenieTemplateModel &screenieTemplateModel, ScreenieControl &screenieControl, QWidget *parent = 0);
     virtual ~TemplateModelPropertiesWidget();
 
     void initializeUi();

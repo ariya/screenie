@@ -32,30 +32,23 @@
 class PropertyDialogFactoryPrivate
 {
 public:
-    PropertyDialogFactoryPrivate()
+    PropertyDialogFactoryPrivate(ScreenieControl &theScreenieControl)
+        : screenieControl(theScreenieControl)
     {}
 
-    static PropertyDialogFactory *instance;
+    ScreenieControl &screenieControl;
 };
-
-PropertyDialogFactory *PropertyDialogFactoryPrivate::instance = 0;
 
 // public
 
-PropertyDialogFactory &PropertyDialogFactory::getInstance()
+PropertyDialogFactory::PropertyDialogFactory(ScreenieControl &screenieControl)
+    : d(new PropertyDialogFactoryPrivate(screenieControl))
 {
-    if (PropertyDialogFactoryPrivate::instance == 0) {
-        PropertyDialogFactoryPrivate::instance = new PropertyDialogFactory();
-    }
-    return *PropertyDialogFactoryPrivate::instance;
 }
 
-void PropertyDialogFactory::destroyInstance()
+PropertyDialogFactory::~PropertyDialogFactory()
 {
-    if (PropertyDialogFactoryPrivate::instance != 0) {
-        delete PropertyDialogFactoryPrivate::instance;
-        PropertyDialogFactoryPrivate::instance = 0;
-    }
+    delete d;
 }
 
 QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieModel, QWidget *parent)
@@ -63,7 +56,7 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     QDialog *result = 0;
     if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
         ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        result = new TemplateModelPropertiesDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result = new TemplateModelPropertiesDialog(screenieTemplateModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         result->setWindowTitle(QObject::tr("Template Properties"));
     }
     if (result != 0) {
@@ -73,14 +66,3 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     return result;
 }
 
-// protected
-
-PropertyDialogFactory::~PropertyDialogFactory()
-{}
-
-// private
-
-PropertyDialogFactory::PropertyDialogFactory()
-    : d(new PropertyDialogFactoryPrivate())
-{
-}

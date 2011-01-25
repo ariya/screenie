@@ -25,6 +25,7 @@
 
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../ScreenieControl.h"
 #include "GeometryPropertiesWidget.h"
 #include "ReflectionPropertiesWidget.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
@@ -36,19 +37,21 @@
 class ScreenieModelPropertiesDialogPrivate
 {
 public:
-    ScreenieModelPropertiesDialogPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel)
+    ScreenieModelPropertiesDialogPrivate(ScreenieModelInterface &theScreenieModel, ScreenieControl &theScreenieControl)
+        : screenieModel(theScreenieModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieModelInterface &screenieModel;
+    ScreenieControl &screenieControl;
 };
 
 // public
 
-ScreenieModelPropertiesDialog::ScreenieModelPropertiesDialog(ScreenieModelInterface &screenieModel, QWidget *parent, Qt::WindowFlags flags) :
+ScreenieModelPropertiesDialog::ScreenieModelPropertiesDialog(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
     QDialog(parent, flags),
     ui(new Ui::ScreenieModelPropertiesDialog),
-    d(new ScreenieModelPropertiesDialogPrivate(screenieModel))
+    d(new ScreenieModelPropertiesDialogPrivate(screenieModel, screenieControl))
 {
     ui->setupUi(this);
     frenchConnection();
@@ -67,9 +70,9 @@ ScreenieModelPropertiesDialog::~ScreenieModelPropertiesDialog()
 
 void ScreenieModelPropertiesDialog::initializeUi()
 {
-    GeometryPropertiesWidget *geometryPropertiesWidget = new GeometryPropertiesWidget(d->screenieModel, this);
+    GeometryPropertiesWidget *geometryPropertiesWidget = new GeometryPropertiesWidget(d->screenieModel, d->screenieControl, this);
     ui->propertiesTabWidget->addTab(geometryPropertiesWidget, tr("&Geometry"));
-    ReflectionPropertiesWidget *reflectionPropertiesWidget = new ReflectionPropertiesWidget(d->screenieModel, this);
+    ReflectionPropertiesWidget *reflectionPropertiesWidget = new ReflectionPropertiesWidget(d->screenieModel, d->screenieControl, this);
     ui->propertiesTabWidget->addTab(reflectionPropertiesWidget, tr("&Reflection"));
 }
 

@@ -23,6 +23,8 @@
 
 #include <QtCore/QObject>
 
+#include "KernelLib.h"
+
 struct DocumentInfo;
 class DocumentManagerPrivate;
 
@@ -33,8 +35,8 @@ class DocumentManager : public QObject
 {
     Q_OBJECT
 public:
-    static DocumentManager &getInstance();
-    static void destroyInstance();
+    KERNEL_API static DocumentManager &getInstance();
+    KERNEL_API static void destroyInstance();
 
     /*!
      * Adds \p documentInfo to the managed documents. This DocumentManager takes ownership
@@ -43,11 +45,11 @@ public:
      * \param documentInfo
      *        the DocumentInfo to be managed; ownership is taken by this DocumentManager
      */
-    void add(const DocumentInfo *documentInfo);
-    const QList<const DocumentInfo *> &getDocumentInfos() const;
-    int count() const;
-    void toFront(int id) const;
-    int getModifiedCount() const;
+    KERNEL_API void add(const DocumentInfo *documentInfo);
+    KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
+    KERNEL_API int count() const;
+    KERNEL_API void toFront(int id) const;
+    KERNEL_API int getModifiedCount() const;
 
 signals:
     void documentAdded(const DocumentInfo &documentInfo);

@@ -24,6 +24,7 @@
 #include <QtGui/QDialog>
 
 class ScreenieModelInterface;
+class ScreenieControl;
 class ScreenieModelPropertiesDialogPrivate;
 
 namespace Ui {
@@ -38,7 +39,7 @@ class ScreenieModelPropertiesDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ScreenieModelPropertiesDialog(ScreenieModelInterface &screenieModel, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    ScreenieModelPropertiesDialog(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~ScreenieModelPropertiesDialog();
 
 protected:

@@ -21,6 +21,7 @@
 #include <QtGui/QTabWidget>
 
 #include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../ScreenieControl.h"
 #include "TemplateModelPropertiesWidget.h"
 #include "ScreenieModelPropertiesDialog.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
@@ -29,18 +30,20 @@
 class TemplateModelPropertiesDialogPrivate
 {
 public:
-    TemplateModelPropertiesDialogPrivate(ScreenieTemplateModel &templateModel)
-        : screenieTemplateModel(templateModel)
+    TemplateModelPropertiesDialogPrivate(ScreenieTemplateModel &templateModel, ScreenieControl &theScreenieControl)
+        : screenieTemplateModel(templateModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieTemplateModel &screenieTemplateModel;
+    ScreenieControl &screenieControl;
 };
 
 // public
 
-TemplateModelPropertiesDialog::TemplateModelPropertiesDialog(ScreenieTemplateModel &screenieTemplateModel, QWidget *parent, Qt::WindowFlags flags) :
-    ScreenieModelPropertiesDialog(screenieTemplateModel, parent, flags),
-    d(new TemplateModelPropertiesDialogPrivate(screenieTemplateModel))
+TemplateModelPropertiesDialog::TemplateModelPropertiesDialog(ScreenieTemplateModel &screenieTemplateModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
+    ScreenieModelPropertiesDialog(screenieTemplateModel, screenieControl, parent, flags),
+    d(new TemplateModelPropertiesDialogPrivate(screenieTemplateModel, screenieControl))
 {
     initializeUi();
 }
@@ -57,7 +60,7 @@ TemplateModelPropertiesDialog::~TemplateModelPropertiesDialog()
 
 void TemplateModelPropertiesDialog::initializeUi()
 {
-    TemplateModelPropertiesWidget *templateModelPropertiesWidget = new TemplateModelPropertiesWidget(d->screenieTemplateModel, this);
+    TemplateModelPropertiesWidget *templateModelPropertiesWidget = new TemplateModelPropertiesWidget(d->screenieTemplateModel, d->screenieControl, this);
     ui->propertiesTabWidget->addTab(templateModelPropertiesWidget, tr("&Template"));
 
     ScreenieModelPropertiesDialog::initializeUi();
