@@ -22,7 +22,9 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/Dialogs/GeometryPropertiesWidget.h \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.h \
            $$PWD/src/Dialogs/TemplateModelPropertiesDialog.h \
-           $$PWD/src/Dialogs/ReflectionPropertiesWidget.h
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.h \
+           $$PWD/src/Dialogs/FilePathModelPropertiesDialog.h \
+           $$PWD/src/Dialogs/FilePathModelPropertiesWidget.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -39,9 +41,12 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Dialogs/GeometryPropertiesWidget.cpp \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.cpp \
            $$PWD/src/Dialogs/TemplateModelPropertiesDialog.cpp \
-           $$PWD/src/Dialogs/ReflectionPropertiesWidget.cpp
+           $$PWD/src/Dialogs/ReflectionPropertiesWidget.cpp \
+           $$PWD/src/Dialogs/FilePathModelPropertiesDialog.cpp \
+           $$PWD/src/Dialogs/FilePathModelPropertiesWidget.cpp
 
 FORMS += $$PWD/ui/ScreenieModelPropertiesDialog.ui \
          $$PWD/ui/GeometryPropertiesWidget.ui \
          $$PWD/ui/TemplateModelPropertiesWidget.ui \
-         $$PWD/ui/ReflectionPropertiesWidget.ui
+         $$PWD/ui/ReflectionPropertiesWidget.ui \
+         $$PWD/ui/FilePathModelPropertiesWidget.ui

@@ -27,6 +27,7 @@
 #include "../../Model/src/ScreenieImageModel.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
 #include "Dialogs/TemplateModelPropertiesDialog.h"
+#include "Dialogs/FilePathModelPropertiesDialog.h"
 #include "PropertyDialogFactory.h"
 
 class PropertyDialogFactoryPrivate
@@ -58,6 +59,10 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
         ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
         result = new TemplateModelPropertiesDialog(screenieTemplateModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         result->setWindowTitle(QObject::tr("Template Properties"));
+    } else if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
+        ScreenieFilePathModel &screenieFilePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
+        result = new FilePathModelPropertiesDialog(screenieFilePathModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result->setWindowTitle(QObject::tr("File Path Properties"));
     }
     if (result != 0) {
         result->setAttribute(Qt::WA_DeleteOnClose);
