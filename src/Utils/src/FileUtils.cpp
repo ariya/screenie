@@ -30,7 +30,8 @@ const QString FileUtils::TemplateExtension = QString("xst");
 
 QString FileUtils::getOpenImageFileFilter()
 {
-    QString result = QObject::tr("JPEG") + " (*.jpg);;" +
+    QString result = QObject::tr("Images") + " (*.jpg *.png *.bmp *.tif);;" +
+                     QObject::tr("JPEG") + " (*.jpg);;" +
                      QObject::tr("Portable Network Graphics") + " (*.png);;" +
                      QObject::tr("Windows Bitmap") + " (*.bmp);;" +
                      QObject::tr("Tagged Image File Format") + " (*.tif);;" +
