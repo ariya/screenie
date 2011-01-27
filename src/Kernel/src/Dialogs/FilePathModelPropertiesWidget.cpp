@@ -23,6 +23,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QFileDialog>
 
+#include "../../../Utils/src/FileUtils.h"
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../ScreenieControl.h"
 #include "FilePathModelPropertiesWidget.h"
@@ -85,7 +86,8 @@ void FilePathModelPropertiesWidget::on_filePathLineEdit_editingFinished()
 void FilePathModelPropertiesWidget::on_filePathPushButton_clicked()
 {
     QString directory = QFileInfo(d->screenieFilePathModel.getFilePath()).absolutePath();
-    QFileDialog *fileDialog = new QFileDialog(this, tr("Select Image"), directory);
+    QString filter = FileUtils::getOpenImageFileFilter();
+    QFileDialog *fileDialog = new QFileDialog(this, tr("Select Image"), directory, filter);
     fileDialog->setAcceptMode(QFileDialog::AcceptOpen);
     fileDialog->setFileMode(QFileDialog::ExistingFile);
     fileDialog->open(this, SLOT(handleFileSelected(QString)));

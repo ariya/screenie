@@ -18,6 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include "FileUtils.h"
@@ -26,3 +27,20 @@
 
 const QString FileUtils::SceneExtension = QString("xsc");
 const QString FileUtils::TemplateExtension = QString("xst");
+
+QString FileUtils::getOpenImageFileFilter()
+{
+    QString result = QObject::tr("JPEG") + " (*.jpg);;" +
+                     QObject::tr("Portable Network Graphics") + " (*.png);;" +
+                     QObject::tr("Windows Bitmap") + " (*.bmp);;" +
+                     QObject::tr("Tagged Image File Format") + " (*.tif);;" +
+                     QObject::tr("All Files") + " (*)";
+    return result;
+}
+
+QString FileUtils::getSaveImageFileFilter()
+{
+    /*!\todo Support JPEG (and maybe TIFF/BMP) in the future as well */
+    QString result = QObject::tr("Portable Network Graphics") + "(*.png)";
+    return result;
+}
