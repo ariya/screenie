@@ -39,12 +39,16 @@ public:
     {}
 
     ScreenieControl &screenieControl;
+    static QDialog *lastDialog;
 };
+
+QDialog *PropertyDialogFactoryPrivate::lastDialog = 0;
 
 // public
 
-PropertyDialogFactory::PropertyDialogFactory(ScreenieControl &screenieControl)
-    : d(new PropertyDialogFactoryPrivate(screenieControl))
+PropertyDialogFactory::PropertyDialogFactory(ScreenieControl &screenieControl, QObject *parent)
+    : QObject(parent),
+      d(new PropertyDialogFactoryPrivate(screenieControl))
 {
 }
 
@@ -70,9 +74,21 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
         result->setWindowTitle(QObject::tr("Image Properties"));
     }
     if (result != 0) {
+        connect(result, SIGNAL(destroyed()),
+                this, SLOT(handlePropertyDialogDestroyed()));
         result->setAttribute(Qt::WA_DeleteOnClose);
         result->setWindowIcon(QIcon(":/img/application-icon.png"));
+        if (PropertyDialogFactoryPrivate::lastDialog != 0) {
+            delete PropertyDialogFactoryPrivate::lastDialog;
+        }
+        PropertyDialogFactoryPrivate::lastDialog = result;
     }
     return result;
+}
+
+// private slots
+
+void PropertyDialogFactory::handlePropertyDialogDestroyed(){
+    PropertyDialogFactoryPrivate::lastDialog = 0;
 }
 

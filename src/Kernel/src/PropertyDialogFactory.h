@@ -21,6 +21,8 @@
 #ifndef PROPERTYDIALOGFACTORY_H
 #define PROPERTYDIALOGFACTORY_H
 
+#include <QtCore/QObject>
+
 class QDialog;
 class QWidget;
 
@@ -33,15 +35,15 @@ class PropertyDialogFactoryPrivate;
 /*!
  * Creates property dialogs for the given ScreenieModelInterface.
  */
-class PropertyDialogFactory
+class PropertyDialogFactory : public QObject
 {
+    Q_OBJECT
 public:
-    PropertyDialogFactory(ScreenieControl &screenieControl);
-    ~PropertyDialogFactory();
+    PropertyDialogFactory(ScreenieControl &screenieControl, QObject *parent = 0);
+    virtual ~PropertyDialogFactory();
 
     /*!
-     * Creates a property dialog for the given \p screenieModel. The caller
-     * is the owner of the created dialog. The dialog has the flag \c Qt::WA_DeleteOnClose
+     * Creates a property dialog for the given \p screenieModel. The dialog has the flag \c Qt::WA_DeleteOnClose
      * set.
      *
      * \param screenieModel
@@ -55,6 +57,9 @@ public:
 
 private:
     PropertyDialogFactoryPrivate *d;
+
+private slots:
+    void handlePropertyDialogDestroyed();
 };
 
 #endif // PROPERTYDIALOGFACTORY_H
