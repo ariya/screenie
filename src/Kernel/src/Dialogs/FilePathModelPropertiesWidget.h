@@ -21,6 +21,7 @@
 #ifndef FILEPATHMODELPROPERTIESWIDGET_H
 #define FILEPATHMODELPROPERTIESWIDGET_H
 
+#include <QtCore/QString>
 #include <QtGui/QWidget>
 
 class ScreenieFilePathModel;
@@ -42,6 +43,16 @@ public:
 private:
     Ui::FilePathModelPropertiesWidget *ui;
     FilePathModelPropertiesWidgetPrivate *d;
+
+    void frenchConnection();
+
+private slots:
+    void updateUi();
+
+    void on_filePathLineEdit_editingFinished();
+    void on_filePathPushButton_clicked();
+
+    void handleFileSelected(QString filePath);
 };
 
 #endif // FILEPATHMODELPROPERTIESWIDGET_H

@@ -61,7 +61,7 @@ FilePathModelPropertiesDialog::~FilePathModelPropertiesDialog()
 void FilePathModelPropertiesDialog::initializeUi()
 {
     FilePathModelPropertiesWidget *filePathModelPropertiesWidget = new FilePathModelPropertiesWidget(d->screenieFilePathModel, d->screenieControl, this);
-    ui->propertiesTabWidget->addTab(filePathModelPropertiesWidget, tr("&Filepath"));
+    ui->propertiesTabWidget->addTab(filePathModelPropertiesWidget, tr("&File Path"));
 
     ScreenieModelPropertiesDialog::initializeUi();
 }

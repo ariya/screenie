@@ -27,6 +27,7 @@
 #include <QtCore/QtAlgorithms>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
+#include <QtCore/QDir>
 #include <QtGui/QColor>
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsItem>
@@ -121,6 +122,21 @@ QList<ScreenieTemplateModel *> ScreenieControl::getSelectedTemplateModels() cons
             ScreenieModelInterface &screenieModel = screeniePixmapItem->getScreenieModel();
             if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
                 result.append(&static_cast<ScreenieTemplateModel &>(screenieModel));
+            }
+        }
+    }
+    return result;
+}
+
+QList<ScreenieFilePathModel *> ScreenieControl::getSelectedFilePathModels() const
+{
+    QList<ScreenieFilePathModel *> result;
+    foreach (QGraphicsItem *selectedItem, d->screenieGraphicsScene.selectedItems()) {
+        if (selectedItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
+            ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(selectedItem);
+            ScreenieModelInterface &screenieModel = screeniePixmapItem->getScreenieModel();
+            if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
+                result.append(&static_cast<ScreenieFilePathModel &>(screenieModel));
             }
         }
     }
@@ -391,6 +407,15 @@ void ScreenieControl::setBlueBackgroundComponent(int blue)
     d->screenieScene.setBackgroundColor(backgroundColor);
 }
 
+void ScreenieControl::setFilePath(const QString &filePath, ScreenieFilePathModel *screenieFilePathModel)
+{
+    QList<ScreenieFilePathModel *> screenieFilePathModels = getEditableFilePathModels(screenieFilePathModel);
+    QString qtFilePath = QDir::fromNativeSeparators(filePath);
+    foreach (ScreenieFilePathModel *screenieFilePathModel, screenieFilePathModels) {
+        screenieFilePathModel->setFilePath(qtFilePath);
+    }
+}
+
 void ScreenieControl::setTargetWidth(int width, ScreenieTemplateModel *screenieTemplateModel)
 {
     QList<ScreenieTemplateModel *> screenieTemplateModels = getEditableTemplateModels(screenieTemplateModel);
@@ -629,11 +654,22 @@ QList<ScreenieModelInterface *> ScreenieControl::getEditableModels(ScreenieModel
     return result;
 }
 
-QList<ScreenieTemplateModel *> ScreenieControl::getEditableTemplateModels(ScreenieTemplateModel *templateModel)
+QList<ScreenieFilePathModel *> ScreenieControl::getEditableFilePathModels(ScreenieFilePathModel *screenieFilePathModel)
+{
+    QList<ScreenieFilePathModel *> result;
+    if (screenieFilePathModel != 0) {
+        result.append(screenieFilePathModel);
+    } else {
+        result = getSelectedFilePathModels();
+    }
+    return result;
+}
+
+QList<ScreenieTemplateModel *> ScreenieControl::getEditableTemplateModels(ScreenieTemplateModel *screenieTemplateModel)
 {
     QList<ScreenieTemplateModel *> result;
-    if (templateModel != 0) {
-        result.append(templateModel);
+    if (screenieTemplateModel != 0) {
+        result.append(screenieTemplateModel);
     } else {
         result = getSelectedTemplateModels();
     }

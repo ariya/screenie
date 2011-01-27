@@ -40,6 +40,7 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreenieGraphicsScene;
 class ScreeniePixmapItem;
+class ScreenieFilePathModel;
 class ScreenieTemplateModel;
 class Reflection;
 class ScreenieControlPrivate;
@@ -69,6 +70,7 @@ public:
 
     KERNEL_API QList<ScreenieModelInterface *> getSelectedScreenieModels() const;
     KERNEL_API QList<ScreenieTemplateModel *> getSelectedTemplateModels() const;
+    KERNEL_API QList<ScreenieFilePathModel *> getSelectedFilePathModels() const;
 
     KERNEL_API DefaultScreenieModel &getDefaultScreenieModel();
 
@@ -112,6 +114,8 @@ public slots:
     KERNEL_API void setGreenBackgroundComponent(int green);
     KERNEL_API void setBlueBackgroundComponent(int blue);
 
+    KERNEL_API void setFilePath(const QString &filePath, ScreenieFilePathModel *screenieFilePathModel = 0);
+
     KERNEL_API void setTargetWidth(int width, ScreenieTemplateModel *screenieTemplateModel = 0);
     KERNEL_API void setTargetHeight(int height, ScreenieTemplateModel *screenieTemplateModel = 0);
     KERNEL_API void setFitMode(SizeFitter::FitMode fitMode, ScreenieTemplateModel *screenieTemplateModel = 0);
@@ -139,6 +143,8 @@ private:
 
     // returns 'screenieModel' in the list if set to != 0, otherwise all selected models are returned in the list
     QList<ScreenieModelInterface *> getEditableModels(ScreenieModelInterface *screenieModel = 0);
+    // returns 'screenieFilePathModel' in the list if set to != 0, otherwise all selected filepath models are returned in the list
+    QList<ScreenieFilePathModel *> getEditableFilePathModels(ScreenieFilePathModel *screenieFilePathModel = 0);
     // returns 'screenieTemplateModel' in the list if set to != 0, otherwise all selected template models are returned in the list
     QList<ScreenieTemplateModel *> getEditableTemplateModels(ScreenieTemplateModel *screenieTemplateModel = 0);
 

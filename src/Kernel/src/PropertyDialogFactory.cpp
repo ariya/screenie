@@ -63,7 +63,7 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     } else if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
         ScreenieFilePathModel &screenieFilePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
         result = new FilePathModelPropertiesDialog(screenieFilePathModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-        result->setWindowTitle(QObject::tr("File Path Properties"));
+        result->setWindowTitle(QObject::tr("Image Properties"));
     } else if (screenieModel.inherits(ScreenieImageModel::staticMetaObject.className())) {
         ScreenieImageModel &screenieImageModel = static_cast<ScreenieImageModel &>(screenieModel);
         result = new ImageModelPropertiesDialog(screenieImageModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
