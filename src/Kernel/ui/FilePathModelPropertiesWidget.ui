@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>345</width>
-    <height>49</height>
+    <width>340</width>
+    <height>68</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,6 +37,15 @@
       <widget class="QPushButton" name="filePathPushButton">
        <property name="text">
         <string>...</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
