@@ -18,29 +18,29 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef TEMPLATEMODELPROPERTIESDIALOG_H
-#define TEMPLATEMODELPROPERTIESDIALOG_H
+#ifndef FILEPATHMODELPROPERTIESDIALOG_H
+#define FILEPATHMODELPROPERTIESDIALOG_H
 
 class QWidget;
 
 #include "ScreenieModelPropertiesDialog.h"
 
-class ScreenieTemplateModel;
+class ScreenieFilePathModel;
 class ScreenieControl;
-class TemplateModelPropertiesDialogPrivate;
+class FilePathModelPropertiesDialogPrivate;
 
-class TemplateModelPropertiesDialog : public ScreenieModelPropertiesDialog
+class FilePathModelPropertiesDialog : public ScreenieModelPropertiesDialog
 {
     Q_OBJECT
 public:
-    TemplateModelPropertiesDialog(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~TemplateModelPropertiesDialog();
+    FilePathModelPropertiesDialog(ScreenieFilePathModel &templateModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~FilePathModelPropertiesDialog();
 
 protected:
     virtual void initializeUi();
 
 private:
-    TemplateModelPropertiesDialogPrivate *d;
+    FilePathModelPropertiesDialogPrivate *d;
 };
 
-#endif // TEMPLATEMODELPROPERTIESDIALOG_H
+#endif // FILEPATHMODELPROPERTIESDIALOG_H

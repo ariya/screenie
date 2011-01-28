@@ -20,50 +20,48 @@
 
 #include <QtGui/QTabWidget>
 
-#include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../ScreenieControl.h"
-#include "TemplateModelPropertiesWidget.h"
+#include "FilePathModelPropertiesWidget.h"
 #include "ScreenieModelPropertiesDialog.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
-#include "TemplateModelPropertiesDialog.h"
+#include "FilePathModelPropertiesDialog.h"
 
-class TemplateModelPropertiesDialogPrivate
+class FilePathModelPropertiesDialogPrivate
 {
 public:
-    TemplateModelPropertiesDialogPrivate(ScreenieTemplateModel &templateModel, ScreenieControl &theScreenieControl)
-        : screenieTemplateModel(templateModel),
+    FilePathModelPropertiesDialogPrivate(ScreenieFilePathModel &filePathModel, ScreenieControl &theScreenieControl)
+        : screenieFilePathModel(filePathModel),
           screenieControl(theScreenieControl)
     {}
 
-    ScreenieTemplateModel &screenieTemplateModel;
+    ScreenieFilePathModel &screenieFilePathModel;
     ScreenieControl &screenieControl;
 };
 
 // public
 
-TemplateModelPropertiesDialog::TemplateModelPropertiesDialog(ScreenieTemplateModel &screenieTemplateModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
-    ScreenieModelPropertiesDialog(screenieTemplateModel, screenieControl, parent, flags),
-    d(new TemplateModelPropertiesDialogPrivate(screenieTemplateModel, screenieControl))
+FilePathModelPropertiesDialog::FilePathModelPropertiesDialog(ScreenieFilePathModel &screenieFilePathModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
+    ScreenieModelPropertiesDialog(screenieFilePathModel, screenieControl, parent, flags),
+    d(new FilePathModelPropertiesDialogPrivate(screenieFilePathModel, screenieControl))
 {
     initializeUi();
 }
 
-TemplateModelPropertiesDialog::~TemplateModelPropertiesDialog()
+FilePathModelPropertiesDialog::~FilePathModelPropertiesDialog()
 {
 #ifdef DEBUG
-    qDebug("TemplateModelPropertiesDialog::~TemplateModelPropertiesDialog(): called.");
+    qDebug("FilePathModelPropertiesDialog::~FilePathModelPropertiesDialog(): called.");
 #endif
     delete d;
 }
 
 // protected
 
-void TemplateModelPropertiesDialog::initializeUi()
+void FilePathModelPropertiesDialog::initializeUi()
 {
-    TemplateModelPropertiesWidget *templateModelPropertiesWidget = new TemplateModelPropertiesWidget(d->screenieTemplateModel, d->screenieControl, this);
-    ui->propertiesTabWidget->addTab(templateModelPropertiesWidget, tr("&Template"));
+    FilePathModelPropertiesWidget *filePathModelPropertiesWidget = new FilePathModelPropertiesWidget(d->screenieFilePathModel, d->screenieControl, this);
+    ui->propertiesTabWidget->addTab(filePathModelPropertiesWidget, tr("&File Path"));
 
     ScreenieModelPropertiesDialog::initializeUi();
 }
-
-

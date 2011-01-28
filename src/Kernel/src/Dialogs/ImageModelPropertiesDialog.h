@@ -18,29 +18,29 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef TEMPLATEMODELPROPERTIESDIALOG_H
-#define TEMPLATEMODELPROPERTIESDIALOG_H
+#ifndef IMAGEMODELPROPERTIESDIALOG_H
+#define IMAGEMODELPROPERTIESDIALOG_H
 
 class QWidget;
 
 #include "ScreenieModelPropertiesDialog.h"
 
-class ScreenieTemplateModel;
+class ScreenieImageModel;
 class ScreenieControl;
-class TemplateModelPropertiesDialogPrivate;
+class ImageModelPropertiesDialogPrivate;
 
-class TemplateModelPropertiesDialog : public ScreenieModelPropertiesDialog
+class ImageModelPropertiesDialog : public ScreenieModelPropertiesDialog
 {
     Q_OBJECT
 public:
-    TemplateModelPropertiesDialog(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~TemplateModelPropertiesDialog();
+    ImageModelPropertiesDialog(ScreenieImageModel &pixmapModel, ScreenieControl &screenieControl, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~ImageModelPropertiesDialog();
 
 protected:
     virtual void initializeUi();
 
 private:
-    TemplateModelPropertiesDialogPrivate *d;
+    ImageModelPropertiesDialogPrivate *d;
 };
 
-#endif // TEMPLATEMODELPROPERTIESDIALOG_H
+#endif // IMAGEMODELPROPERTIESDIALOG_H

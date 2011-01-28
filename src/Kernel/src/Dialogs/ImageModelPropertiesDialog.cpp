@@ -20,49 +20,45 @@
 
 #include <QtGui/QTabWidget>
 
-#include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../../../Model/src/ScreenieImageModel.h"
 #include "../ScreenieControl.h"
-#include "TemplateModelPropertiesWidget.h"
 #include "ScreenieModelPropertiesDialog.h"
 #include "ui_ScreenieModelPropertiesDialog.h"
-#include "TemplateModelPropertiesDialog.h"
+#include "ImageModelPropertiesDialog.h"
 
-class TemplateModelPropertiesDialogPrivate
+class ImageModelPropertiesDialogPrivate
 {
 public:
-    TemplateModelPropertiesDialogPrivate(ScreenieTemplateModel &templateModel, ScreenieControl &theScreenieControl)
-        : screenieTemplateModel(templateModel),
+    ImageModelPropertiesDialogPrivate(ScreenieImageModel &templateModel, ScreenieControl &theScreenieControl)
+        : screenieImageModel(templateModel),
           screenieControl(theScreenieControl)
     {}
 
-    ScreenieTemplateModel &screenieTemplateModel;
+    ScreenieImageModel &screenieImageModel;
     ScreenieControl &screenieControl;
 };
 
 // public
 
-TemplateModelPropertiesDialog::TemplateModelPropertiesDialog(ScreenieTemplateModel &screenieTemplateModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
-    ScreenieModelPropertiesDialog(screenieTemplateModel, screenieControl, parent, flags),
-    d(new TemplateModelPropertiesDialogPrivate(screenieTemplateModel, screenieControl))
+ImageModelPropertiesDialog::ImageModelPropertiesDialog(ScreenieImageModel &screenieImageModel, ScreenieControl &screenieControl, QWidget *parent, Qt::WindowFlags flags) :
+    ScreenieModelPropertiesDialog(screenieImageModel, screenieControl, parent, flags),
+    d(new ImageModelPropertiesDialogPrivate(screenieImageModel, screenieControl))
 {
     initializeUi();
 }
 
-TemplateModelPropertiesDialog::~TemplateModelPropertiesDialog()
+ImageModelPropertiesDialog::~ImageModelPropertiesDialog()
 {
 #ifdef DEBUG
-    qDebug("TemplateModelPropertiesDialog::~TemplateModelPropertiesDialog(): called.");
+    qDebug("ImageModelPropertiesDialog::~ImageModelPropertiesDialog(): called.");
 #endif
     delete d;
 }
 
 // protected
 
-void TemplateModelPropertiesDialog::initializeUi()
+void ImageModelPropertiesDialog::initializeUi()
 {
-    TemplateModelPropertiesWidget *templateModelPropertiesWidget = new TemplateModelPropertiesWidget(d->screenieTemplateModel, d->screenieControl, this);
-    ui->propertiesTabWidget->addTab(templateModelPropertiesWidget, tr("&Template"));
-
     ScreenieModelPropertiesDialog::initializeUi();
 }
 

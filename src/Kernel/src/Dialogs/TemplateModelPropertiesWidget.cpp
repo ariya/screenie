@@ -25,24 +25,27 @@
 
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../ScreenieControl.h"
 #include "TemplateModelPropertiesWidget.h"
 #include "ui_TemplateModelPropertiesWidget.h"
 
 class TemplateModelPropertiesWidgetPrivate
 {
 public:
-    TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel)
-        : screenieTemplateModel(templateModel)
+    TemplateModelPropertiesWidgetPrivate(ScreenieTemplateModel &templateModel, ScreenieControl &theScreenieControl)
+        : screenieTemplateModel(templateModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieTemplateModel &screenieTemplateModel;
+    ScreenieControl &screenieControl;
     bool ignoreUpdateSignals;
 };
 
-TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, QWidget *parent) :
+TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TemplateModelPropertiesWidget),
-    d(new TemplateModelPropertiesWidgetPrivate(templateModel))
+    d(new TemplateModelPropertiesWidgetPrivate(templateModel, screenieControl))
 {
     ui->setupUi(this);
     initializeUi();
@@ -116,7 +119,7 @@ void TemplateModelPropertiesWidget::on_widthLineEdit_editingFinished()
     bool ok;
     int width = ui->widthLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieTemplateModel.getSizeFitter().setTargetWidth(width);
+         d->screenieControl.setTargetWidth(width, &d->screenieTemplateModel);
     }
 }
 
@@ -125,28 +128,27 @@ void TemplateModelPropertiesWidget::on_heightLineEdit_editingFinished()
     bool ok;
     int height = ui->heightLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieTemplateModel.getSizeFitter().setTargetHeight(height);
+        d->screenieControl.setTargetHeight(height, &d->screenieTemplateModel);
     }
 }
 
 void TemplateModelPropertiesWidget::on_fitModeComboBox_activated(int index)
 {
-    SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
     switch (index) {
     case 0:
-        sizeFitter.setFitMode(SizeFitter::NoFit);
+        d->screenieControl.setFitMode(SizeFitter::NoFit, &d->screenieTemplateModel);
         break;
     case 1:
-        sizeFitter.setFitMode(SizeFitter::Fit);
+        d->screenieControl.setFitMode(SizeFitter::Fit, &d->screenieTemplateModel);
         break;
     case 2:
-        sizeFitter.setFitMode(SizeFitter::FitToWidth);
+        d->screenieControl.setFitMode(SizeFitter::FitToWidth, &d->screenieTemplateModel);
         break;
     case 3:
-        sizeFitter.setFitMode(SizeFitter::FitToHeight);
+        d->screenieControl.setFitMode(SizeFitter::FitToHeight, &d->screenieTemplateModel);
         break;
     case 4:
-        sizeFitter.setFitMode(SizeFitter::ExactFit);
+        d->screenieControl.setFitMode(SizeFitter::ExactFit, &d->screenieTemplateModel);
         break;
     default:
 #ifdef DEBUG
@@ -158,12 +160,10 @@ void TemplateModelPropertiesWidget::on_fitModeComboBox_activated(int index)
 
 void TemplateModelPropertiesWidget::on_respectOrientationCheckBox_toggled(bool checked)
 {
-    SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
-    sizeFitter.setFitOptionEnabled(SizeFitter::RespectOrientation, checked);
+    d->screenieControl.setFitOptionEnabled(SizeFitter::RespectOrientation, checked, &d->screenieTemplateModel);
 }
 
 void TemplateModelPropertiesWidget::on_enlargeCheckBox_toggled(bool checked)
 {
-    SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
-    sizeFitter.setFitOptionEnabled(SizeFitter::Enlarge, checked);
+    d->screenieControl.setFitOptionEnabled(SizeFitter::Enlarge, checked, &d->screenieTemplateModel);
 }

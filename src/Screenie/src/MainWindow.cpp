@@ -55,12 +55,11 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "../../Kernel/src/DocumentManager.h"
 #include "../../Kernel/src/PropertyDialogFactory.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-
-#include "../../Kernel/src/ScreeniePixmapItem.h"
 
 // public
 
@@ -123,7 +122,7 @@ MainWindow::~MainWindow()
 
     // destroy singletons
     Settings::destroyInstance();
-    PropertyDialogFactory::destroyInstance();
+    DocumentManager::destroyInstance();
 }
 
 bool MainWindow::read(const QString &filePath)
@@ -410,11 +409,11 @@ void MainWindow::restoreWindowGeometry()
     if (windowGeometry.fullScreen) {
         showFullScreen();
     } else {
-        showNormal();
+        resize(windowGeometry.size);
         if (!windowGeometry.position.isNull()) {
             move(windowGeometry.position);
         }
-        resize(windowGeometry.size);
+        showNormal();
     }
 }
 
@@ -516,7 +515,7 @@ void MainWindow::on_exportAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastExportDirectoryPath = settings.getLastExportDirectoryPath();
-    QString filter = tr("Portable Network Graphics (*.png)");
+    QString filter = FileUtils::getSaveImageFileFilter();
     QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
@@ -558,7 +557,8 @@ void MainWindow::on_addImageAction_triggered()
 {
     Settings &settings = Settings::getInstance();
     QString lastImageDirectoryPath = settings.getLastImageDirectoryPath();
-    QStringList filePaths = QFileDialog::getOpenFileNames(this, tr("Add Image"), lastImageDirectoryPath);
+    QString filter = FileUtils::getOpenImageFileFilter();
+    QStringList filePaths = QFileDialog::getOpenFileNames(this, tr("Add Image"), lastImageDirectoryPath, filter);
     if (filePaths.count() > 0) {
         foreach(QString filePath, filePaths) {
             m_screenieControl->addImage(filePath, QPointF(0.0, 0.0));

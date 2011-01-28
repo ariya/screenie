@@ -24,6 +24,7 @@
 #include <QtGui/QWidget>
 
 class ScreenieModelInterface;
+class ScreenieControl;
 class ReflectionPropertiesWidgetPrivate;
 
 namespace Ui {
@@ -34,7 +35,7 @@ class ReflectionPropertiesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ReflectionPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent = 0);
+    ReflectionPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent = 0);
     virtual ~ReflectionPropertiesWidget();
 
 private:

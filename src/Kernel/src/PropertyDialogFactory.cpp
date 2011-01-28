@@ -27,35 +27,34 @@
 #include "../../Model/src/ScreenieImageModel.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
 #include "Dialogs/TemplateModelPropertiesDialog.h"
+#include "Dialogs/FilePathModelPropertiesDialog.h"
+#include "Dialogs/ImageModelPropertiesDialog.h"
 #include "PropertyDialogFactory.h"
 
 class PropertyDialogFactoryPrivate
 {
 public:
-    PropertyDialogFactoryPrivate()
+    PropertyDialogFactoryPrivate(ScreenieControl &theScreenieControl)
+        : screenieControl(theScreenieControl)
     {}
 
-    static PropertyDialogFactory *instance;
+    ScreenieControl &screenieControl;
+    static QDialog *lastDialog;
 };
 
-PropertyDialogFactory *PropertyDialogFactoryPrivate::instance = 0;
+QDialog *PropertyDialogFactoryPrivate::lastDialog = 0;
 
 // public
 
-PropertyDialogFactory &PropertyDialogFactory::getInstance()
+PropertyDialogFactory::PropertyDialogFactory(ScreenieControl &screenieControl, QObject *parent)
+    : QObject(parent),
+      d(new PropertyDialogFactoryPrivate(screenieControl))
 {
-    if (PropertyDialogFactoryPrivate::instance == 0) {
-        PropertyDialogFactoryPrivate::instance = new PropertyDialogFactory();
-    }
-    return *PropertyDialogFactoryPrivate::instance;
 }
 
-void PropertyDialogFactory::destroyInstance()
+PropertyDialogFactory::~PropertyDialogFactory()
 {
-    if (PropertyDialogFactoryPrivate::instance != 0) {
-        delete PropertyDialogFactoryPrivate::instance;
-        PropertyDialogFactoryPrivate::instance = 0;
-    }
+    delete d;
 }
 
 QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieModel, QWidget *parent)
@@ -63,24 +62,33 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
     QDialog *result = 0;
     if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
         ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        result = new TemplateModelPropertiesDialog(screenieTemplateModel, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result = new TemplateModelPropertiesDialog(screenieTemplateModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         result->setWindowTitle(QObject::tr("Template Properties"));
+    } else if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
+        ScreenieFilePathModel &screenieFilePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
+        result = new FilePathModelPropertiesDialog(screenieFilePathModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result->setWindowTitle(QObject::tr("Image Properties"));
+    } else if (screenieModel.inherits(ScreenieImageModel::staticMetaObject.className())) {
+        ScreenieImageModel &screenieImageModel = static_cast<ScreenieImageModel &>(screenieModel);
+        result = new ImageModelPropertiesDialog(screenieImageModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        result->setWindowTitle(QObject::tr("Image Properties"));
     }
     if (result != 0) {
+        connect(result, SIGNAL(destroyed()),
+                this, SLOT(handlePropertyDialogDestroyed()));
         result->setAttribute(Qt::WA_DeleteOnClose);
         result->setWindowIcon(QIcon(":/img/application-icon.png"));
+        if (PropertyDialogFactoryPrivate::lastDialog != 0) {
+            delete PropertyDialogFactoryPrivate::lastDialog;
+        }
+        PropertyDialogFactoryPrivate::lastDialog = result;
     }
     return result;
 }
 
-// protected
+// private slots
 
-PropertyDialogFactory::~PropertyDialogFactory()
-{}
-
-// private
-
-PropertyDialogFactory::PropertyDialogFactory()
-    : d(new PropertyDialogFactoryPrivate())
-{
+void PropertyDialogFactory::handlePropertyDialogDestroyed(){
+    PropertyDialogFactoryPrivate::lastDialog = 0;
 }
+

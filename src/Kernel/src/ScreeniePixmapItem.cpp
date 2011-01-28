@@ -54,8 +54,14 @@ public:
           transformPixmap(true),
           ignoreUpdates(false),
           itemTransformed(false),
+          propertyDialogFactory(new PropertyDialogFactory(screenieControl)),
           propertyDialog(0)
     {}
+
+    ~ScreeniePixmapItemPrivate()
+    {
+        delete propertyDialogFactory;
+    }
 
     ScreenieModelInterface &screenieModel;
     ScreenieControl &screenieControl;
@@ -63,6 +69,7 @@ public:
     bool transformPixmap;
     bool ignoreUpdates;
     bool itemTransformed;
+    PropertyDialogFactory *propertyDialogFactory;
     QDialog *propertyDialog;
 };
 
@@ -105,6 +112,7 @@ int ScreeniePixmapItem::type() const
 
 void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+    Q_UNUSED(event);
     if (!d->itemTransformed) {
         // for now we only allow properties of a single item to be modified at the same time
         selectExclusive();
@@ -115,7 +123,7 @@ void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             parent = 0;
         }
         if (d->propertyDialog == 0) {
-            d->propertyDialog = PropertyDialogFactory::getInstance().createDialog(d->screenieModel);
+            d->propertyDialog = d->propertyDialogFactory->createDialog(d->screenieModel);
             if (d->propertyDialog != 0) {
                 connect(d->propertyDialog, SIGNAL(destroyed()),
                         this, SLOT(handlePropertyDialogDestroyed()));

@@ -18,41 +18,41 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef TEMPLATEMODELPROPERTIESWIDGET_H
-#define TEMPLATEMODELPROPERTIESWIDGET_H
+#ifndef FILEPATHMODELPROPERTIESWIDGET_H
+#define FILEPATHMODELPROPERTIESWIDGET_H
 
+#include <QtCore/QString>
 #include <QtGui/QWidget>
 
-class ScreenieTemplateModel;
+class ScreenieFilePathModel;
 class ScreenieControl;
-class TemplateModelPropertiesWidgetPrivate;
+class FilePathModelPropertiesWidgetPrivate;
 
 namespace Ui {
-    class TemplateModelPropertiesWidget;
+    class FilePathModelPropertiesWidget;
 }
 
-class TemplateModelPropertiesWidget : public QWidget
+class FilePathModelPropertiesWidget : public QWidget
 {
     Q_OBJECT
-public:
-    TemplateModelPropertiesWidget(ScreenieTemplateModel &screenieTemplateModel, ScreenieControl &screenieControl, QWidget *parent = 0);
-    virtual ~TemplateModelPropertiesWidget();
 
-    void initializeUi();
-    void frenchConnection();
+public:
+    FilePathModelPropertiesWidget(ScreenieFilePathModel &filePathModel, ScreenieControl &screenieControl, QWidget *parent = 0);
+    ~FilePathModelPropertiesWidget();
 
 private:
-    Ui::TemplateModelPropertiesWidget *ui;
-    TemplateModelPropertiesWidgetPrivate *d;
+    Ui::FilePathModelPropertiesWidget *ui;
+    FilePathModelPropertiesWidgetPrivate *d;
+
+    void frenchConnection();
 
 private slots:
     void updateUi();
 
-    void on_widthLineEdit_editingFinished();
-    void on_heightLineEdit_editingFinished();
-    void on_fitModeComboBox_activated(int index);
-    void on_respectOrientationCheckBox_toggled(bool checked);
-    void on_enlargeCheckBox_toggled(bool checked);
+    void on_filePathLineEdit_editingFinished();
+    void on_filePathPushButton_clicked();
+
+    void handleFileSelected(QString filePath);
 };
 
-#endif // TEMPLATEMODELPROPERTIESWIDGET_H
+#endif // FILEPATHMODELPROPERTIESWIDGET_H

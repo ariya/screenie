@@ -80,7 +80,6 @@ void ScreenieGraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 void ScreenieGraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
     if (this->itemAt(event->scenePos().x(), event->scenePos().y()) == 0) {
-        event->setAccepted(event->mimeData()->hasUrls());
         d->itemDragDrop = false;
     } else {
         QGraphicsScene::dragMoveEvent(event);

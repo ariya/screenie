@@ -23,25 +23,28 @@
 #include <QtGui/QLineEdit>
 
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../ScreenieControl.h"
 #include "GeometryPropertiesWidget.h"
 #include "ui_GeometryPropertiesWidget.h"
 
 class GeometryPropertiesWidgetPrivate
 {
 public:
-    GeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel)
-        : screenieModel(theScreenieModel)
+    GeometryPropertiesWidgetPrivate(ScreenieModelInterface &theScreenieModel, ScreenieControl &theScreenieControl)
+        : screenieModel(theScreenieModel),
+          screenieControl(theScreenieControl)
     {}
 
     ScreenieModelInterface &screenieModel;
+    ScreenieControl &screenieControl;
 };
 
 // public
 
-GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, QWidget *parent) :
+GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GeometryPropertiesWidget),
-    d(new GeometryPropertiesWidgetPrivate(screenieModel))
+    d(new GeometryPropertiesWidgetPrivate(screenieModel, screenieControl))
 {
     ui->setupUi(this);
     initializeUi();
@@ -97,7 +100,7 @@ void GeometryPropertiesWidget::on_positionXLineEdit_editingFinished()
     bool ok;
     qreal x = ui->positionXLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setPositionX(x);
+        d->screenieControl.setPositionX(x, &d->screenieModel);
     }
 }
 
@@ -106,7 +109,7 @@ void GeometryPropertiesWidget::on_positionYLineEdit_editingFinished()
     bool ok;
     qreal y = ui->positionYLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setPositionY(y);
+       d->screenieControl.setPositionY(y, &d->screenieModel);
     }
 }
 
@@ -115,13 +118,13 @@ void GeometryPropertiesWidget::on_rotationLineEdit_editingFinished()
     bool ok;
     int angle = ui->rotationLineEdit->text().toInt(&ok);
     if (ok) {
-        d->screenieModel.setRotation(angle);
+        d->screenieControl.setRotation(angle, &d->screenieModel);
     }
 }
 
 void GeometryPropertiesWidget::on_rotationSlider_valueChanged(int value)
 {
-    d->screenieModel.setRotation(value);
+    d->screenieControl.setRotation(value, &d->screenieModel);
 }
 
 void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
@@ -129,11 +132,11 @@ void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
     bool ok;
     qreal distance = ui->distanceLineEdit->text().toFloat(&ok);
     if (ok) {
-        d->screenieModel.setDistance(distance);
+        d->screenieControl.setDistance(distance, &d->screenieModel);
     }
 }
 
 void GeometryPropertiesWidget::on_distanceSlider_valueChanged(int value)
 {
-    d->screenieModel.setDistance(value);
+    d->screenieControl.setDistance(value, &d->screenieModel);
 }
