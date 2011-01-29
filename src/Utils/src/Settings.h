@@ -155,6 +155,7 @@ protected:
     virtual ~Settings();
 
 private:
+    Q_DISABLE_COPY(Settings)
     SettingsPrivate *d;
 
     Settings();

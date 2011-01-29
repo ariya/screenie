@@ -58,6 +58,8 @@ protected:
     void showNormal();
 
 private:
+    Q_DISABLE_COPY(MainWindow)
+
     Ui::MainWindow *ui;
     ScreenieGraphicsScene *m_screenieGraphicsScene;
     ScreenieScene *m_screenieScene;
@@ -133,7 +135,6 @@ private slots:
     void handleRecentFile(const QString &filePath);
 
     void handleFileSaveAsSelected(const QString &filePath);
-    void handleFileOpenSelected(const QString &filePath);
     void handleConfirm(int result);
 
 };

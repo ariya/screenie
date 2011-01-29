@@ -45,6 +45,8 @@ signals:
     void openRecentFile(const QString &filePath);
 
 private:
+    Q_DISABLE_COPY(RecentFiles)
+
     QActionGroup *m_recentFilesActionGroup;
     bool m_ignoreUpdateSignals;
     QAction *m_clearRecentFilesAction;

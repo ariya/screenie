@@ -62,6 +62,9 @@ Clipboard::Clipboard(ScreenieControl &screenieControl, QObject *parent) :
 
 Clipboard::~Clipboard()
 {
+#ifdef DEBUG
+    qDebug("Clipboard::~Clipboard(): called.");
+#endif
     delete d;
 }
 

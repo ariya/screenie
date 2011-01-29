@@ -175,6 +175,7 @@ signals:
     void selectionChanged();
 
 private:
+    Q_DISABLE_COPY(ScreenieScene)
     ScreenieScenePrivate *d;
 
     void frenchConnection();

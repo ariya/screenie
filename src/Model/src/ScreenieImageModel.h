@@ -29,7 +29,7 @@
 #include "AbstractScreenieModel.h"
 #include "ModelLib.h"
 
-class ScreeniePixmapModelPrivate;
+class ScreenieImageModelPrivate;
 
 /*!
  * Implementation note: we need do export the whole class here, since
@@ -63,7 +63,7 @@ public:
     void setImage(QImage image);
 
 private:
-    ScreeniePixmapModelPrivate *d;
+    ScreenieImageModelPrivate *d;
 };
 
 #endif // SCREENIEIMAGEMODEL_H

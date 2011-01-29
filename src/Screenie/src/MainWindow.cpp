@@ -39,8 +39,8 @@
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
 #include <QtGui/QCloseEvent>
-#include <QtOpenGL/QGLWidget>
-#include <QtOpenGL/QGLFormat>
+//#include <QtOpenGL/QGLWidget>
+//#include <QtOpenGL/QGLFormat>
 
 #include "../../Utils/src/Settings.h"
 #include "../../Utils/src/Version.h"
@@ -105,12 +105,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     createScene();
-    m_clipboard = new Clipboard(*m_screenieControl, this);
 
     initializeUi();
     updateUi();
-    setUnifiedTitleAndToolBarOnMac(true);    
     restoreWindowGeometry();
+    // call unified toolbar AFTER restoring window geometry!
+    setUnifiedTitleAndToolBarOnMac(true);    
     frenchConnection();
 }
 
@@ -323,6 +323,7 @@ void MainWindow::createScene()
 {
     m_screenieScene = new ScreenieScene();
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    m_clipboard = new Clipboard(*m_screenieControl, this);
 }
 
 void MainWindow::updateScene(ScreenieScene &screenieScene)
@@ -330,9 +331,11 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
     // delete previous instances
     delete m_screenieScene;
     delete m_screenieControl;
+    delete m_clipboard;
     m_screenieScene = &screenieScene;
 
     m_screenieControl = new ScreenieControl(*m_screenieScene, *m_screenieGraphicsScene);
+    m_clipboard = new Clipboard(*m_screenieControl, this);
     m_screenieControl->updateScene();
     updateUi();
     connect(m_screenieScene, SIGNAL(changed()),
@@ -413,7 +416,6 @@ void MainWindow::restoreWindowGeometry()
         if (!windowGeometry.position.isNull()) {
             move(windowGeometry.position);
         }
-        showNormal();
     }
 }
 
@@ -463,14 +465,25 @@ void MainWindow::on_openAction_triggered()
                                  .arg(FileUtils::TemplateExtension);
         QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
 
-        QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
-        fileDialog->setNameFilter(filter);
-        fileDialog->setWindowTitle(tr("Open"));
-        fileDialog->setDirectory(lastDocumentDirectoryPath);
-        fileDialog->setWindowModality(Qt::WindowModal);
-        fileDialog->setAcceptMode(QFileDialog::AcceptOpen);
-        fileDialog->setAttribute(Qt::WA_DeleteOnClose);
-        fileDialog->open(this, SLOT(handleFileOpenSelected(const QString &)));
+
+        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
+
+        if (!filePath.isNull()) {
+            MainWindow *mainWindow = new MainWindow();
+            mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+            bool ok = mainWindow->read(filePath);
+            if (ok) {
+                QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+                Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
+                mainWindow->show();
+            } else {
+                /*!\todo Error handling, show a nice error message to the user ;) */
+                delete mainWindow;
+            }
+    #ifdef DEBUG
+            qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
+    #endif
+        }
     }
 }
 
@@ -739,21 +752,6 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
             settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
             settings.addRecentFile(filePath);
         }
-    }
-}
-
-void MainWindow::handleFileOpenSelected(const QString &filePath)
-{
-    if (!filePath.isNull()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
-        bool ok = read(filePath);
-        if (ok) {
-            QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-            Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
-        }
-#ifdef DEBUG
-        qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
-#endif
     }
 }
 

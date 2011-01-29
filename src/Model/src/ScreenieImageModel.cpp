@@ -25,25 +25,25 @@
 #include "../../Utils/src/PaintTools.h"
 #include "ScreenieImageModel.h"
 
-class ScreeniePixmapModelPrivate
+class ScreenieImageModelPrivate
 {
 public:
-    ScreeniePixmapModelPrivate() {}
-    ScreeniePixmapModelPrivate(const ScreeniePixmapModelPrivate &other)
+    ScreenieImageModelPrivate() {}
+    ScreenieImageModelPrivate(const ScreenieImageModelPrivate &other)
         : image(other.image) {}
 
     QImage image;
 };
 
 ScreenieImageModel::ScreenieImageModel(QImage image)
-    : d(new ScreeniePixmapModelPrivate())
+    : d(new ScreenieImageModelPrivate())
 {
     d->image = fitToMaximumSize(image);
 }
 
 ScreenieImageModel::ScreenieImageModel(const ScreenieImageModel &other)
     : AbstractScreenieModel(other),
-      d(new ScreeniePixmapModelPrivate(*other.d))
+      d(new ScreenieImageModelPrivate(*other.d))
 {
 }
 

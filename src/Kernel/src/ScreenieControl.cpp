@@ -173,6 +173,7 @@ ScreenieScene &ScreenieControl::getScreenieScene() const
 {
     return d->screenieScene;
 }
+
 ScreenieGraphicsScene &ScreenieControl::getScreenieGraphicsScene() const
 {
     return d->screenieGraphicsScene;
