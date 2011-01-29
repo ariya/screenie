@@ -58,9 +58,9 @@ public:
 
 protected:
     virtual int type() const;
-    virtual void contextMenuEvent (QGraphicsSceneContextMenuEvent *event);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event);

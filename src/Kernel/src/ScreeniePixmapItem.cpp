@@ -110,29 +110,6 @@ int ScreeniePixmapItem::type() const
     return ScreeniePixmapType;
 }
 
-void ScreeniePixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
-{
-    Q_UNUSED(event);
-    if (!d->itemTransformed) {
-        // for now we only allow properties of a single item to be modified at the same time
-        selectExclusive();
-        QWidget *parent;
-        if (scene() != 0) {
-            parent = scene()->views().first()->viewport();
-        } else {
-            parent = 0;
-        }
-        if (d->propertyDialog == 0) {
-            d->propertyDialog = d->propertyDialogFactory->createDialog(d->screenieModel);
-            if (d->propertyDialog != 0) {
-                connect(d->propertyDialog, SIGNAL(destroyed()),
-                        this, SLOT(handlePropertyDialogDestroyed()));
-                d->propertyDialog->show();
-            }
-        }
-    }
-}
-
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
    d->transformPixmap = isInsidePixmap(event->pos());
@@ -149,6 +126,36 @@ void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
     /*!\todo Maybe define some pixel threshold before we consider this item to be transformed? */
     d->itemTransformed = true;
+}
+
+void ScreeniePixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    switch (event->button()) {
+    case Qt::RightButton:
+        if (!d->itemTransformed) {
+            event->accept();
+            // for now we only allow properties of a single item to be modified at the same time
+            selectExclusive();
+            QWidget *parent;
+            if (scene() != 0) {
+                parent = scene()->views().first()->viewport();
+            } else {
+                parent = 0;
+            }
+            if (d->propertyDialog == 0) {
+                d->propertyDialog = d->propertyDialogFactory->createDialog(d->screenieModel);
+                if (d->propertyDialog != 0) {
+                    connect(d->propertyDialog, SIGNAL(destroyed()),
+                            this, SLOT(handlePropertyDialogDestroyed()));
+                    d->propertyDialog->show();
+                }
+            }
+        }
+        break;
+    default:
+        event->ignore();
+        break;
+    }
 }
 
 void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
