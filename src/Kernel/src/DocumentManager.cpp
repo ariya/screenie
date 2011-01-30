@@ -57,7 +57,7 @@ void DocumentManager::destroyInstance()
 void DocumentManager::add(const DocumentInfo *documentInfo)
 {
     d->documentInfos.append(documentInfo);
-    connect(&documentInfo->mainWindow, SIGNAL(destroyed(QObject*)),
+    connect(documentInfo->mainWindow, SIGNAL(destroyed(QObject*)),
             this, SLOT(remove(QObject*)));
 }
 
@@ -75,7 +75,7 @@ void DocumentManager::toFront(int id) const
 {
     const DocumentInfo *documentInfo = d->documentInfos.at(id);
     if (documentInfo != 0) {
-        documentInfo->mainWindow.show();
+        documentInfo->mainWindow->show();
     }
 }
 
@@ -83,7 +83,7 @@ int DocumentManager::getModifiedCount() const
 {
     int result = 0;
     foreach (const DocumentInfo *documentInfo, d->documentInfos) {
-        if (documentInfo->screenieScene.isModified()) {
+        if (documentInfo->screenieScene->isModified()) {
             result++;
         }
     }
@@ -111,7 +111,7 @@ void DocumentManager::remove(QObject *object)
     QMainWindow *mainWindow = qobject_cast<QMainWindow *>(object);
     if (mainWindow != 0) {
         foreach(const DocumentInfo *documentInfo, d->documentInfos) {
-            if (documentInfo->mainWindow.winId() == mainWindow->winId()) {
+            if (documentInfo->mainWindow->winId() == mainWindow->winId()) {
                 emit documentRemoved(*documentInfo);
                 d->documentInfos.removeOne(documentInfo);
                 break;

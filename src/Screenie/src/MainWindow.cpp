@@ -56,6 +56,7 @@
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
 #include "../../Kernel/src/DocumentManager.h"
+#include "../../Kernel/src/DocumentInfo.h"
 #include "../../Kernel/src/PropertyDialogFactory.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
@@ -300,11 +301,8 @@ void MainWindow::updateTitle()
     } else {
         title = tr("New", "The document name for an unsaved document.");
     }
-    if (m_screenieScene->isModified()) {
-        title.append("* - ");
-    } else {
-        title.append(" - ");
-    }
+    title.append("[*] - ");
+    setWindowModified(m_screenieScene->isModified());
     title.append(Version::getApplicationName());
     setWindowTitle(title);
 }
@@ -453,43 +451,41 @@ void MainWindow::on_newAction_triggered()
 
 void MainWindow::on_openAction_triggered()
 {
-    if (proceedWithModifiedScene()) {
-        Settings &settings = Settings::getInstance();
-        QString lastDocumentDirectoryPath = settings.getLastDocumentDirectoryPath();
-        QString allFilter = tr("Screenie Scenes (*.%1 *.%2)", "Open dialog filter")
-                            .arg(FileUtils::SceneExtension)
-                            .arg(FileUtils::TemplateExtension);
-        QString sceneFilter = tr("Screenie Scene (*.%1)", "Open dialog filter")
-                              .arg(FileUtils::SceneExtension);
-        QString templateFilter = tr("Screenie Template (*.%1)", "Open dialog filter")
-                                 .arg(FileUtils::TemplateExtension);
-        QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
+    Settings &settings = Settings::getInstance();
+    QString lastDocumentDirectoryPath = settings.getLastDocumentDirectoryPath();
+    QString allFilter = tr("Screenie Scenes (*.%1 *.%2)", "Open dialog filter")
+                        .arg(FileUtils::SceneExtension)
+                        .arg(FileUtils::TemplateExtension);
+    QString sceneFilter = tr("Screenie Scene (*.%1)", "Open dialog filter")
+                          .arg(FileUtils::SceneExtension);
+    QString templateFilter = tr("Screenie Template (*.%1)", "Open dialog filter")
+                             .arg(FileUtils::TemplateExtension);
+    QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
 
 
-        QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
 
-        if (!filePath.isNull()) {
-            MainWindow *mainWindow = new MainWindow();
-            mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
-            bool ok = mainWindow->read(filePath);
-            if (ok) {
-                QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
-                Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
-                mainWindow->show();
-            } else {
-                /*!\todo Error handling, show a nice error message to the user ;) */
-                delete mainWindow;
-            }
-    #ifdef DEBUG
-            qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
-    #endif
+    if (!filePath.isNull()) {
+        MainWindow *mainWindow = new MainWindow();
+        mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+        bool ok = mainWindow->read(filePath);
+        if (ok) {
+            QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
+            Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
+            DocumentInfo *documentInfo = new DocumentInfo();
+            documentInfo->mainWindow = mainWindow;
+            documentInfo->screenieScene = mainWindow->m_screenieScene;
+            DocumentManager::getInstance().add(documentInfo);
+            mainWindow->show();
+        } else {
+            /*!\todo Error handling, show a nice error message to the user ;) */
+            delete mainWindow;
         }
+#ifdef DEBUG
+        qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
+#endif
     }
 }
-
-//void MainWindow::saveBefore(const char *followUpAction) {
-
-//}
 
 void MainWindow::on_saveAction_triggered()
 {

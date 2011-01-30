@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>347</height>
+    <width>448</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -282,8 +282,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>300</width>
-     <height>20</height>
+     <width>448</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -335,10 +335,16 @@
     <addaction name="separator"/>
     <addaction name="selectAllAction"/>
    </widget>
+   <widget class="QMenu" name="windowMenu">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_Insert"/>
    <addaction name="menu_View"/>
+   <addaction name="windowMenu"/>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -366,6 +372,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
   <action name="addImageAction">
@@ -430,6 +439,9 @@
   <action name="aboutQtAction">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="addTemplateAction">

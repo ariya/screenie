@@ -26,8 +26,8 @@ class ScreenieScene;
 
 struct DocumentInfo
 {
-    QMainWindow &mainWindow;
-    ScreenieScene &screenieScene;
+    QMainWindow *mainWindow;
+    ScreenieScene *screenieScene;
 };
 
 #endif // DOCUMENTINFO_H
