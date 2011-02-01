@@ -39,27 +39,10 @@ ScreenieApplication::ScreenieApplication(int &argc, char **argv)
 
 void ScreenieApplication::show()
 {
-
 #ifdef Q_OS_MAC
     // Mac apps prefer not to have icons in menus
     QCoreApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
-
-    // Load translation try from /usr/share/screenie, then ./l10n/screenie then ./
-    /*!\todo Move i18n stuff into separate Babelfish class */
-    QString locale = QLocale::system().name();
-    QTranslator translator;
-    if (translator.load(QString("screenie_") + locale, "/usr/share/screenie/") == false) {
-        if (translator.load(QString("l10n/screenie_") + locale) == false) {
-            translator.load(QString("screenie_") + locale);
-        }
-    }
-    installTranslator(&translator);
-
-    // Load the system translator to get the Save dialog translated
-    QTranslator qtTranslator;
-    qtTranslator.load(QString("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    installTranslator(&qtTranslator);
 
     m_mainWindow = new MainWindow();
     m_mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);

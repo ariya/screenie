@@ -23,8 +23,10 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
+#include <QtCore/QCoreApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 #include <QtGui/QMenu>
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
@@ -113,6 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // call unified toolbar AFTER restoring window geometry!
     setUnifiedTitleAndToolBarOnMac(true);    
     frenchConnection();
+    updateDocumentManager(*this);
 }
 
 MainWindow::~MainWindow()
@@ -168,6 +171,8 @@ void MainWindow::frenchConnection()
             this, SLOT(updateUi()));
     connect(m_clipboard, SIGNAL(dataChanged()),
             this, SLOT(updateUi()));
+    connect(&DocumentManager::getInstance(), SIGNAL(changed()),
+            this, SLOT(updateWindowMenu()));
 
     // recent files
     connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
@@ -417,6 +422,14 @@ void MainWindow::restoreWindowGeometry()
     }
 }
 
+void MainWindow::updateDocumentManager(MainWindow &mainWindow)
+{
+    DocumentInfo *documentInfo = new DocumentInfo();
+    documentInfo->mainWindow = &mainWindow;
+    documentInfo->screenieScene = mainWindow.m_screenieScene;
+    DocumentManager::getInstance().add(documentInfo);
+}
+
 // private slots
 
 bool MainWindow::proceed(int answer, const char *followUpAction) {
@@ -472,10 +485,6 @@ void MainWindow::on_openAction_triggered()
         if (ok) {
             QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
-            DocumentInfo *documentInfo = new DocumentInfo();
-            documentInfo->mainWindow = mainWindow;
-            documentInfo->screenieScene = mainWindow->m_screenieScene;
-            DocumentManager::getInstance().add(documentInfo);
             mainWindow->show();
         } else {
             /*!\todo Error handling, show a nice error message to the user ;) */
@@ -535,6 +544,11 @@ void MainWindow::on_exportAction_triggered()
             settings.setLastExportDirectoryPath(lastExportDirectoryPath);
         }
     }
+}
+
+void MainWindow::on_quitAction_triggered()
+{
+    QCoreApplication::instance()->quit();
 }
 
 void MainWindow::on_cutAction_triggered()
@@ -761,6 +775,19 @@ void  MainWindow::handleRecentFile(const QString &filePath)
     if (proceedWithModifiedScene()) {
         read(filePath);
     }
+}
+
+void MainWindow::updateWindowMenu()
+{
+    ui->windowMenu->clear();
+    const QActionGroup &actionGroup = DocumentManager::getInstance().getMenuEntries();
+    foreach(QAction *action, actionGroup.actions()) {
+        ui->windowMenu->addAction(action);
+    }
+
+#ifdef DEBUG
+    qDebug("MainWindow::updateWindowMenu: called. actions: %d", actionGroup.actions().count());
+#endif
 }
 
 

@@ -283,7 +283,7 @@
      <x>0</x>
      <y>0</y>
      <width>448</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -303,6 +303,7 @@
     <addaction name="separator"/>
     <addaction name="recentFilesMenu"/>
     <addaction name="separator"/>
+    <addaction name="closeAction"/>
     <addaction name="quitAction"/>
    </widget>
    <widget class="QMenu" name="menu_About">
@@ -372,9 +373,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::QuitRole</enum>
    </property>
   </action>
   <action name="addImageAction">
@@ -542,24 +540,32 @@
     <string>Ctrl+N</string>
    </property>
   </action>
+  <action name="closeAction">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../../Resources/Resources.qrc"/>
  </resources>
  <connections>
   <connection>
-   <sender>quitAction</sender>
+   <sender>closeAction</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
+     <x>223</x>
+     <y>226</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
+     <x>223</x>
+     <y>226</y>
     </hint>
    </hints>
   </connection>

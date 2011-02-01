@@ -23,6 +23,8 @@
 
 #include <QtCore/QObject>
 
+class QActionGroup;
+
 #include "KernelLib.h"
 
 struct DocumentInfo;
@@ -46,14 +48,13 @@ public:
      *        the DocumentInfo to be managed; ownership is taken by this DocumentManager
      */
     KERNEL_API void add(const DocumentInfo *documentInfo);
-    KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
+    KERNEL_API const QActionGroup &getMenuEntries() const;
     KERNEL_API int count() const;
     KERNEL_API void toFront(int id) const;
     KERNEL_API int getModifiedCount() const;
 
 signals:
-    void documentAdded(const DocumentInfo &documentInfo);
-    void documentRemoved(const DocumentInfo &documentInfo);
+    void changed();
 
 protected:
     virtual ~DocumentManager();

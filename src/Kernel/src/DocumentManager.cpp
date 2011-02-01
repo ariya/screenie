@@ -19,7 +19,10 @@
  */
 
 #include <QtCore/QList>
+#include <QtCore/QString>
 #include <QtGui/QMainWindow>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 
 #include "../../Model/src/ScreenieScene.h"
 #include "DocumentInfo.h"
@@ -28,8 +31,18 @@
 class DocumentManagerPrivate
 {
 public:
-    DocumentManagerPrivate() {}
+    DocumentManagerPrivate()
+        : actionGroup(new QActionGroup(0))
+    {
+    }
+
+    ~DocumentManagerPrivate()
+    {
+        delete actionGroup;
+    }
+
     QList<const DocumentInfo *> documentInfos;
+    QActionGroup *actionGroup;
 
     static DocumentManager *instance;
 };
@@ -59,11 +72,15 @@ void DocumentManager::add(const DocumentInfo *documentInfo)
     d->documentInfos.append(documentInfo);
     connect(documentInfo->mainWindow, SIGNAL(destroyed(QObject*)),
             this, SLOT(remove(QObject*)));
+    QAction *action = new QAction(d->actionGroup);
+    action->setText(QString("Window: ") + QString::number((int)documentInfo->mainWindow->winId()));
+    d->actionGroup->addAction(action);
+    emit changed();
 }
 
-const QList<const DocumentInfo *> &DocumentManager::getDocumentInfos() const
+const QActionGroup &DocumentManager::getMenuEntries() const
 {
-    return d->documentInfos;
+    return *d->actionGroup;
 }
 
 int DocumentManager::count() const
@@ -112,8 +129,8 @@ void DocumentManager::remove(QObject *object)
     if (mainWindow != 0) {
         foreach(const DocumentInfo *documentInfo, d->documentInfos) {
             if (documentInfo->mainWindow->winId() == mainWindow->winId()) {
-                emit documentRemoved(*documentInfo);
                 d->documentInfos.removeOne(documentInfo);
+                emit changed();
                 break;
             }
         }

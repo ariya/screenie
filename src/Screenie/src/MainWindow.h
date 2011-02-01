@@ -89,6 +89,8 @@ private:
     void proceedWithModifiedScene(const char *slot);
     void restoreWindowGeometry();
 
+    void updateDocumentManager(MainWindow &mainWindow);
+
 private slots:
     bool proceed(int answer, const char *followUpAction);
 
@@ -98,6 +100,7 @@ private slots:
     void on_saveAction_triggered();
     void on_saveAsAction_triggered();
     void on_exportAction_triggered();
+    void on_quitAction_triggered();
 
     // Edit
     void on_cutAction_triggered();
@@ -133,6 +136,7 @@ private slots:
     void updateUi();
     void updateDefaultValues();
     void handleRecentFile(const QString &filePath);
+    void updateWindowMenu();
 
     void handleFileSaveAsSelected(const QString &filePath);
     void handleConfirm(int result);
