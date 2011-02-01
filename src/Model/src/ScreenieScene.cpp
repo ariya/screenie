@@ -23,6 +23,7 @@
 #include <QtGui/QColor>
 
 #include "ScreenieModelInterface.h"
+#include "SceneDefaults.h"
 #include "ScreenieScene.h"
 
 class ScreenieScenePrivate
@@ -196,6 +197,15 @@ bool ScreenieScene::isModified() const
 void ScreenieScene::setModified(bool modified)
 {
     d->modified = modified;
+}
+
+bool ScreenieScene::isDefault() const
+{
+    bool result;
+    result = d->screenieModels.count() == 0 &&
+             d->backgroundColor == SceneDefaults::BackgroundColor &&
+             d->backgroundEnabled == SceneDefaults::BackgroundEnabled;
+    return result;
 }
 
 // private

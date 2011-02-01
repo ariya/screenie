@@ -129,6 +129,7 @@ public:
      * Returns whether this ScreenieScene has been modified since creation or the last save.
      *
      * \return \c true if this ScreenieScene has unsaved changes; \c false else
+     * \sa #isDefault()
      */
     MODEL_API bool isModified() const;
 
@@ -139,6 +140,16 @@ public:
      *        set to \c true if modified; \c false else
      */
     MODEL_API void setModified(bool modified);
+
+    /*!
+     * Returns whether this Scene is a \em default Scene, that is whether it has
+     * just been created. A \em default Scene contains no items and the Scene
+     * properties are all set to default values.
+     *
+     * \return \c true if this Scene is a \em default Scene; \c false else
+     * \sa #isModified()
+     */
+    MODEL_API bool isDefault() const;
 
 signals:
     /*!

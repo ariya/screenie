@@ -479,20 +479,25 @@ void MainWindow::on_openAction_triggered()
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
 
     if (!filePath.isNull()) {
-        MainWindow *mainWindow = new MainWindow();
-        mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
-        bool ok = mainWindow->read(filePath);
+        bool ok;
+        if (m_screenieScene->isDefault()) {
+            ok = read(filePath);
+        } else {
+            MainWindow *mainWindow = new MainWindow();
+            mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+            ok = mainWindow->read(filePath);
+            if (ok) {
+                mainWindow->show();
+            } else {
+                delete mainWindow;
+            }
+        }
         if (ok) {
             QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
-            mainWindow->show();
         } else {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            delete mainWindow;
+             /*!\todo Error handling, show a nice error message to the user ;) */
         }
-#ifdef DEBUG
-        qDebug("MainWindow::handleFileOpenSelected: ok: %d", ok);
-#endif
     }
 }
 
