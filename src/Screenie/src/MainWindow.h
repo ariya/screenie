@@ -31,6 +31,7 @@
 class QWidget;
 class QCloseEvent;
 class QFileDialog;
+class QEvent;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -52,10 +53,13 @@ public:
 
     bool read(const QString &filePath);
 
+public slots:
+    virtual void showFullScreen();
+    virtual void showNormal();
+
 protected:
-    void closeEvent(QCloseEvent *event);
-    void showFullScreen();
-    void showNormal();
+    virtual void closeEvent(QCloseEvent *event);
+    virtual void changeEvent(QEvent *event);
 
 private:
     Q_DISABLE_COPY(MainWindow)

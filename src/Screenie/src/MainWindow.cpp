@@ -23,6 +23,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
+#include <QtCore/QEvent>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
 #include <QtGui/QMenu>
@@ -111,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
     updateUi();
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
-    setUnifiedTitleAndToolBarOnMac(true);    
+    setUnifiedTitleAndToolBarOnMac(true);
     frenchConnection();
 }
 
@@ -142,6 +143,30 @@ bool MainWindow::read(const QString &filePath)
     return result;
 }
 
+// public slots
+
+void MainWindow::showFullScreen()
+{
+    /*!\todo Settings which control what becomes invisible in fullscreen mode */
+    ui->toolBar->setVisible(false);
+    ui->sidePanel->setVisible(false);
+    // Note: Qt crashes when we don't disable the unified toolbar before going
+    // fullscreen (when we switch back to normal view, that is)!
+    // But since for now we hide it anyway that does not make any visible difference.
+    // The Qt documentation recommends anyway to do so.
+    // Also refer to: http://bugreports.qt.nokia.com/browse/QTBUG-16274
+    setUnifiedTitleAndToolBarOnMac(false);
+    QMainWindow::showFullScreen();
+}
+
+void MainWindow::showNormal()
+{
+    QMainWindow::showNormal();
+    ui->toolBar->setVisible(true);
+    ui->sidePanel->setVisible(true);
+    setUnifiedTitleAndToolBarOnMac(true);
+}
+
 // protected
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -155,6 +180,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
     } else {
         event->ignore();
+    }
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if (this->isActiveWindow()) {
+        ui->sidePanel->setStyleSheet("#sidePanel {background-color: rgb(218, 223, 230); border-right: 1px solid rgb(187, 187, 187);}");
+    } else {
+        ui->sidePanel->setStyleSheet("#sidePanel {background-color: rgb(237, 237, 237); border-right: 1px solid rgb(187, 187, 187);}");
     }
 }
 
@@ -380,28 +415,6 @@ void MainWindow::proceedWithModifiedScene(const char *slot)
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     messageBox->open(this, slot);
 
-}
-
-void MainWindow::showFullScreen()
-{
-    /*!\todo Settings which control what becomes invisible in fullscreen mode */
-    ui->toolBar->setVisible(false);
-    ui->sidePanel->setVisible(false);
-    // Note: Qt crashes when we don't disable the unified toolbar before going
-    // fullscreen (when we switch back to normal view, that is)!
-    // But since for now we hide it anyway that does not make any visible difference.
-    // The Qt documentation recommends anyway to do so.
-    // Also refer to: http://bugreports.qt.nokia.com/browse/QTBUG-16274
-    setUnifiedTitleAndToolBarOnMac(false);
-    QMainWindow::showFullScreen();
-}
-
-void MainWindow::showNormal()
-{
-    QMainWindow::showNormal();
-    ui->toolBar->setVisible(true);
-    ui->sidePanel->setVisible(true);
-    setUnifiedTitleAndToolBarOnMac(true);
 }
 
 void MainWindow::restoreWindowGeometry()
