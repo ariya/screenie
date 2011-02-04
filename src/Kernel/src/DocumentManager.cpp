@@ -81,11 +81,11 @@ int DocumentManager::count() const
     return d->documentInfos.count();
 }
 
-void DocumentManager::toFront(int id) const
+void DocumentManager::activate(int id) const
 {
     const DocumentInfo *documentInfo = d->documentInfos.at(id);
     if (documentInfo != 0) {
-        documentInfo->mainWindow->show();
+        documentInfo->mainWindow->activateWindow();
     }
 }
 

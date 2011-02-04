@@ -32,6 +32,7 @@ class QWidget;
 class QCloseEvent;
 class QFileDialog;
 class QActionGroup;
+class QSignalMapper;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -70,6 +71,7 @@ private:
     QString m_documentFilePath;
     RecentFiles m_recentFiles;
     QActionGroup *m_windowActionGroup;
+    QSignalMapper *m_windowMapper;
 
     void frenchConnection();
 
@@ -139,6 +141,7 @@ private slots:
     void updateDefaultValues();
     void handleRecentFile(const QString &filePath);
     void updateWindowMenu();
+    void activateWindow(int id);
 
     void handleFileSaveAsSelected(const QString &filePath);
     void handleConfirm(int result);

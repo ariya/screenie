@@ -50,7 +50,7 @@ public:
     KERNEL_API void add(const DocumentInfo *documentInfo);
     KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
     KERNEL_API int count() const;
-    KERNEL_API void toFront(int id) const;
+    KERNEL_API void activate(int id) const;
     KERNEL_API int getModifiedCount() const;
 
 signals:

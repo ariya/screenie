@@ -23,6 +23,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
+#include <QtCore/QSignalMapper>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
@@ -173,6 +174,8 @@ void MainWindow::frenchConnection()
     // recent files
     connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
             this, SLOT(handleRecentFile(const QString &)));
+    connect(m_windowMapper, SIGNAL(mapped(int)),
+            this, SLOT(activateWindow(int)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -311,6 +314,7 @@ void MainWindow::updateTitle()
 void MainWindow::initializeUi()
 {
     m_windowActionGroup = new QActionGroup(this);
+    m_windowMapper = new QSignalMapper(this);
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
     ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
@@ -780,6 +784,8 @@ void  MainWindow::handleRecentFile(const QString &filePath)
 
 void MainWindow::updateWindowMenu()
 {
+    int id = 0;
+
     ui->windowMenu->clear();
     m_windowActionGroup->actions().clear();
     const QList<const DocumentInfo *> &documentInfos = DocumentManager::getInstance().getDocumentInfos();
@@ -788,8 +794,16 @@ void MainWindow::updateWindowMenu()
         action->setText(documentInfo->mainWindow->windowTitle());
         m_windowActionGroup->addAction(action);
         ui->windowMenu->addAction(action);
+        connect(action, SIGNAL(triggered()),
+                m_windowMapper, SLOT(map()));
+        m_windowMapper->setMapping(action, id);
+        ++id;
     }
+}
 
+void MainWindow::activateWindow(int id)
+{
+    DocumentManager::getInstance().activate(id);
 }
 
 
