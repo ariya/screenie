@@ -23,8 +23,6 @@
 
 #include <QtCore/QObject>
 
-class QActionGroup;
-
 #include "KernelLib.h"
 
 struct DocumentInfo;
@@ -42,13 +40,15 @@ public:
 
     /*!
      * Adds \p documentInfo to the managed documents. This DocumentManager takes ownership
-     * of \p documentInfo which must be allocated on the heap.
+     * of \p documentInfo which must be allocated on the heap. The \em object name of the
+     * corresponding QMainWindow in \c documentInfo is updated. It is used to identify the
+     * window later on.
      *
      * \param documentInfo
      *        the DocumentInfo to be managed; ownership is taken by this DocumentManager
      */
     KERNEL_API void add(const DocumentInfo *documentInfo);
-    KERNEL_API const QActionGroup &getMenuEntries() const;
+    KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
     KERNEL_API int count() const;
     KERNEL_API void toFront(int id) const;
     KERNEL_API int getModifiedCount() const;
@@ -60,6 +60,7 @@ protected:
     virtual ~DocumentManager();
 
 private:
+    Q_DISABLE_COPY(DocumentManager)
     DocumentManagerPrivate *d;
 
     DocumentManager();

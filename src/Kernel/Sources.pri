@@ -12,12 +12,12 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/ScreenieGraphicsScene.h \
            $$PWD/src/ScreeniePixmapItem.h \
            $$PWD/src/TemplateOrganizer.h \
-           $$PWD/src/DocumentInfo.h \
-           $$PWD/src/DocumentManager.h \
            $$PWD/src/Clipboard/Clipboard.h \
            $$PWD/src/Clipboard/ScreenieMimeData.h \
            $$PWD/src/Clipboard/MimeHelper.h \
            $$PWD/src/PropertyDialogFactory.h \
+           $$PWD/src/DocumentManager.h \
+           $$PWD/src/DocumentInfo.h \
            $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.h \
            $$PWD/src/Dialogs/GeometryPropertiesWidget.h \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.h \
@@ -33,11 +33,11 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/ScreenieGraphicsScene.cpp \
            $$PWD/src/ScreeniePixmapItem.cpp \
            $$PWD/src/TemplateOrganizer.cpp \
-           $$PWD/src/DocumentManager.cpp \
            $$PWD/src/Clipboard/Clipboard.cpp \
            $$PWD/src/Clipboard/ScreenieMimeData.cpp \
            $$PWD/src/Clipboard/MimeHelper.cpp \
            $$PWD/src/PropertyDialogFactory.cpp \
+           $$PWD/src/DocumentManager.cpp \
            $$PWD/src/Dialogs/ScreenieModelPropertiesDialog.cpp \
            $$PWD/src/Dialogs/GeometryPropertiesWidget.cpp \
            $$PWD/src/Dialogs/TemplateModelPropertiesWidget.cpp \

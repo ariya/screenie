@@ -23,7 +23,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
-#include <QtCore/QCoreApplication>
+#include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
@@ -57,9 +57,9 @@
 #include "../../Kernel/src/ScreenieControl.h"
 #include "../../Kernel/src/ScreenieGraphicsScene.h"
 #include "../../Kernel/src/ScreeniePixmapItem.h"
+#include "../../Kernel/src/PropertyDialogFactory.h"
 #include "../../Kernel/src/DocumentManager.h"
 #include "../../Kernel/src/DocumentInfo.h"
-#include "../../Kernel/src/PropertyDialogFactory.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -123,10 +123,6 @@ MainWindow::~MainWindow()
     delete m_screenieScene;
     delete m_screenieControl;
     delete ui;
-
-    // destroy singletons
-    Settings::destroyInstance();
-    DocumentManager::destroyInstance();
 }
 
 bool MainWindow::read(const QString &filePath)
@@ -314,6 +310,7 @@ void MainWindow::updateTitle()
 
 void MainWindow::initializeUi()
 {
+    m_windowActionGroup = new QActionGroup(this);
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
     ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
@@ -475,7 +472,6 @@ void MainWindow::on_openAction_triggered()
                              .arg(FileUtils::TemplateExtension);
     QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
 
-
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
 
     if (!filePath.isNull()) {
@@ -553,7 +549,7 @@ void MainWindow::on_exportAction_triggered()
 
 void MainWindow::on_quitAction_triggered()
 {
-    QCoreApplication::instance()->quit();
+    QApplication::closeAllWindows();
 }
 
 void MainWindow::on_cutAction_triggered()
@@ -785,14 +781,15 @@ void  MainWindow::handleRecentFile(const QString &filePath)
 void MainWindow::updateWindowMenu()
 {
     ui->windowMenu->clear();
-    const QActionGroup &actionGroup = DocumentManager::getInstance().getMenuEntries();
-    foreach(QAction *action, actionGroup.actions()) {
+    m_windowActionGroup->actions().clear();
+    const QList<const DocumentInfo *> &documentInfos = DocumentManager::getInstance().getDocumentInfos();
+    foreach(const DocumentInfo *documentInfo, documentInfos) {
+        QAction *action = new QAction(this);
+        action->setText(documentInfo->mainWindow->windowTitle());
+        m_windowActionGroup->addAction(action);
         ui->windowMenu->addAction(action);
     }
 
-#ifdef DEBUG
-    qDebug("MainWindow::updateWindowMenu: called. actions: %d", actionGroup.actions().count());
-#endif
 }
 
 

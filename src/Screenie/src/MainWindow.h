@@ -31,6 +31,7 @@
 class QWidget;
 class QCloseEvent;
 class QFileDialog;
+class QActionGroup;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -68,6 +69,7 @@ private:
     Clipboard *m_clipboard;
     QString m_documentFilePath;
     RecentFiles m_recentFiles;
+    QActionGroup *m_windowActionGroup;
 
     void frenchConnection();
 

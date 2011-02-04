@@ -35,7 +35,6 @@ class ScreenieApplication : public QApplication
 {
     Q_OBJECT
 public:
-
     /*!
      * Creates this ScreenieApplication.
      *
@@ -61,6 +60,11 @@ protected:
 
 private:
     MainWindow *m_mainWindow;
+
+    void frenchConnection();
+
+private slots:
+    void handleLastWindowClosed();
 };
 
 #endif // SCREENIEAPPLICATION_H

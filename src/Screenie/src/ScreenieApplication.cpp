@@ -27,6 +27,8 @@
 #include <QtCore/QEvent>
 #include <QtGui/QFileOpenEvent>
 
+#include "../../Utils/src/Settings.h"
+#include "../../Kernel/src/DocumentManager.h"
 #include "MainWindow.h"
 #include "ScreenieApplication.h"
 
@@ -35,6 +37,7 @@
 ScreenieApplication::ScreenieApplication(int &argc, char **argv)
     : QApplication(argc, argv)
 {
+    frenchConnection();
 }
 
 void ScreenieApplication::show()
@@ -69,4 +72,21 @@ bool ScreenieApplication::event(QEvent *event)
         result = QApplication::event(event);
     }
     return result;
+}
+
+// private
+
+void ScreenieApplication::frenchConnection()
+{
+    connect(QApplication::instance(), SIGNAL(lastWindowClosed()),
+            this, SLOT(handleLastWindowClosed()));
+}
+
+// private slots
+
+void ScreenieApplication::handleLastWindowClosed()
+{
+    // destroy singletons
+    Settings::destroyInstance();
+    DocumentManager::destroyInstance();
 }
