@@ -37,8 +37,9 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreeniePixmapItem;
 class ScreenieControl;
-class Clipboard;
 class ScreenieGraphicsScene;
+class Clipboard;
+class PlatformManager;
 
 namespace Ui {
     class MainWindow;
@@ -65,6 +66,7 @@ private:
     Q_DISABLE_COPY(MainWindow)
 
     Ui::MainWindow *ui;
+    PlatformManager *m_platformManager;
     ScreenieGraphicsScene *m_screenieGraphicsScene;
     ScreenieScene *m_screenieScene;
     ScreenieControl *m_screenieControl;

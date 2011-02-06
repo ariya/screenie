@@ -59,6 +59,8 @@
 #include "../../Kernel/src/DocumentManager.h"
 #include "../../Kernel/src/DocumentInfo.h"
 #include "../../Kernel/src/PropertyDialogFactory.h"
+#include "PlatformManager/PlatformManagerFactory.h"
+#include "PlatformManager/PlatFormManager.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -77,23 +79,6 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->recentFilesMenu->addAction(recentFileAction);
     }
 
-    setWindowIcon(QIcon(":/img/application-icon.png"));
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
-
-    /*!\todo Move shortcut assignment to separate class, see http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
-#ifdef Q_OS_MAC
-    // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-    // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
-    // For Mac there does not seem to be a common shortcut for fullscreen
-    // (unlike F11 for other platforms), but iTunes uses Meta + F
-    // Note: by default on Mac Qt swaps CTRL and META
-    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
-#endif
-
-    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
-    connect(shortcut, SIGNAL(activated()),
-            ui->deleteAction, SIGNAL(triggered()));
-
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -109,6 +94,8 @@ MainWindow::MainWindow(QWidget *parent) :
     createScene();
 
     initializeUi();
+    m_platformManager = PlatformManagerFactory::getInstance().create();
+    m_platformManager->initialize(*ui);
     updateUi();
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
@@ -120,6 +107,7 @@ MainWindow::~MainWindow()
 {
     delete m_screenieScene;
     delete m_screenieControl;
+    delete m_platformManager;
     delete ui;
 
     // destroy singletons
@@ -186,10 +174,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::changeEvent(QEvent *event)
 {
     QMainWindow::changeEvent(event);
-    if (this->isActiveWindow()) {
-        ui->sidePanel->setStyleSheet("#sidePanel {background-color: rgb(218, 223, 230); border-right: 1px solid rgb(187, 187, 187);}");
-    } else {
-        ui->sidePanel->setStyleSheet("#sidePanel {background-color: rgb(237, 237, 237); border-right: 1px solid rgb(187, 187, 187);}");
+    switch (event->type()) {
+    case QEvent::ActivationChange:
+        m_platformManager->handleWindowActivation(isActiveWindow());
+        break;
+     default:
+        break;
     }
 }
 
@@ -344,6 +334,13 @@ void MainWindow::updateTitle()
 
 void MainWindow::initializeUi()
 {
+    setWindowIcon(QIcon(":/img/application-icon.png"));
+    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
+    connect(shortcut, SIGNAL(activated()),
+            ui->deleteAction, SIGNAL(triggered()));
+
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
     ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
