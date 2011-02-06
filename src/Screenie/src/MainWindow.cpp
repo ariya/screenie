@@ -60,7 +60,7 @@
 #include "../../Kernel/src/DocumentInfo.h"
 #include "../../Kernel/src/PropertyDialogFactory.h"
 #include "PlatformManager/PlatformManagerFactory.h"
-#include "PlatformManager/PlatFormManager.h"
+#include "PlatformManager/PlatformManager.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
