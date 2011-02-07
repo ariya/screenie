@@ -60,18 +60,22 @@ PropertyDialogFactory::~PropertyDialogFactory()
 QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieModel, QWidget *parent)
 {
     QDialog *result = 0;
-    if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-        ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        result = new TemplateModelPropertiesDialog(screenieTemplateModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+    if (screenieTemplateModel != 0) {
+        result = new TemplateModelPropertiesDialog(*screenieTemplateModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         result->setWindowTitle(QObject::tr("Template Properties"));
-    } else if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-        ScreenieFilePathModel &screenieFilePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
-        result = new FilePathModelPropertiesDialog(screenieFilePathModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-        result->setWindowTitle(QObject::tr("Image Properties"));
-    } else if (screenieModel.inherits(ScreenieImageModel::staticMetaObject.className())) {
-        ScreenieImageModel &screenieImageModel = static_cast<ScreenieImageModel &>(screenieModel);
-        result = new ImageModelPropertiesDialog(screenieImageModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-        result->setWindowTitle(QObject::tr("Image Properties"));
+    } else {
+        ScreenieFilePathModel *screenieFilePathModel = qobject_cast<ScreenieFilePathModel *>(&screenieModel);
+        if (screenieFilePathModel != 0) {
+            result = new FilePathModelPropertiesDialog(*screenieFilePathModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+            result->setWindowTitle(QObject::tr("Image Properties"));
+        } else {
+            ScreenieImageModel *screenieImageModel = qobject_cast<ScreenieImageModel *>(&screenieModel);
+            if (screenieImageModel != 0) {
+                result = new ImageModelPropertiesDialog(*screenieImageModel, d->screenieControl, parent, Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+                result->setWindowTitle(QObject::tr("Image Properties"));
+            }
+        }
     }
     if (result != 0) {
         connect(result, SIGNAL(destroyed()),

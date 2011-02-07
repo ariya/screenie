@@ -44,8 +44,8 @@ bool MimeHelper::accept(const QMimeData *mimeData, Mode mode)
 {
     bool result;
     if (mimeData != 0) {
-        if (mimeData->inherits(ScreenieMimeData::staticMetaObject.className())) {
-            const ScreenieMimeData *screenieMimeData = static_cast<const ScreenieMimeData *>(mimeData);
+        const ScreenieMimeData *screenieMimeData = qobject_cast<const ScreenieMimeData *>(mimeData);
+        if (screenieMimeData != 0) {
             result = screenieMimeData->hasScreenieModels();
         }
         else if (mimeData->hasImage()) {

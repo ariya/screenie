@@ -67,18 +67,18 @@ void TemplateOrganizer::frenchConnection()
 
 void TemplateOrganizer::handleModelAdded(ScreenieModelInterface &screenieModel)
 {
-    if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-        ScreenieTemplateModel &screenieTemplateModel = static_cast<ScreenieTemplateModel &>(screenieModel);
-        d->templates.append(&screenieTemplateModel);
-        screenieTemplateModel.setOrder(d->templates.count());
+    ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+    if (screenieTemplateModel != 0) {
+        d->templates.append(screenieTemplateModel);
+        screenieTemplateModel->setOrder(d->templates.count());
         d->ordered = false;
     }
 }
 
 void TemplateOrganizer::handleModelRemoved(ScreenieModelInterface &screenieModel)
 {
-    if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-        ScreenieTemplateModel *screenieTemplateModel = static_cast<ScreenieTemplateModel *>(&screenieModel);
+    ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+    if (screenieTemplateModel != 0) {
         int index = d->templates.indexOf(screenieTemplateModel, 0);
         if (index != -1) {
             d->templates.removeAt(index);

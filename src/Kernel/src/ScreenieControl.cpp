@@ -120,8 +120,9 @@ QList<ScreenieTemplateModel *> ScreenieControl::getSelectedTemplateModels() cons
         if (selectedItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(selectedItem);
             ScreenieModelInterface &screenieModel = screeniePixmapItem->getScreenieModel();
-            if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-                result.append(&static_cast<ScreenieTemplateModel &>(screenieModel));
+            ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+            if (screenieTemplateModel != 0) {
+                result.append(screenieTemplateModel);
             }
         }
     }
@@ -135,8 +136,9 @@ QList<ScreenieFilePathModel *> ScreenieControl::getSelectedFilePathModels() cons
         if (selectedItem->type() == ScreeniePixmapItem::ScreeniePixmapType) {
             ScreeniePixmapItem *screeniePixmapItem = static_cast<ScreeniePixmapItem *>(selectedItem);
             ScreenieModelInterface &screenieModel = screeniePixmapItem->getScreenieModel();
-            if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-                result.append(&static_cast<ScreenieFilePathModel &>(screenieModel));
+            ScreenieFilePathModel *screenieFilePathModel = qobject_cast<ScreenieFilePathModel *>(&screenieModel);
+            if (screenieFilePathModel != 0) {
+                result.append(screenieFilePathModel);
             }
         }
     }
@@ -454,7 +456,7 @@ void ScreenieControl::convertItemsToTemplate(ScreenieScene &screenieScene)
     QList<ScreenieModelInterface *> templateItems;
     QList<ScreenieModelInterface *> nonTemplateItems;
     foreach (ScreenieModelInterface *screenieModel, screenieScene.getModels()) {
-        if (!screenieModel->inherits(ScreenieTemplateModel::staticMetaObject.className())) {
+        if (!qobject_cast<ScreenieTemplateModel *>(screenieModel)) {
             ScreenieTemplateModel *templateModel = new ScreenieTemplateModel();
             templateModel->convert(*screenieModel);
             templateItems.append(templateModel);
@@ -582,15 +584,16 @@ void ScreenieControl::updateImageModel(const QImage &image, ScreenieModelInterfa
 {
     QImage actualImage = image;
     if (!actualImage.isNull()) {
-        if (screenieModel.inherits(ScreenieImageModel::staticMetaObject.className())) {
-            ScreenieImageModel &screenieImageModel = static_cast<ScreenieImageModel &>(screenieModel);
-            QPointF itemPosition = calculateItemPosition(screenieImageModel.getPosition(), screenieImageModel.getSize(), actualImage.size());
-            screenieImageModel.setImage(actualImage);
-            screenieImageModel.setPosition(itemPosition);
+        ScreenieImageModel *screenieImageModel = qobject_cast<ScreenieImageModel *>(&screenieModel);
+        if (screenieImageModel != 0) {
+            QPointF itemPosition = calculateItemPosition(screenieImageModel->getPosition(), screenieImageModel->getSize(), actualImage.size());
+            screenieImageModel->setImage(actualImage);
+            screenieImageModel->setPosition(itemPosition);
         } else {
             // convert to ScreenieImageModel
-            if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-                actualImage = scaleToTemplate(static_cast<ScreenieTemplateModel &>(screenieModel), actualImage);
+            ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+            if (screenieTemplateModel != 0) {
+                actualImage = scaleToTemplate(*screenieTemplateModel, actualImage);
             }
             ScreenieImageModel *screenieImageModel = new ScreenieImageModel(actualImage);
             QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), screenieModel.getSize(), actualImage.size());
@@ -604,17 +607,18 @@ void ScreenieControl::updateImageModel(const QImage &image, ScreenieModelInterfa
 
 void ScreenieControl::updateFilePathModel(const QString &filePath, ScreenieModelInterface &screenieModel)
 {
-    if (screenieModel.inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-        ScreenieFilePathModel &filePathModel = static_cast<ScreenieFilePathModel &>(screenieModel);
-        QSize oldSize = filePathModel.getSize();
-        filePathModel.setFilePath(filePath);
-        QPointF itemPosition = calculateItemPosition(screenieModel.getPosition(), oldSize, screenieModel.getSize());
-        filePathModel.setPosition(itemPosition);
+    ScreenieFilePathModel *filePathModel = qobject_cast<ScreenieFilePathModel *>(&screenieModel);
+    if (filePathModel != 0) {
+        QSize oldSize = filePathModel->getSize();
+        filePathModel->setFilePath(filePath);
+        QPointF itemPosition = calculateItemPosition(filePathModel->getPosition(), oldSize, filePathModel->getSize());
+        filePathModel->setPosition(itemPosition);
     } else {
         SizeFitter sizeFitter;
         ScreenieFilePathModel *screenieFilePathModel;
-        if (screenieModel.inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-            sizeFitter = static_cast<ScreenieTemplateModel &>(screenieModel).getSizeFitter();
+        ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(&screenieModel);
+        if (screenieTemplateModel != 0) {
+            sizeFitter = screenieTemplateModel->getSizeFitter();
             screenieFilePathModel = new ScreenieFilePathModel(filePath, &sizeFitter);
         } else {
             screenieFilePathModel = new ScreenieFilePathModel(filePath);

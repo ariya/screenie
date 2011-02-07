@@ -187,18 +187,25 @@ bool XmlScreenieSceneDao::writeScreenieModels(const ScreenieScene &screenieScene
     }
 
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
-        if (screenieModel->inherits(ScreenieFilePathModel::staticMetaObject.className())) {
-            result = writeFilePathModel(static_cast<ScreenieFilePathModel &>(*screenieModel));
-        } else if (screenieModel->inherits(ScreenieImageModel::staticMetaObject.className())) {
-            result = writePixmapModel(static_cast<ScreenieImageModel &>(*screenieModel));
-        } else if (screenieModel->inherits(ScreenieTemplateModel::staticMetaObject.className())) {
-            result = writeTemplateModel(static_cast<ScreenieTemplateModel &>(*screenieModel));
-        }
+        ScreenieFilePathModel *screenieFilePathModel = qobject_cast<ScreenieFilePathModel *>(screenieModel);
+        if (screenieFilePathModel != 0) {
+            result = writeFilePathModel(*screenieFilePathModel);
+        } else {
+            ScreenieImageModel *screenieImageModel = qobject_cast<ScreenieImageModel *>(screenieModel);
+            if (screenieImageModel != 0) {
+                result = writePixmapModel(*screenieImageModel);
+            } else {
+                ScreenieTemplateModel *screenieTemplateModel = qobject_cast<ScreenieTemplateModel *>(screenieModel);
+                if (screenieTemplateModel != 0) {
+                    result = writeTemplateModel(*screenieTemplateModel);
+                }
 #ifdef DEBUG
-        else {
-            qCritical("XmlScreenieSceneDao::writeScreenieModels: UNSUPPORTED: %s", screenieModel->metaObject()->className());
-        }
+                else {
+                    qCritical("XmlScreenieSceneDao::writeScreenieModels: UNSUPPORTED: %s", screenieModel->metaObject()->className());
+                }
 #endif
+            }
+        }
     }
     return result;
 }
