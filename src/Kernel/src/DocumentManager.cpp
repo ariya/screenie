@@ -21,7 +21,10 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+#include <QtCore/QSignalMapper>
 #include <QtGui/QMainWindow>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 
 #include "../../Model/src/ScreenieScene.h"
 #include "DocumentInfo.h"
@@ -31,15 +34,23 @@ class DocumentManagerPrivate
 {
 public:
     DocumentManagerPrivate()
+        : windowActionGroup(new QActionGroup(0))
     {}
 
+    ~DocumentManagerPrivate()
+    {
+        delete windowActionGroup;
+    }
+
     QList<const DocumentInfo *> documentInfos;
+    QActionGroup *windowActionGroup;
+    QSignalMapper windowMapper;
     static DocumentManager *instance;
-    static int windowId;
+    static int nextWindowId;
 };
 
 DocumentManager *DocumentManagerPrivate::instance = 0;
-int DocumentManagerPrivate::windowId = 0;
+int DocumentManagerPrivate::nextWindowId = 0;
 
 // public
 
@@ -59,21 +70,29 @@ void DocumentManager::destroyInstance()
     }
 }
 
-void DocumentManager::add(const DocumentInfo *documentInfo)
+void DocumentManager::add(DocumentInfo *documentInfo)
 {
     QMainWindow *mainWindow = documentInfo->mainWindow;
     d->documentInfos.append(documentInfo);
     connect(mainWindow, SIGNAL(destroyed(QObject *)),
             this, SLOT(remove(QObject *)));
     // update object name ("window ID")
-    mainWindow->setObjectName(mainWindow->objectName() + QString::number(d->windowId));
-    ++d->windowId;
+    mainWindow->setObjectName(mainWindow->objectName() + QString::number(d->nextWindowId));
+    documentInfo->id = d->nextWindowId;
+    ++d->nextWindowId;
+    QAction *action = new QAction(d->windowActionGroup);
+    action->setText(mainWindow->objectName());
     emit changed();
 }
 
 const QList<const DocumentInfo *> &DocumentManager::getDocumentInfos() const
 {
     return d->documentInfos;
+}
+
+QActionGroup &DocumentManager::getActionGroup() const
+{
+    return *d->windowActionGroup;
 }
 
 int DocumentManager::count() const
@@ -118,13 +137,7 @@ DocumentManager::DocumentManager()
 
 void DocumentManager::remove(QObject *object)
 {
-#ifdef DEBUG
-    qDebug("DocumentManager::remove: called. %s", qPrintable(object->objectName()));
-#endif
     foreach(const DocumentInfo *documentInfo, d->documentInfos) {
-#ifdef DEBUG
-        qDebug("DocumentManager::remove: called: compare %s with %s", qPrintable(documentInfo->mainWindow->objectName()), qPrintable(object->objectName()));
-#endif
         if (documentInfo->mainWindow->objectName() == object->objectName()) {
             d->documentInfos.removeOne(documentInfo);
             emit changed();

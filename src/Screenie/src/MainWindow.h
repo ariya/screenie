@@ -33,6 +33,7 @@ class QCloseEvent;
 class QFileDialog;
 class QActionGroup;
 class QSignalMapper;
+class QEvent;
 
 class ScreenieModelInterface;
 class ScreenieScene;
@@ -58,6 +59,7 @@ protected:
     void closeEvent(QCloseEvent *event);
     void showFullScreen();
     void showNormal();
+    virtual bool event(QEvent *event);
 
 private:
     Q_DISABLE_COPY(MainWindow)
@@ -141,6 +143,7 @@ private slots:
     void updateDefaultValues();
     void handleRecentFile(const QString &filePath);
     void updateWindowMenu();
+    void updateWindowMenuState();
     void activateWindow(int id);
 
     void handleFileSaveAsSelected(const QString &filePath);

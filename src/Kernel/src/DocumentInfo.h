@@ -28,6 +28,7 @@ struct DocumentInfo
 {
     QMainWindow *mainWindow;
     ScreenieScene *screenieScene;
+    int id;
 };
 
 #endif // DOCUMENTINFO_H
