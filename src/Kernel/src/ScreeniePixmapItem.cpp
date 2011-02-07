@@ -153,7 +153,7 @@ void ScreeniePixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
         break;
     default:
-        event->ignore();
+        QGraphicsPixmapItem::mouseReleaseEvent(event);
         break;
     }
 }
