@@ -799,22 +799,7 @@ void  MainWindow::handleRecentFile(const QString &filePath)
 
 void MainWindow::updateWindowMenu()
 {
-//    int id = 0;
-
     ui->windowMenu->clear();
-//    m_windowActionGroup->actions().clear();
-//    const QList<const DocumentInfo *> &documentInfos = DocumentManager::getInstance().getDocumentInfos();
-//    foreach(const DocumentInfo *documentInfo, documentInfos) {
-//        QAction *action = new QAction(m_windowActionGroup);
-//        action->setCheckable(true);
-//        action->setData(documentInfo->id);
-//        action->setText(documentInfo->mainWindow->windowTitle());
-//        ui->windowMenu->addAction(action);
-//        connect(action, SIGNAL(triggered()),
-//                m_windowMapper, SLOT(map()));
-//        m_windowMapper->setMapping(action, id);
-//        ++id;
-//    }
     QActionGroup &actionGroup = DocumentManager::getInstance().getActionGroup();
     foreach (QAction *action, actionGroup.actions()) {
         ui->windowMenu->addAction(action);
@@ -842,11 +827,6 @@ void MainWindow::updateWindowMenuState()
             }
         }
     }
-}
-
-void MainWindow::activateWindow(int id)
-{
-    DocumentManager::getInstance().activate(id);
 }
 
 

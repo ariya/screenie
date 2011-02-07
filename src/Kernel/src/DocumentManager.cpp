@@ -86,6 +86,9 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     action->setCheckable(true);
     action->setData(documentInfo->id);
     action->setText(mainWindow->objectName());
+    d->windowMapper.setMapping(action, documentInfo->id);
+    connect(action, SIGNAL(triggered()),
+            &d->windowMapper, SLOT(map()));
     emit changed();
 }
 
@@ -102,14 +105,6 @@ QActionGroup &DocumentManager::getActionGroup() const
 int DocumentManager::count() const
 {
     return d->documentInfos.count();
-}
-
-void DocumentManager::activate(int id) const
-{
-    const DocumentInfo *documentInfo = d->documentInfos.at(id);
-    if (documentInfo != 0) {
-        documentInfo->mainWindow->activateWindow();
-    }
 }
 
 int DocumentManager::getModifiedCount() const
@@ -135,6 +130,18 @@ DocumentManager::~DocumentManager()
 DocumentManager::DocumentManager()
     : d(new DocumentManagerPrivate())
 {
+    frenchConnection();
+}
+
+void DocumentManager::frenchConnection()
+{
+    connect(&d->windowMapper, SIGNAL(mapped(int)),
+            this, SLOT(activate(int)));
+}
+
+void DocumentManager::updateActionGroup()
+{
+
 }
 
 // private slots
@@ -151,6 +158,16 @@ void DocumentManager::remove(QObject *object)
             }
             d->documentInfos.removeOne(documentInfo);
             emit changed();
+            break;
+        }
+    }
+}
+
+void DocumentManager::activate(int id) const
+{
+    foreach(const DocumentInfo *documentInfo, d->documentInfos) {
+        if (documentInfo->id == id) {
+            documentInfo->mainWindow->activateWindow();
             break;
         }
     }

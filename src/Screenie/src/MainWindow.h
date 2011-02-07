@@ -148,7 +148,6 @@ private slots:
     void handleRecentFile(const QString &filePath);
     void updateWindowMenu();
     void updateWindowMenuState();
-    void activateWindow(int id);
 
     void handleFileSaveAsSelected(const QString &filePath);
     void handleConfirm(int result);

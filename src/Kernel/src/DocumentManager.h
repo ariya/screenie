@@ -53,7 +53,7 @@ public:
     KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
     KERNEL_API QActionGroup &getActionGroup() const;
     KERNEL_API int count() const;
-    KERNEL_API void activate(int id) const;
+
     KERNEL_API int getModifiedCount() const;
 
 signals:
@@ -68,10 +68,12 @@ private:
 
     DocumentManager();
 
+    void frenchConnection();
     void updateActionGroup();
 
 private slots:
     void remove(QObject *mainWindow);
+    void activate(int id) const;
 };
 
 #endif // DOCUMENTMANAGER_H
