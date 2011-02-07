@@ -35,7 +35,9 @@ class DocumentManagerPrivate
 public:
     DocumentManagerPrivate()
         : windowActionGroup(new QActionGroup(0))
-    {}
+    {
+        windowActionGroup->setExclusive(true);
+    }
 
     ~DocumentManagerPrivate()
     {
@@ -81,6 +83,8 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     documentInfo->id = d->nextWindowId;
     ++d->nextWindowId;
     QAction *action = new QAction(d->windowActionGroup);
+    action->setCheckable(true);
+    action->setData(documentInfo->id);
     action->setText(mainWindow->objectName());
     emit changed();
 }
@@ -139,6 +143,12 @@ void DocumentManager::remove(QObject *object)
 {
     foreach(const DocumentInfo *documentInfo, d->documentInfos) {
         if (documentInfo->mainWindow->objectName() == object->objectName()) {
+            foreach (QAction *action, d->windowActionGroup->actions()) {
+                if (action->data().toInt() ==  documentInfo->id) {
+                    delete action;
+                    break;
+                }
+            }
             d->documentInfos.removeOne(documentInfo);
             emit changed();
             break;
