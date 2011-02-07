@@ -1,0 +1,64 @@
+/* This file is part of the Screenie project.
+   Screenie is a fancy screenshot composer.
+
+   Copyright (C) 2008 Ariya Hidayat <ariya.hidayat@gmail.com>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include <QtGui/QAction>
+#include <QtGui/QKeySequence>
+
+#include "ui_MainWindow.h"
+#include "MacPlatformManager.h"
+
+class MacPlatformManagerPrivate
+{
+public:
+    MacPlatformManagerPrivate(Ui::MainWindow &theMainWindow)
+        : mainWindow(theMainWindow)
+    {}
+
+    Ui::MainWindow &mainWindow;
+};
+
+// public
+
+MacPlatformManager::MacPlatformManager()
+    :d(0)
+{}
+
+MacPlatformManager::~MacPlatformManager()
+{
+    if (d != 0) {
+        delete d;
+    }
+}
+
+void MacPlatformManager::initialize(Ui::MainWindow &mainWindow)
+{
+    d = new MacPlatformManagerPrivate(mainWindow);
+    AbstractPlatformManager::initialize(mainWindow);
+    mainWindow.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
+}
+
+void MacPlatformManager::handleWindowActivation(bool active)
+{
+    if (active) {
+        d->mainWindow.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(218, 223, 230); border-right: 1px solid rgb(187, 187, 187);}");
+    } else {
+        d->mainWindow.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(237, 237, 237); border-right: 1px solid rgb(187, 187, 187);}");
+    }
+}

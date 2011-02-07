@@ -371,9 +371,6 @@
    <property name="text">
     <string>&amp;Quit</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
   </action>
   <action name="addImageAction">
    <property name="icon">
@@ -386,9 +383,6 @@
    <property name="toolTip">
     <string>Add Image</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+I</string>
-   </property>
   </action>
   <action name="openAction">
    <property name="icon">
@@ -397,9 +391,6 @@
    </property>
    <property name="text">
     <string>&amp;Open</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="saveAction">
@@ -410,9 +401,6 @@
    <property name="text">
     <string>&amp;Save</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
   </action>
   <action name="saveAsAction">
    <property name="icon">
@@ -422,16 +410,10 @@
    <property name="text">
     <string>Save &amp;As</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
   </action>
   <action name="exportAction">
    <property name="text">
     <string>&amp;Export Image</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="aboutQtAction">
@@ -453,9 +435,6 @@
    <property name="toolTip">
     <string>Add Template</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
-   </property>
   </action>
   <action name="toggleFullScreenAction">
    <property name="icon">
@@ -468,16 +447,10 @@
    <property name="toolTip">
     <string>View Full Screen</string>
    </property>
-   <property name="shortcut">
-    <string>F11</string>
-   </property>
   </action>
   <action name="selectAllAction">
    <property name="text">
     <string>Select &amp;All</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="cutAction">
@@ -488,9 +461,6 @@
    <property name="text">
     <string>Cu&amp;t</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+X</string>
-   </property>
   </action>
   <action name="copyAction">
    <property name="icon">
@@ -499,9 +469,6 @@
    </property>
    <property name="text">
     <string>&amp;Copy</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="pasteAction">
@@ -512,9 +479,6 @@
    <property name="text">
     <string>&amp;Paste</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
-   </property>
   </action>
   <action name="deleteAction">
    <property name="icon">
@@ -523,9 +487,6 @@
    </property>
    <property name="text">
     <string>&amp;Delete</string>
-   </property>
-   <property name="shortcut">
-    <string>Del</string>
    </property>
   </action>
   <action name="newAction">
@@ -536,16 +497,10 @@
    <property name="text">
     <string>&amp;New</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
   </action>
   <action name="closeAction">
    <property name="text">
     <string>Close</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>
@@ -560,8 +515,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>226</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>223</x>

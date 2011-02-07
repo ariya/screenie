@@ -24,6 +24,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 #include <QtCore/QSignalMapper>
+#include <QtCore/QEvent>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
@@ -61,6 +62,9 @@
 #include "../../Kernel/src/PropertyDialogFactory.h"
 #include "../../Kernel/src/DocumentManager.h"
 #include "../../Kernel/src/DocumentInfo.h"
+#include "../../Kernel/src/PropertyDialogFactory.h"
+#include "PlatformManager/PlatformManagerFactory.h"
+#include "PlatformManager/PlatformManager.h"
 #include "RecentFiles.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -79,23 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->recentFilesMenu->addAction(recentFileAction);
     }
 
-    setWindowIcon(QIcon(":/img/application-icon.png"));
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
-
-    /*!\todo Move shortcut assignment to separate class, see http://doc.trolltech.com/latest/qkeysequence.html#StandardKey-enum */
-#ifdef Q_OS_MAC
-    // Also refer to http://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-    // (or: http://doc.trolltech.com/latest/qkeysequence.html#standard-shortcuts)
-    // For Mac there does not seem to be a common shortcut for fullscreen
-    // (unlike F11 for other platforms), but iTunes uses Meta + F
-    // Note: by default on Mac Qt swaps CTRL and META
-    ui->toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
-#endif
-
-    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
-    connect(shortcut, SIGNAL(activated()),
-            ui->deleteAction, SIGNAL(triggered()));
-
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -111,10 +98,12 @@ MainWindow::MainWindow(QWidget *parent) :
     createScene();
 
     initializeUi();
+    m_platformManager = PlatformManagerFactory::getInstance().create();
+    m_platformManager->initialize(*ui);
     updateUi();
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
-    setUnifiedTitleAndToolBarOnMac(true);    
+    setUnifiedTitleAndToolBarOnMac(true);
     frenchConnection();
     updateDocumentManager(*this);
 }
@@ -123,6 +112,7 @@ MainWindow::~MainWindow()
 {
     delete m_screenieScene;
     delete m_screenieControl;
+    delete m_platformManager;
     delete ui;
 }
 
@@ -142,6 +132,30 @@ bool MainWindow::read(const QString &filePath)
     return result;
 }
 
+// public slots
+
+void MainWindow::showFullScreen()
+{
+    /*!\todo Settings which control what becomes invisible in fullscreen mode */
+    ui->toolBar->setVisible(false);
+    ui->sidePanel->setVisible(false);
+    // Note: Qt crashes when we don't disable the unified toolbar before going
+    // fullscreen (when we switch back to normal view, that is)!
+    // But since for now we hide it anyway that does not make any visible difference.
+    // The Qt documentation recommends anyway to do so.
+    // Also refer to: http://bugreports.qt.nokia.com/browse/QTBUG-16274
+    setUnifiedTitleAndToolBarOnMac(false);
+    QMainWindow::showFullScreen();
+}
+
+void MainWindow::showNormal()
+{
+    QMainWindow::showNormal();
+    ui->toolBar->setVisible(true);
+    ui->sidePanel->setVisible(true);
+    setUnifiedTitleAndToolBarOnMac(true);
+}
+
 // protected
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -158,13 +172,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-bool MainWindow::event(QEvent *event)
+void MainWindow::changeEvent(QEvent *event)
 {
-    bool result = QMainWindow::event(event);
-    if (event->type() == QEvent::ActivationChange) {
+    QMainWindow::changeEvent(event);
+    switch (event->type()) {
+    case QEvent::ActivationChange:
+        m_platformManager->handleWindowActivation(isActiveWindow());
         updateWindowMenuState();
+        break;
+     default:
+        break;
     }
-    return result;
 }
 
 // private
@@ -322,9 +340,18 @@ void MainWindow::updateTitle()
 
 void MainWindow::initializeUi()
 {
+
     m_windowActionGroup = new QActionGroup(this);
     m_windowActionGroup->setExclusive(true);
     m_windowMapper = new QSignalMapper(this);
+
+    setWindowIcon(QIcon(":/img/application-icon.png"));
+    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
+    connect(shortcut, SIGNAL(activated()),
+            ui->deleteAction, SIGNAL(triggered()));
+
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
     ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
@@ -396,28 +423,6 @@ void MainWindow::proceedWithModifiedScene(const char *slot)
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     messageBox->open(this, slot);
 
-}
-
-void MainWindow::showFullScreen()
-{
-    /*!\todo Settings which control what becomes invisible in fullscreen mode */
-    ui->toolBar->setVisible(false);
-    ui->sidePanel->setVisible(false);
-    // Note: Qt crashes when we don't disable the unified toolbar before going
-    // fullscreen (when we switch back to normal view, that is)!
-    // But since for now we hide it anyway that does not make any visible difference.
-    // The Qt documentation recommends anyway to do so.
-    // Also refer to: http://bugreports.qt.nokia.com/browse/QTBUG-16274
-    setUnifiedTitleAndToolBarOnMac(false);
-    QMainWindow::showFullScreen();
-}
-
-void MainWindow::showNormal()
-{
-    QMainWindow::showNormal();
-    ui->toolBar->setVisible(true);
-    ui->sidePanel->setVisible(true);
-    setUnifiedTitleAndToolBarOnMac(true);
 }
 
 void MainWindow::restoreWindowGeometry()

@@ -39,8 +39,9 @@ class ScreenieModelInterface;
 class ScreenieScene;
 class ScreeniePixmapItem;
 class ScreenieControl;
-class Clipboard;
 class ScreenieGraphicsScene;
+class Clipboard;
+class PlatformManager;
 
 namespace Ui {
     class MainWindow;
@@ -55,16 +56,19 @@ public:
 
     bool read(const QString &filePath);
 
+public slots:
+    virtual void showFullScreen();
+    virtual void showNormal();
+
 protected:
-    void closeEvent(QCloseEvent *event);
-    void showFullScreen();
-    void showNormal();
-    virtual bool event(QEvent *event);
+    virtual void closeEvent(QCloseEvent *event);
+    virtual void changeEvent(QEvent *event);
 
 private:
     Q_DISABLE_COPY(MainWindow)
 
     Ui::MainWindow *ui;
+    PlatformManager *m_platformManager;
     ScreenieGraphicsScene *m_screenieGraphicsScene;
     ScreenieScene *m_screenieScene;
     ScreenieControl *m_screenieControl;
