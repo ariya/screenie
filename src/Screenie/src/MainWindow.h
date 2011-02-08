@@ -104,6 +104,7 @@ private slots:
     void on_openAction_triggered();
     void on_saveAction_triggered();
     void on_saveAsAction_triggered();
+    void on_saveAsTemplateAction_triggered();
     void on_exportAction_triggered();
     void on_quitAction_triggered();
 
@@ -144,6 +145,7 @@ private slots:
     void updateWindowMenu();
 
     void handleFileSaveAsSelected(const QString &filePath);
+    void handleFileSaveAsTemplateSelected(const QString &filePath);
     void handleConfirm(int result);
 
 };

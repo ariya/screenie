@@ -215,6 +215,7 @@ bool MainWindow::writeScene(const QString &filePath)
     result = screenieSceneDao->write(*m_screenieScene);
     if (result) {
         m_screenieScene->setModified(false);
+        setWindowModified(false);
         m_documentFilePath = filePath;
         updateTitle();
     }
@@ -527,18 +528,33 @@ void MainWindow::on_saveAsAction_triggered()
     QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
     QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
                           .arg(FileUtils::SceneExtension);
-    QString templateFilter = tr("Screenie Template (*.%1)", "Save As dialog filter")
-                             .arg(FileUtils::TemplateExtension);
-    QString filter = sceneFilter + ";;" + templateFilter;
+
 
     QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
-    fileDialog->setNameFilter(filter);
+    fileDialog->setNameFilter(sceneFilter);
+    fileDialog->setDefaultSuffix(FileUtils::SceneExtension);
     fileDialog->setWindowTitle(tr("Save As"));
     fileDialog->setDirectory(lastDocumentDirectoryPath);
     fileDialog->setWindowModality(Qt::WindowModal);
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     fileDialog->setAttribute(Qt::WA_DeleteOnClose);
     fileDialog->open(this, SLOT(handleFileSaveAsSelected(const QString &)));
+}
+
+void MainWindow::on_saveAsTemplateAction_triggered()
+{
+    QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
+    QString templateFilter = tr("Screenie Template (*.%1)", "Save As Template dialog filter")
+                             .arg(FileUtils::TemplateExtension);
+    QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
+    fileDialog->setNameFilter(templateFilter);
+    fileDialog->setDefaultSuffix(FileUtils::TemplateExtension);
+    fileDialog->setWindowTitle(tr("Save As"));
+    fileDialog->setDirectory(lastDocumentDirectoryPath);
+    fileDialog->setWindowModality(Qt::WindowModal);
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+    fileDialog->open(this, SLOT(handleFileSaveAsTemplateSelected(const QString &)));
 }
 
 void MainWindow::on_exportAction_triggered()
@@ -754,20 +770,25 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 {
     bool ok = false;
     if (!filePath.isNull()) {
-        if (filePath.endsWith("." + FileUtils::SceneExtension)) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(false);
-            ok = writeScene(filePath);
-        } else if (filePath.endsWith("." + FileUtils::TemplateExtension)) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(true);
-            ok = writeTemplate(filePath);
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        m_screenieScene->setTemplate(false);
+        ok = writeScene(filePath);
+        if (ok) {
+            QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
+            Settings &settings = Settings::getInstance();
+            settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+            settings.addRecentFile(filePath);
         }
-#ifdef DEBUG
-        else {
-            qWarning("MainWindow::handleFileSaveAsSelected: UNSUPPORTED EXTENSION: %s", qPrintable(filePath));
-        }
-#endif
+    }
+}
+
+void MainWindow::handleFileSaveAsTemplateSelected(const QString &filePath)
+{
+    bool ok = false;
+    if (!filePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        m_screenieScene->setTemplate(true);
+        ok = writeTemplate(filePath);
         if (ok) {
             QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
             Settings &settings = Settings::getInstance();
@@ -782,7 +803,7 @@ void MainWindow::handleConfirm(int result)
 
 }
 
-void  MainWindow::handleRecentFile(const QString &filePath)
+void MainWindow::handleRecentFile(const QString &filePath)
 {
     if (proceedWithModifiedScene()) {
         read(filePath);

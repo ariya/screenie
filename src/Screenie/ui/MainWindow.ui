@@ -299,6 +299,8 @@
     <addaction name="openAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
+    <addaction name="saveAsTemplateAction"/>
+    <addaction name="separator"/>
     <addaction name="exportAction"/>
     <addaction name="separator"/>
     <addaction name="recentFilesMenu"/>
@@ -501,6 +503,11 @@
   <action name="closeAction">
    <property name="text">
     <string>Close</string>
+   </property>
+  </action>
+  <action name="saveAsTemplateAction">
+   <property name="text">
+    <string>Save As &amp;Template</string>
    </property>
   </action>
  </widget>
