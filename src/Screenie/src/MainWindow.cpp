@@ -436,14 +436,14 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
     documentInfo->mainWindow = &mainWindow;
     documentInfo->screenieScene = mainWindow.m_screenieScene;
     DocumentManager::getInstance().add(documentInfo);
-
 }
-
 
 MainWindow *MainWindow::createMainWindow()
 {
     MainWindow *result = new MainWindow();
     QPoint position = pos();
+    /*!\todo Bug (Mac): With unified toolbar calling move calculates wrong window positions!
+             Possible workaround: pass along desired position in c'tor */
     position += QPoint(28, 28);
     result->move(position);
     result->setAttribute(Qt::WA_DeleteOnClose, true);
