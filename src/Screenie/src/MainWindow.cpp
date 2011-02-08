@@ -78,11 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // recent files menu
-    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
-        ui->recentFilesMenu->addAction(recentFileAction);
-    }
-
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -342,6 +337,11 @@ void MainWindow::initializeUi()
     updateTitle();
     updateWindowMenu();
 
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -439,6 +439,17 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
 
 }
 
+
+MainWindow *MainWindow::createMainWindow()
+{
+    MainWindow *result = new MainWindow();
+    QPoint position = pos();
+    position += QPoint(28, 28);
+    result->move(position);
+    result->setAttribute(Qt::WA_DeleteOnClose, true);
+    return result;
+}
+
 // private slots
 
 bool MainWindow::proceed(int answer, const char *followUpAction) {
@@ -466,8 +477,7 @@ bool MainWindow::proceed(int answer, const char *followUpAction) {
 
 void MainWindow::on_newAction_triggered()
 {
-    MainWindow *mainWindow = new MainWindow();
-    mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+    MainWindow *mainWindow = createMainWindow();
     mainWindow->show();
 }
 
@@ -491,8 +501,7 @@ void MainWindow::on_openAction_triggered()
         if (m_screenieScene->isDefault()) {
             ok = read(filePath);
         } else {
-            MainWindow *mainWindow = new MainWindow();
-            mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+            MainWindow *mainWindow = createMainWindow();
             ok = mainWindow->read(filePath);
             if (ok) {
                 mainWindow->show();
@@ -549,7 +558,7 @@ void MainWindow::on_saveAsTemplateAction_triggered()
     QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
     fileDialog->setNameFilter(templateFilter);
     fileDialog->setDefaultSuffix(FileUtils::TemplateExtension);
-    fileDialog->setWindowTitle(tr("Save As"));
+    fileDialog->setWindowTitle(tr("Save As Template"));
     fileDialog->setDirectory(lastDocumentDirectoryPath);
     fileDialog->setWindowModality(Qt::WindowModal);
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
@@ -805,9 +814,19 @@ void MainWindow::handleConfirm(int result)
 
 void MainWindow::handleRecentFile(const QString &filePath)
 {
-    if (proceedWithModifiedScene()) {
-        read(filePath);
+    bool ok;
+    if (m_screenieScene->isDefault()) {
+        ok = read(filePath);
+    } else {
+        MainWindow *mainWindow = createMainWindow();
+        ok = mainWindow->read(filePath);
+        if (ok) {
+            mainWindow->show();
+        } else {
+            delete mainWindow;
+        }
     }
+    /*!\todo Error handling, show a nice error message to the user ;) */
 }
 
 void MainWindow::updateWindowMenu()
@@ -818,5 +837,4 @@ void MainWindow::updateWindowMenu()
         ui->windowMenu->addAction(action);
     }
 }
-
 

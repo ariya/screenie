@@ -95,6 +95,7 @@ private:
     void restoreWindowGeometry();
 
     void updateDocumentManager(MainWindow &mainWindow);
+    MainWindow *createMainWindow();
 
 private slots:
     bool proceed(int answer, const char *followUpAction);
@@ -147,6 +148,8 @@ private slots:
     void handleFileSaveAsSelected(const QString &filePath);
     void handleFileSaveAsTemplateSelected(const QString &filePath);
     void handleConfirm(int result);
+
+
 
 };
 
