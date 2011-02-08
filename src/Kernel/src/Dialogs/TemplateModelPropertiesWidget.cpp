@@ -90,18 +90,28 @@ void TemplateModelPropertiesWidget::updateUi()
     switch (sizeFitter.getFitMode()) {
     case SizeFitter::NoFit:
         ui->fitModeComboBox->setCurrentIndex(0);
+        ui->respectOrientationCheckBox->setEnabled(false);
+        ui->enlargeCheckBox->setEnabled(false);
         break;
     case SizeFitter::Fit:
         ui->fitModeComboBox->setCurrentIndex(1);
+        ui->respectOrientationCheckBox->setEnabled(true);
+        ui->enlargeCheckBox->setEnabled(true);
         break;
     case SizeFitter::FitToWidth:
         ui->fitModeComboBox->setCurrentIndex(2);
+        ui->respectOrientationCheckBox->setEnabled(false);
+        ui->enlargeCheckBox->setEnabled(true);
         break;
     case SizeFitter::FitToHeight:
         ui->fitModeComboBox->setCurrentIndex(3);
+        ui->respectOrientationCheckBox->setEnabled(false);
+        ui->enlargeCheckBox->setEnabled(true);
         break;
     case SizeFitter::ExactFit:
         ui->fitModeComboBox->setCurrentIndex(4);
+        ui->respectOrientationCheckBox->setEnabled(true);
+        ui->enlargeCheckBox->setEnabled(true);
         break;
     default:
 #ifdef DEBUG
