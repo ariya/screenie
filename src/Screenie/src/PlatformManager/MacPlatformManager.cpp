@@ -27,11 +27,11 @@
 class MacPlatformManagerPrivate
 {
 public:
-    MacPlatformManagerPrivate(Ui::MainWindow &theMainWindow)
-        : mainWindow(theMainWindow)
+    MacPlatformManagerPrivate(Ui::MainWindow &theMainWindowUi)
+        : mainWindowUi(theMainWindowUi)
     {}
 
-    Ui::MainWindow &mainWindow;
+    Ui::MainWindow &mainWindowUi;
 };
 
 // public
@@ -47,18 +47,18 @@ MacPlatformManager::~MacPlatformManager()
     }
 }
 
-void MacPlatformManager::initialize(Ui::MainWindow &mainWindow)
+void MacPlatformManager::initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi)
 {
-    d = new MacPlatformManagerPrivate(mainWindow);
-    AbstractPlatformManager::initialize(mainWindow);
-    mainWindow.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
+    d = new MacPlatformManagerPrivate(mainWindowUi);
+    AbstractPlatformManager::initialize(mainWindow, mainWindowUi);
+    mainWindowUi.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 }
 
 void MacPlatformManager::handleWindowActivation(bool active)
 {
     if (active) {
-        d->mainWindow.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(218, 223, 230); border-right: 1px solid rgb(187, 187, 187);}");
+        d->mainWindowUi.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(218, 223, 230); border-right: 1px solid rgb(187, 187, 187);}");
     } else {
-        d->mainWindow.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(237, 237, 237); border-right: 1px solid rgb(187, 187, 187);}");
+        d->mainWindowUi.sidePanel->setStyleSheet("#sidePanel {background-color: rgb(237, 237, 237); border-right: 1px solid rgb(187, 187, 187);}");
     }
 }

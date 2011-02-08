@@ -78,11 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // recent files menu
-    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
-        ui->recentFilesMenu->addAction(recentFileAction);
-    }
-
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
     ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -96,16 +91,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     createScene();
-
+    updateDocumentManager(*this);
     initializeUi();
     m_platformManager = PlatformManagerFactory::getInstance().create();
-    m_platformManager->initialize(*ui);
+    m_platformManager->initialize(*this, *ui);
     updateUi();
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
     setUnifiedTitleAndToolBarOnMac(true);
     frenchConnection();
-    updateDocumentManager(*this);
 }
 
 MainWindow::~MainWindow()
@@ -200,8 +194,6 @@ void MainWindow::frenchConnection()
     // recent files
     connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
             this, SLOT(handleRecentFile(const QString &)));
-    connect(m_windowMapper, SIGNAL(mapped(int)),
-            this, SLOT(activateWindow(int)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -218,6 +210,7 @@ bool MainWindow::writeScene(const QString &filePath)
     result = screenieSceneDao->write(*m_screenieScene);
     if (result) {
         m_screenieScene->setModified(false);
+        setWindowModified(false);
         m_documentFilePath = filePath;
         updateTitle();
     }
@@ -326,30 +319,30 @@ void MainWindow::updateEditActions()
 void MainWindow::updateTitle()
 {
     QString title;
+    DocumentManager &documentManager = DocumentManager::getInstance();
     if (!m_documentFilePath.isNull()) {
         title = QFileInfo(m_documentFilePath).fileName();
+        documentManager.setWindowTitle(title, *this);
     } else {
-        title = tr("New", "The document name for an unsaved document.");
+        title = documentManager.getWindowTitle(*this);
     }
     title.append("[*] - ");
-    setWindowModified(m_screenieScene->isModified());
     title.append(Version::getApplicationName());
     setWindowTitle(title);
 }
 
 void MainWindow::initializeUi()
 {
-
-    m_windowActionGroup = new QActionGroup(this);
-    m_windowActionGroup->setExclusive(true);
-    m_windowMapper = new QSignalMapper(this);
-
     setWindowIcon(QIcon(":/img/application-icon.png"));
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+    updateTitle();
+    updateWindowMenu();
 
-    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
-    connect(shortcut, SIGNAL(activated()),
-            ui->deleteAction, SIGNAL(triggered()));
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
+    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
@@ -443,6 +436,18 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
     documentInfo->mainWindow = &mainWindow;
     documentInfo->screenieScene = mainWindow.m_screenieScene;
     DocumentManager::getInstance().add(documentInfo);
+
+}
+
+
+MainWindow *MainWindow::createMainWindow()
+{
+    MainWindow *result = new MainWindow();
+    QPoint position = pos();
+    position += QPoint(28, 28);
+    result->move(position);
+    result->setAttribute(Qt::WA_DeleteOnClose, true);
+    return result;
 }
 
 // private slots
@@ -472,8 +477,7 @@ bool MainWindow::proceed(int answer, const char *followUpAction) {
 
 void MainWindow::on_newAction_triggered()
 {
-    MainWindow *mainWindow = new MainWindow();
-    mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+    MainWindow *mainWindow = createMainWindow();
     mainWindow->show();
 }
 
@@ -497,8 +501,7 @@ void MainWindow::on_openAction_triggered()
         if (m_screenieScene->isDefault()) {
             ok = read(filePath);
         } else {
-            MainWindow *mainWindow = new MainWindow();
-            mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+            MainWindow *mainWindow = createMainWindow();
             ok = mainWindow->read(filePath);
             if (ok) {
                 mainWindow->show();
@@ -534,18 +537,33 @@ void MainWindow::on_saveAsAction_triggered()
     QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
     QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
                           .arg(FileUtils::SceneExtension);
-    QString templateFilter = tr("Screenie Template (*.%1)", "Save As dialog filter")
-                             .arg(FileUtils::TemplateExtension);
-    QString filter = sceneFilter + ";;" + templateFilter;
+
 
     QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
-    fileDialog->setNameFilter(filter);
+    fileDialog->setNameFilter(sceneFilter);
+    fileDialog->setDefaultSuffix(FileUtils::SceneExtension);
     fileDialog->setWindowTitle(tr("Save As"));
     fileDialog->setDirectory(lastDocumentDirectoryPath);
     fileDialog->setWindowModality(Qt::WindowModal);
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     fileDialog->setAttribute(Qt::WA_DeleteOnClose);
     fileDialog->open(this, SLOT(handleFileSaveAsSelected(const QString &)));
+}
+
+void MainWindow::on_saveAsTemplateAction_triggered()
+{
+    QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
+    QString templateFilter = tr("Screenie Template (*.%1)", "Save As Template dialog filter")
+                             .arg(FileUtils::TemplateExtension);
+    QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
+    fileDialog->setNameFilter(templateFilter);
+    fileDialog->setDefaultSuffix(FileUtils::TemplateExtension);
+    fileDialog->setWindowTitle(tr("Save As Template"));
+    fileDialog->setDirectory(lastDocumentDirectoryPath);
+    fileDialog->setWindowModality(Qt::WindowModal);
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+    fileDialog->open(this, SLOT(handleFileSaveAsTemplateSelected(const QString &)));
 }
 
 void MainWindow::on_exportAction_triggered()
@@ -744,7 +762,7 @@ void MainWindow::updateUi()
         updateEditActions();
     }
     updateDefaultValues();
-    updateTitle();
+    setWindowModified(m_screenieScene->isModified());
 }
 
 void MainWindow::updateDefaultValues()
@@ -761,20 +779,25 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 {
     bool ok = false;
     if (!filePath.isNull()) {
-        if (filePath.endsWith("." + FileUtils::SceneExtension)) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(false);
-            ok = writeScene(filePath);
-        } else if (filePath.endsWith("." + FileUtils::TemplateExtension)) {
-            /*!\todo Error handling, show a nice error message to the user ;) */
-            m_screenieScene->setTemplate(true);
-            ok = writeTemplate(filePath);
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        m_screenieScene->setTemplate(false);
+        ok = writeScene(filePath);
+        if (ok) {
+            QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
+            Settings &settings = Settings::getInstance();
+            settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+            settings.addRecentFile(filePath);
         }
-#ifdef DEBUG
-        else {
-            qWarning("MainWindow::handleFileSaveAsSelected: UNSUPPORTED EXTENSION: %s", qPrintable(filePath));
-        }
-#endif
+    }
+}
+
+void MainWindow::handleFileSaveAsTemplateSelected(const QString &filePath)
+{
+    bool ok = false;
+    if (!filePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        m_screenieScene->setTemplate(true);
+        ok = writeTemplate(filePath);
         if (ok) {
             QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
             Settings &settings = Settings::getInstance();
@@ -789,11 +812,21 @@ void MainWindow::handleConfirm(int result)
 
 }
 
-void  MainWindow::handleRecentFile(const QString &filePath)
+void MainWindow::handleRecentFile(const QString &filePath)
 {
-    if (proceedWithModifiedScene()) {
-        read(filePath);
+    bool ok;
+    if (m_screenieScene->isDefault()) {
+        ok = read(filePath);
+    } else {
+        MainWindow *mainWindow = createMainWindow();
+        ok = mainWindow->read(filePath);
+        if (ok) {
+            mainWindow->show();
+        } else {
+            delete mainWindow;
+        }
     }
+    /*!\todo Error handling, show a nice error message to the user ;) */
 }
 
 void MainWindow::updateWindowMenu()
@@ -804,5 +837,4 @@ void MainWindow::updateWindowMenu()
         ui->windowMenu->addAction(action);
     }
 }
-
 

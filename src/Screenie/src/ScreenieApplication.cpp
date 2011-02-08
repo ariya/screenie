@@ -29,6 +29,7 @@
 
 #include "../../Utils/src/Settings.h"
 #include "../../Kernel/src/DocumentManager.h"
+#include "PlatformManager/PlatformManagerFactory.h"
 #include "MainWindow.h"
 #include "ScreenieApplication.h"
 
@@ -89,4 +90,5 @@ void ScreenieApplication::handleLastWindowClosed()
     // destroy singletons
     Settings::destroyInstance();
     DocumentManager::destroyInstance();
+    PlatformManagerFactory::destroyInstance();
 }

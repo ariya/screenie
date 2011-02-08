@@ -21,6 +21,8 @@
 #ifndef WINDOWSPLATFORMMANAGER_H
 #define WINDOWSPLATFORMMANAGER_H
 
+class QMainWindow;
+
 #include "AbstractPlatformManager.h"
 
 class WindowsPlatformManagerPrivate;
@@ -35,7 +37,7 @@ public:
     WindowsPlatformManager();
     virtual ~WindowsPlatformManager();
 
-    virtual void initialize(Ui::MainWindow &mainWindow);
+    virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
     virtual void handleWindowActivation(bool active);
 
 private:

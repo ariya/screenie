@@ -18,31 +18,39 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <QtCore/QObject>
 #include <QtGui/QAction>
 #include <QtGui/QKeySequence>
+#include <QtGui/QShortcut>
+#include <QtGui/QMainWindow>
 
 #include "ui_MainWindow.h"
 #include "AbstractPlatformManager.h"
 
 // public
 
-void AbstractPlatformManager::initialize(Ui::MainWindow &mainWindow)
+void AbstractPlatformManager::initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi)
 {
     // File
-    mainWindow.newAction->setShortcut(QKeySequence::New);
-    mainWindow.openAction->setShortcut(QKeySequence::Open);
-    mainWindow.saveAction->setShortcut(QKeySequence::Save);
-    mainWindow.saveAsAction->setShortcut(QKeySequence::SaveAs);
-    mainWindow.exportAction->setShortcut(QKeySequence(Qt::Key_E + Qt::CTRL));
-    mainWindow.closeAction->setShortcut(QKeySequence::Close);
-    mainWindow.quitAction->setShortcut(QKeySequence::Quit);
+    mainWindowUi.newAction->setShortcut(QKeySequence::New);
+    mainWindowUi.openAction->setShortcut(QKeySequence::Open);
+    mainWindowUi.saveAction->setShortcut(QKeySequence::Save);
+    mainWindowUi.saveAsAction->setShortcut(QKeySequence::SaveAs);
+    mainWindowUi.exportAction->setShortcut(QKeySequence(Qt::Key_E + Qt::CTRL));
+    mainWindowUi.closeAction->setShortcut(QKeySequence::Close);
+    mainWindowUi.quitAction->setShortcut(QKeySequence::Quit);
     // Edit
-    mainWindow.cutAction->setShortcut(QKeySequence::Cut);
-    mainWindow.copyAction->setShortcut(QKeySequence::Copy);
-    mainWindow.pasteAction->setShortcut(QKeySequence::Paste);
-    mainWindow.deleteAction->setShortcut(QKeySequence::Delete);
-    mainWindow.selectAllAction->setShortcut(QKeySequence::SelectAll);
+    mainWindowUi.cutAction->setShortcut(QKeySequence::Cut);
+    mainWindowUi.copyAction->setShortcut(QKeySequence::Copy);
+    mainWindowUi.pasteAction->setShortcut(QKeySequence::Paste);
+    mainWindowUi.deleteAction->setShortcut(QKeySequence::Delete);
+    mainWindowUi.selectAllAction->setShortcut(QKeySequence::SelectAll);
     // Insert
-    mainWindow.addImageAction->setShortcut(QKeySequence(Qt::Key_I + Qt::CTRL));
-    mainWindow.addTemplateAction->setShortcut(QKeySequence(Qt::Key_T + Qt::CTRL));
+    mainWindowUi.addImageAction->setShortcut(QKeySequence(Qt::Key_I + Qt::CTRL));
+    mainWindowUi.addTemplateAction->setShortcut(QKeySequence(Qt::Key_T + Qt::CTRL));
+    // Generic
+    QShortcut *shortcut = new QShortcut(QKeySequence("Backspace"), &mainWindow);
+    QObject::connect(shortcut, SIGNAL(activated()),
+                     mainWindowUi.deleteAction, SIGNAL(triggered()));
+
 }

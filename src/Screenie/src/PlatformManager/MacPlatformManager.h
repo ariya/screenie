@@ -21,6 +21,8 @@
 #ifndef MACPLATFORMMANAGER_H
 #define MACPLATFORMMANAGER_H
 
+class QMainWindow;
+
 #include "AbstractPlatformManager.h"
 
 class MacPlatformManagerPrivate;
@@ -35,7 +37,7 @@ public:
     MacPlatformManager();
     virtual ~MacPlatformManager();
 
-    virtual void initialize(Ui::MainWindow &mainWindow);
+    virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
     virtual void handleWindowActivation(bool active);
 
 private:
