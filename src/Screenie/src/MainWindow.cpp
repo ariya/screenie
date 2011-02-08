@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     createScene();
-
+    updateDocumentManager(*this);
     initializeUi();
     m_platformManager = PlatformManagerFactory::getInstance().create();
     m_platformManager->initialize(*this, *ui);
@@ -105,7 +105,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // call unified toolbar AFTER restoring window geometry!
     setUnifiedTitleAndToolBarOnMac(true);
     frenchConnection();
-    updateDocumentManager(*this);
 }
 
 MainWindow::~MainWindow()
@@ -324,13 +323,14 @@ void MainWindow::updateEditActions()
 void MainWindow::updateTitle()
 {
     QString title;
+    DocumentManager &documentManager = DocumentManager::getInstance();
     if (!m_documentFilePath.isNull()) {
         title = QFileInfo(m_documentFilePath).fileName();
+        documentManager.setWindowTitle(title, *this);
     } else {
-        title = tr("New", "The document name for an unsaved document.");
+        title = documentManager.getWindowTitle(*this);
     }
     title.append("[*] - ");
-    setWindowModified(m_screenieScene->isModified());
     title.append(Version::getApplicationName());
     setWindowTitle(title);
 }
@@ -338,6 +338,9 @@ void MainWindow::updateTitle()
 void MainWindow::initializeUi()
 {
     setWindowIcon(QIcon(":/img/application-icon.png"));
+    updateTitle();
+    updateWindowMenu();
+
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
@@ -432,6 +435,7 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
     documentInfo->mainWindow = &mainWindow;
     documentInfo->screenieScene = mainWindow.m_screenieScene;
     DocumentManager::getInstance().add(documentInfo);
+
 }
 
 // private slots
@@ -733,7 +737,7 @@ void MainWindow::updateUi()
         updateEditActions();
     }
     updateDefaultValues();
-    updateTitle();
+    setWindowModified(m_screenieScene->isModified());
 }
 
 void MainWindow::updateDefaultValues()

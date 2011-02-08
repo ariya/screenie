@@ -22,7 +22,9 @@
 #define DOCUMENTMANAGER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
+class QAction;
 class QActionGroup;
 class QEvent;
 class QMainWindow;
@@ -50,9 +52,11 @@ public:
      *
      * \param documentInfo
      *        the DocumentInfo to be managed; ownership is taken by this DocumentManager
+     * \sa #changed()
      */
     KERNEL_API void add(DocumentInfo *documentInfo);
-    //KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
+    KERNEL_API void setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow);
+    KERNEL_API QString getWindowTitle(const QMainWindow &mainWindow) const;
     KERNEL_API QActionGroup &getActionGroup() const;
     KERNEL_API int count() const;
     KERNEL_API int getModifiedCount() const;
@@ -74,7 +78,8 @@ private:
 
     void frenchConnection();
     void updateActionGroup(const QMainWindow &mainWindow);
-    const DocumentInfo *getDocumentInfo(const QObject &object);
+    QAction *getWindowAction(int id) const;
+    DocumentInfo *getDocumentInfo(const QObject &object) const;
 
 private slots:
     void remove(QObject *mainWindow);

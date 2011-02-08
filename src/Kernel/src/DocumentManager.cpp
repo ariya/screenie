@@ -45,7 +45,7 @@ public:
         delete windowActionGroup;
     }
 
-    QList<const DocumentInfo *> documentInfos;
+    QList<DocumentInfo *> documentInfos;
     QActionGroup *windowActionGroup;
     QSignalMapper windowMapper;
     static DocumentManager *instance;
@@ -84,14 +84,37 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     mainWindow->installEventFilter(this);
     documentInfo->id = d->nextWindowId;
     ++d->nextWindowId;
+    documentInfo->windowTitle = tr("New %1", "New document title + ID").arg(d->nextWindowId);
     QAction *action = new QAction(d->windowActionGroup);
     action->setCheckable(true);
     action->setData(documentInfo->id);
-    action->setText(mainWindow->objectName());
+    action->setText(documentInfo->windowTitle);
     d->windowMapper.setMapping(action, documentInfo->id);
     connect(action, SIGNAL(triggered()),
             &d->windowMapper, SLOT(map()));
     emit changed();
+}
+
+void DocumentManager::setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow)
+{
+    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        documentInfo->windowTitle = windowTitle;
+        QAction *action = getWindowAction(documentInfo->id);
+        if (action != 0) {
+            action->setText(windowTitle);
+        }
+    }
+}
+
+QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
+{
+    QString result;
+    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        result = documentInfo->windowTitle;
+    }
+    return result;
 }
 
 QActionGroup &DocumentManager::getActionGroup() const
@@ -126,7 +149,6 @@ bool DocumentManager::eventFilter(QObject *object, QEvent *event)
             result = false;
             break;
         default:
-            qDebug("DocumentManager::eventFilter: Window: %d type.", event->type());
             result = QObject::eventFilter(object, event);
             break;
         }
@@ -161,19 +183,29 @@ void DocumentManager::updateActionGroup(const QMainWindow &mainWindow)
 {
     const DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
     if (documentInfo != 0) {
-        foreach (QAction *action, d->windowActionGroup->actions()) {
-            if (action->data().toInt() == documentInfo->id) {
-                action->setChecked(mainWindow.isActiveWindow());
-                break;
-            }
+        QAction *action = getWindowAction(documentInfo->id);
+        if (action != 0) {
+            action->setChecked(mainWindow.isActiveWindow());
         }
     }
 }
 
-const DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object)
+QAction *DocumentManager::getWindowAction(int id) const
 {
-    const DocumentInfo *result = 0;
-    foreach (const DocumentInfo *documentInfo, d->documentInfos) {
+    QAction *result = 0;
+    foreach (QAction *action, d->windowActionGroup->actions()) {
+        if (action->data().toInt() == id) {
+            result = action;
+            break;
+        }
+    }
+    return result;
+}
+
+DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object) const
+{
+    DocumentInfo *result = 0;
+    foreach (DocumentInfo *documentInfo, d->documentInfos) {
         if (documentInfo->mainWindow->objectName() == object.objectName()) {
             result = documentInfo;
             break;
@@ -186,7 +218,7 @@ const DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object)
 
 void DocumentManager::remove(QObject *object)
 {
-    const DocumentInfo *documentInfo = getDocumentInfo(*object);
+    DocumentInfo *documentInfo = getDocumentInfo(*object);
     if (documentInfo != 0) {
         foreach (QAction *action, d->windowActionGroup->actions()) {
             if (action->data().toInt() == documentInfo->id) {
@@ -201,7 +233,7 @@ void DocumentManager::remove(QObject *object)
 
 void DocumentManager::activate(int id) const
 {
-    foreach(const DocumentInfo *documentInfo, d->documentInfos) {
+    foreach(DocumentInfo *documentInfo, d->documentInfos) {
         if (documentInfo->id == id) {
             documentInfo->mainWindow->activateWindow();
             break;

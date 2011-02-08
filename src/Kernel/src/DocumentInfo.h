@@ -21,6 +21,8 @@
 #ifndef DOCUMENTINFO_H
 #define DOCUMENTINFO_H
 
+#include <QtCore/QString>
+
 class QMainWindow;
 class ScreenieScene;
 
@@ -28,6 +30,7 @@ struct DocumentInfo
 {
     QMainWindow *mainWindow;
     ScreenieScene *screenieScene;
+    QString windowTitle;
     int id;
 };
 
