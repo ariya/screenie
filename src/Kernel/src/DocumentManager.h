@@ -24,6 +24,8 @@
 #include <QtCore/QObject>
 
 class QActionGroup;
+class QEvent;
+class QMainWindow;
 
 #include "KernelLib.h"
 
@@ -50,17 +52,19 @@ public:
      *        the DocumentInfo to be managed; ownership is taken by this DocumentManager
      */
     KERNEL_API void add(DocumentInfo *documentInfo);
-    KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
+    //KERNEL_API const QList<const DocumentInfo *> &getDocumentInfos() const;
     KERNEL_API QActionGroup &getActionGroup() const;
     KERNEL_API int count() const;
-
     KERNEL_API int getModifiedCount() const;
+
+    virtual bool eventFilter(QObject *object, QEvent *event);
 
 signals:
     void changed();
 
 protected:
     virtual ~DocumentManager();
+
 
 private:
     Q_DISABLE_COPY(DocumentManager)
@@ -69,7 +73,8 @@ private:
     DocumentManager();
 
     void frenchConnection();
-    void updateActionGroup();
+    void updateActionGroup(const QMainWindow &mainWindow);
+    const DocumentInfo *getDocumentInfo(const QObject &object);
 
 private slots:
     void remove(QObject *mainWindow);

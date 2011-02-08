@@ -21,6 +21,7 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+#include <QtCore/QEvent>
 #include <QtCore/QSignalMapper>
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
@@ -80,6 +81,7 @@ void DocumentManager::add(DocumentInfo *documentInfo)
             this, SLOT(remove(QObject *)));
     // update object name ("window ID")
     mainWindow->setObjectName(mainWindow->objectName() + QString::number(d->nextWindowId));
+    mainWindow->installEventFilter(this);
     documentInfo->id = d->nextWindowId;
     ++d->nextWindowId;
     QAction *action = new QAction(d->windowActionGroup);
@@ -90,11 +92,6 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     connect(action, SIGNAL(triggered()),
             &d->windowMapper, SLOT(map()));
     emit changed();
-}
-
-const QList<const DocumentInfo *> &DocumentManager::getDocumentInfos() const
-{
-    return d->documentInfos;
 }
 
 QActionGroup &DocumentManager::getActionGroup() const
@@ -114,6 +111,27 @@ int DocumentManager::getModifiedCount() const
         if (documentInfo->screenieScene->isModified()) {
             result++;
         }
+    }
+    return result;
+}
+
+bool DocumentManager::eventFilter(QObject *object, QEvent *event)
+{
+    bool result;
+    const QMainWindow *mainWindow = qobject_cast<const QMainWindow *>(object);
+    if (mainWindow != 0) {
+        switch (event->type()) {
+        case QEvent::ActivationChange:
+            updateActionGroup(*mainWindow);
+            result = false;
+            break;
+        default:
+            qDebug("DocumentManager::eventFilter: Window: %d type.", event->type());
+            result = QObject::eventFilter(object, event);
+            break;
+        }
+    } else {
+        result = QObject::eventFilter(object, event);
     }
     return result;
 }
@@ -139,27 +157,45 @@ void DocumentManager::frenchConnection()
             this, SLOT(activate(int)));
 }
 
-void DocumentManager::updateActionGroup()
+void DocumentManager::updateActionGroup(const QMainWindow &mainWindow)
 {
+    const DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        foreach (QAction *action, d->windowActionGroup->actions()) {
+            if (action->data().toInt() == documentInfo->id) {
+                action->setChecked(mainWindow.isActiveWindow());
+                break;
+            }
+        }
+    }
+}
 
+const DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object)
+{
+    const DocumentInfo *result = 0;
+    foreach (const DocumentInfo *documentInfo, d->documentInfos) {
+        if (documentInfo->mainWindow->objectName() == object.objectName()) {
+            result = documentInfo;
+            break;
+        }
+    }
+    return result;
 }
 
 // private slots
 
 void DocumentManager::remove(QObject *object)
 {
-    foreach(const DocumentInfo *documentInfo, d->documentInfos) {
-        if (documentInfo->mainWindow->objectName() == object->objectName()) {
-            foreach (QAction *action, d->windowActionGroup->actions()) {
-                if (action->data().toInt() ==  documentInfo->id) {
-                    delete action;
-                    break;
-                }
+    const DocumentInfo *documentInfo = getDocumentInfo(*object);
+    if (documentInfo != 0) {
+        foreach (QAction *action, d->windowActionGroup->actions()) {
+            if (action->data().toInt() == documentInfo->id) {
+                delete action;
+                break;
             }
-            d->documentInfos.removeOne(documentInfo);
-            emit changed();
-            break;
         }
+        d->documentInfos.removeOne(documentInfo);
+        emit changed();
     }
 }
 

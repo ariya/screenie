@@ -178,7 +178,6 @@ void MainWindow::changeEvent(QEvent *event)
     switch (event->type()) {
     case QEvent::ActivationChange:
         m_platformManager->handleWindowActivation(isActiveWindow());
-        updateWindowMenuState();
         break;
      default:
         break;
@@ -805,29 +804,5 @@ void MainWindow::updateWindowMenu()
         ui->windowMenu->addAction(action);
     }
 }
-
-void MainWindow::updateWindowMenuState()
-{
-    const QList<const DocumentInfo *> &documentInfos = DocumentManager::getInstance().getDocumentInfos();
-    QList<QAction *> actions = m_windowActionGroup->actions();
-    foreach(const DocumentInfo *documentInfo, documentInfos) {
-#ifdef DEBUG
-        qDebug("MainWindow::updateWindowMenuState: winId: %p, title: %s, active: %d",
-               this->winId(), qPrintable(documentInfo->mainWindow->windowTitle()), documentInfo->mainWindow->isActiveWindow());
-#endif
-        if (documentInfo->mainWindow->isActiveWindow()) {
-            foreach (QAction *action, actions) {
-                if (documentInfo->id == action->data().toInt()) {
-#ifdef DEBUG
-                    qDebug("MainWindow::updateWindowMenuState: winId: %p, activating action ID: %d", this->winId(), documentInfo->id);
-#endif
-                    action->setChecked(true);
-                    break;
-                }
-            }
-        }
-    }
-}
-
 
 
