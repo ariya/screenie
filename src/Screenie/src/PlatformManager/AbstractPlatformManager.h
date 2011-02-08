@@ -21,12 +21,18 @@
 #ifndef ABSTRACTPLATFORMMANAGER_H
 #define ABSTRACTPLATFORMMANAGER_H
 
+class QMainWindow;
+
+namespace Ui {
+    class MainWindow;
+}
+
 #include "PlatformManager.h"
 
 class AbstractPlatformManager : public PlatformManager
 {
 public:
-    virtual void initialize(Ui::MainWindow &mainWindow);
+    virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
 };
 
 #endif // ABSTRACTPLATFORMMANAGER_H

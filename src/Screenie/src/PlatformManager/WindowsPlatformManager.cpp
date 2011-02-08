@@ -47,11 +47,11 @@ WindowsPlatformManager::~WindowsPlatformManager()
     }
 }
 
-void WindowsPlatformManager::initialize(Ui::MainWindow &mainWindow)
+void WindowsPlatformManager::initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi)
 {
-    d = new WindowsPlatformManagerPrivate(mainWindow);
-    AbstractPlatformManager::initialize(mainWindow);
-    mainWindow.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F11));
+    d = new WindowsPlatformManagerPrivate(mainWindowUi);
+    AbstractPlatformManager::initialize(mainWindow, mainWindowUi);
+    mainWindowUi.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F11));
 }
 
 void WindowsPlatformManager::handleWindowActivation(bool active)

@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initializeUi();
     m_platformManager = PlatformManagerFactory::getInstance().create();
-    m_platformManager->initialize(*ui);
+    m_platformManager->initialize(*this, *ui);
     updateUi();
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
@@ -200,8 +200,6 @@ void MainWindow::frenchConnection()
     // recent files
     connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
             this, SLOT(handleRecentFile(const QString &)));
-    connect(m_windowMapper, SIGNAL(mapped(int)),
-            this, SLOT(activateWindow(int)));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -339,17 +337,8 @@ void MainWindow::updateTitle()
 
 void MainWindow::initializeUi()
 {
-
-    m_windowActionGroup = new QActionGroup(this);
-    m_windowActionGroup->setExclusive(true);
-    m_windowMapper = new QSignalMapper(this);
-
     setWindowIcon(QIcon(":/img/application-icon.png"));
     ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
-
-    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Backspace", "Edit|Delete")), this);
-    connect(shortcut, SIGNAL(activated()),
-            ui->deleteAction, SIGNAL(triggered()));
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());

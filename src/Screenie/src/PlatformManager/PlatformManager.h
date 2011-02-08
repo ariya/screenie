@@ -21,6 +21,8 @@
 #ifndef PLATFORMMANAGER_H
 #define PLATFORMMANAGER_H
 
+class QMainWindow;
+
 namespace Ui {
     class MainWindow;
 }
@@ -34,7 +36,7 @@ class PlatformManager
 public:
     virtual ~PlatformManager() {}
 
-    virtual void initialize(Ui::MainWindow &mainWindow) = 0;
+    virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi) = 0;
     virtual void handleWindowActivation(bool active) = 0;
 };
 

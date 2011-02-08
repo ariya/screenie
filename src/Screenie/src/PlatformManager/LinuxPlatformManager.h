@@ -21,6 +21,8 @@
 #ifndef LINUXPLATFORMMANAGER_H
 #define LINUXPLATFORMMANAGER_H
 
+class QMainWindow;
+
 #include "AbstractPlatformManager.h"
 
 class LinuxPlatformManagerPrivate;
@@ -35,7 +37,7 @@ public:
     LinuxPlatformManager();
     virtual ~LinuxPlatformManager();
 
-    virtual void initialize(Ui::MainWindow &mainWindow);
+    virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
     virtual void handleWindowActivation(bool active);
 
 private:

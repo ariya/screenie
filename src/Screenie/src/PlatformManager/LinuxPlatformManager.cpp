@@ -20,6 +20,7 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QKeySequence>
+#include <QtGui/QMainWindow>
 
 #include "ui_MainWindow.h"
 #include "LinuxPlatformManager.h"
@@ -27,11 +28,11 @@
 class LinuxPlatformManagerPrivate
 {
 public:
-    LinuxPlatformManagerPrivate(Ui::MainWindow &theMainWindow)
-        : mainWindow(theMainWindow)
+    LinuxPlatformManagerPrivate(Ui::MainWindow &theMainWindowUi)
+        : mainWindowUi(theMainWindowUi)
     {}
 
-    Ui::MainWindow &mainWindow;
+    Ui::MainWindow &mainWindowUi;
 };
 
 // public
@@ -47,11 +48,11 @@ LinuxPlatformManager::~LinuxPlatformManager()
     }
 }
 
-void LinuxPlatformManager::initialize(Ui::MainWindow &mainWindow)
+void LinuxPlatformManager::initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi)
 {
-    d = new LinuxPlatformManagerPrivate(mainWindow);
-    AbstractPlatformManager::initialize(mainWindow);
-    mainWindow.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_11));
+    d = new LinuxPlatformManagerPrivate(mainWindowUi);
+    AbstractPlatformManager::initialize(mainWindow, mainWindowUi);
+    mainWindowUi.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_11));
 }
 
 void LinuxPlatformManager::handleWindowActivation(bool active)
