@@ -154,20 +154,32 @@ void MainWindow::showNormal()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (proceedWithModifiedScene()) {
-        Settings::WindowGeometry windowGeometry;
+    DocumentManager &documentManager = DocumentManager::getInstance();
+    Settings::WindowGeometry windowGeometry;
+    int nofModified = documentManager.getModifiedCount();
+    switch (nofModified)
+    {
+    case 0:
         windowGeometry.fullScreen = isFullScreen();
         windowGeometry.position = pos();
         windowGeometry.size = size();
         Settings::getInstance().setWindowGeometry(windowGeometry);
         event->accept();
-    } else {
-        event->ignore();
+        break;
+    case 1:
+        /*\todo Implement this: ask to save, cancel or quit */
+        event->accept();
+        break;
+    default:
+        /*\todo Implement this: more than one document modified: ask force quit or handle unsaved documents */
+        event->accept();
+        break;
     }
 }
 
 void MainWindow::changeEvent(QEvent *event)
 {
+    /*!\todo Move this into the platform manager, use an event filter there */
     QMainWindow::changeEvent(event);
     switch (event->type()) {
     case QEvent::ActivationChange:
@@ -438,7 +450,6 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
     DocumentManager::getInstance().add(documentInfo);
 
 }
-
 
 MainWindow *MainWindow::createMainWindow()
 {

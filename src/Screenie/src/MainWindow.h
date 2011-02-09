@@ -148,9 +148,6 @@ private slots:
     void handleFileSaveAsSelected(const QString &filePath);
     void handleFileSaveAsTemplateSelected(const QString &filePath);
     void handleConfirm(int result);
-
-
-
 };
 
 #endif // MAINWINDOW_H
