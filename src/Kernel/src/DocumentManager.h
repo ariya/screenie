@@ -30,8 +30,8 @@ class QEvent;
 class QMainWindow;
 
 #include "KernelLib.h"
+#include "DocumentInfo.h"
 
-struct DocumentInfo;
 class DocumentManagerPrivate;
 
 /*!
@@ -41,6 +41,12 @@ class DocumentManager : public QObject
 {
     Q_OBJECT
 public:
+    enum CloseRequest
+    {
+        CloseCurrent,
+        Quit
+    };
+
     KERNEL_API static DocumentManager &getInstance();
     KERNEL_API static void destroyInstance();
 
@@ -55,14 +61,20 @@ public:
      * \sa #changed()
      */
     KERNEL_API void add(DocumentInfo *documentInfo);
-    KERNEL_API void setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow);
     KERNEL_API QString getWindowTitle(const QMainWindow &mainWindow) const;
+    KERNEL_API void setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow);
     KERNEL_API QActionGroup &getActionGroup() const;
     KERNEL_API int count() const;
     KERNEL_API int getModifiedCount() const;
 
+    KERNEL_API DocumentInfo::SaveStrategy getSaveStrategy(const QMainWindow &mainWindow) const;
+    KERNEL_API void setSaveStrategy(const QMainWindow &mainWindow, DocumentInfo::SaveStrategy saveStrategy);
+    KERNEL_API void setSaveStrategyForAll(DocumentInfo::SaveStrategy saveStrategy);
+
     virtual bool eventFilter(QObject *object, QEvent *event);
 
+    KERNEL_API static CloseRequest getCloseRequest();
+    KERNEL_API static void setCloseRequest(CloseRequest closeRequest);
 signals:
     void changed();
 

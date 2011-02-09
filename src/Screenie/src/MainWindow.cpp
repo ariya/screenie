@@ -154,26 +154,32 @@ void MainWindow::showNormal()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    DocumentManager &documentManager = DocumentManager::getInstance();
-    Settings::WindowGeometry windowGeometry;
-    int nofModified = documentManager.getModifiedCount();
-    switch (nofModified)
-    {
-    case 0:
+    if (m_screenieScene->isModified()) {
+        DocumentInfo::SaveStrategy saveStrategy = DocumentManager::getInstance().getSaveStrategy(*this);
+        switch (saveStrategy) {
+        case DocumentInfo::Save:
+            event->ignore();
+            saveBeforeClose();
+        case DocumentInfo::Ask:
+            event->ignore();
+            askBeforeClose();
+            break;
+        case DocumentInfo::Discard:
+            event->accept();
+            break;
+        default:
+#ifdef DEBUG
+            qCritical("MainWindow::closeEvent: UNHANDLED SaveStrategy: %d", saveStrategy);
+#endif
+            event->ignore();
+        }
+    } else {
+        Settings::WindowGeometry windowGeometry;
         windowGeometry.fullScreen = isFullScreen();
         windowGeometry.position = pos();
         windowGeometry.size = size();
         Settings::getInstance().setWindowGeometry(windowGeometry);
         event->accept();
-        break;
-    case 1:
-        /*\todo Implement this: ask to save, cancel or quit */
-        event->accept();
-        break;
-    default:
-        /*\todo Implement this: more than one document modified: ask force quit or handle unsaved documents */
-        event->accept();
-        break;
     }
 }
 
@@ -397,46 +403,89 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
             this, SLOT(updateUi()));
 }
 
-bool MainWindow::proceedWithModifiedScene()
+void MainWindow::handleMultipleModifiedBeforeQuit()
 {
-    bool result;
-    if (m_screenieScene->isModified()) {
-        switch (QMessageBox::question(this, tr("Scene Modified - ") + Version::getApplicationName(),
-                                      tr("Scene Modified - ") + Version::getApplicationName(),
-                                      QMessageBox::Save | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape))
-        {
-        case QMessageBox::Save:
-            on_saveAction_triggered();
-            result = true;
-            break;
-        case QMessageBox::Cancel:
-            result = false;
-            break;
-        case QMessageBox::Discard:
-            result = true;
-            break;
-        default:
-            result = false;
-            break;
-        }
-    } else {
-        result = true;
+    QMessageBox *messageBox = new QMessageBox(tr("Multiple Documents Modified"),
+                                  "Multiple documents are modified.",
+                                  QMessageBox::Question,
+                                  QMessageBox::Save | QMessageBox::Default,
+                                  QMessageBox::Discard,
+                                  QMessageBox::Cancel | QMessageBox::Escape,
+                                  this);
+    messageBox->setAttribute(Qt::WA_DeleteOnClose);
+    int answer = messageBox->exec();
+    switch (answer) {
+    case QMessageBox::Save:
+        DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Ask);
+        QApplication::closeAllWindows();
+#ifdef DEBUG
+        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Save option.");
+#endif
+        break;
+    case QMessageBox::Discard:
+        DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Discard);
+        QApplication::closeAllWindows();
+#ifdef DEBUG
+        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Discard option.");
+#endif
+        break;
+    case QMessageBox::Cancel:
+#ifdef DEBUG
+        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Cancel option.");
+#endif
+        break;
+    default:
+        break;
     }
-    return result;
 }
 
-void MainWindow::proceedWithModifiedScene(const char *slot)
+void MainWindow::askBeforeClose()
 {
-    QMessageBox *messageBox = new QMessageBox(tr("Scene Modified - ") + Version::getApplicationName(),
-                                    tr("Scene Modified - ") + Version::getApplicationName(),
-                                    QMessageBox::Warning,
-                                    QMessageBox::Save | QMessageBox::Default,
-                                    QMessageBox::Discard,
-                                    QMessageBox::Cancel | QMessageBox::Escape,
-                                    this, Qt::Sheet);
+    QMessageBox *messageBox = new QMessageBox(tr("Document Modified"),
+                                  "The document is modified.",
+                                  QMessageBox::Question,
+                                  QMessageBox::Save | QMessageBox::Default,
+                                  QMessageBox::Discard,
+                                  QMessageBox::Cancel | QMessageBox::Escape,
+                                  this);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
-    messageBox->open(this, slot);
+    messageBox->open(this, SLOT(handleAskBeforeClose(int)));
+}
 
+void MainWindow::saveBeforeClose()
+{
+    if (!m_documentFilePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        bool ok = writeScene(m_documentFilePath);
+        if (ok) {
+            close();
+        }
+        /*!\todo Error handling in case document could bot be saved (user tried
+                 to save on a CD-ROM, for instance *grin*) */
+#ifdef DEBUG
+        qDebug("MainWindow::saveBeforeClose: ok: %d", ok);
+#endif
+    } else {
+        saveAsBeforeClose();
+    }
+}
+
+void MainWindow::saveAsBeforeClose()
+{
+    QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
+    QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
+                          .arg(FileUtils::SceneExtension);
+
+
+    QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
+    fileDialog->setNameFilter(sceneFilter);
+    fileDialog->setDefaultSuffix(FileUtils::SceneExtension);
+    fileDialog->setWindowTitle(tr("Save As"));
+    fileDialog->setDirectory(lastDocumentDirectoryPath);
+    fileDialog->setWindowModality(Qt::WindowModal);
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog->setAttribute(Qt::WA_DeleteOnClose);
+    fileDialog->open(this, SLOT(handleFileSaveAsBeforeCloseSelected(const QString &)));
 }
 
 void MainWindow::restoreWindowGeometry()
@@ -457,6 +506,7 @@ void MainWindow::updateDocumentManager(MainWindow &mainWindow)
     DocumentInfo *documentInfo = new DocumentInfo();
     documentInfo->mainWindow = &mainWindow;
     documentInfo->screenieScene = mainWindow.m_screenieScene;
+    documentInfo->saveStrategy = DocumentInfo::Ask;
     DocumentManager::getInstance().add(documentInfo);
 }
 
@@ -605,9 +655,27 @@ void MainWindow::on_exportAction_triggered()
     }
 }
 
+void MainWindow::on_closeAction_triggered()
+{
+    DocumentManager::setCloseRequest(DocumentManager::CloseCurrent);
+    close();
+}
+
 void MainWindow::on_quitAction_triggered()
 {
-    QApplication::closeAllWindows();
+    DocumentManager &documentManager = DocumentManager::getInstance();
+    DocumentManager::setCloseRequest(DocumentManager::Quit);
+    int count = documentManager.count();
+    if (count > 1) {
+        int nofModified = documentManager.getModifiedCount();
+        if (nofModified > 1) {
+            handleMultipleModifiedBeforeQuit();
+        } else {
+            QApplication::closeAllWindows();
+        }
+    } else {
+        QApplication::closeAllWindows();
+    }
 }
 
 void MainWindow::on_cutAction_triggered()
@@ -797,6 +865,37 @@ void MainWindow::updateDefaultValues()
     defaultScreenieModel.setReflectionOpacity(ui->reflectionOpacitySlider->value());
 }
 
+void MainWindow::handleRecentFile(const QString &filePath)
+{
+    bool ok;
+    if (m_screenieScene->isDefault()) {
+        ok = read(filePath);
+    } else {
+        MainWindow *mainWindow = createMainWindow();
+        ok = mainWindow->read(filePath);
+        if (ok) {
+            mainWindow->show();
+        } else {
+            delete mainWindow;
+        }
+    }
+    /*!\todo Error handling, show a nice error message to the user ;) */
+}
+
+void MainWindow::updateWindowMenu()
+{
+    QMenu *windowMenu = ui->windowMenu;
+    windowMenu->clear();
+    windowMenu->addAction(m_minimizeWindowsAction);
+    windowMenu->addAction(m_maximizeWindowsAction);
+    windowMenu->addSeparator();
+    QActionGroup &actionGroup = DocumentManager::getInstance().getActionGroup();
+    foreach (QAction *action, actionGroup.actions()) {
+        windowMenu->addAction(action);
+    }
+
+}
+
 void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 {
     bool ok = false;
@@ -829,39 +928,53 @@ void MainWindow::handleFileSaveAsTemplateSelected(const QString &filePath)
     }
 }
 
+void MainWindow::handleFileSaveAsBeforeCloseSelected(const QString &filePath)
+{
+    bool ok = false;
+    if (!filePath.isNull()) {
+        /*!\todo Error handling, show a nice error message to the user ;) */
+        m_screenieScene->setTemplate(false);
+        ok = writeScene(filePath);
+        if (ok) {
+            QString lastDocumentDirectoryPath = QFileInfo(filePath).absolutePath();
+            Settings &settings = Settings::getInstance();
+            settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
+            settings.addRecentFile(filePath);
+            if (DocumentManager::getCloseRequest() == DocumentManager::CloseCurrent) {
+                close();
+            } else {
+                QApplication::closeAllWindows();
+            }
+        }
+    }
+}
+
 void MainWindow::handleConfirm(int result)
 {
 
 }
 
-void MainWindow::handleRecentFile(const QString &filePath)
+void MainWindow::handleAskBeforeClose(int answer)
 {
-    bool ok;
-    if (m_screenieScene->isDefault()) {
-        ok = read(filePath);
-    } else {
-        MainWindow *mainWindow = createMainWindow();
-        ok = mainWindow->read(filePath);
-        if (ok) {
-            mainWindow->show();
+    switch (answer) {
+    case QMessageBox::Save:
+        saveBeforeClose();
+        break;
+    case QMessageBox::Discard:
+        DocumentManager::getInstance().setSaveStrategy(*this, DocumentInfo::Discard);
+        if (DocumentManager::getCloseRequest() == DocumentManager::CloseCurrent) {
+            close();
         } else {
-            delete mainWindow;
+            QApplication::closeAllWindows();
         }
+        break;
+    case QMessageBox::Cancel:
+        break;
+    default:
+#ifdef DEBUG
+        qCritical("MainWindow::handleAskBeforeClose: UNHANDLED QMessageBox answer: %d", answer);
+#endif
+        break;
     }
-    /*!\todo Error handling, show a nice error message to the user ;) */
-}
-
-void MainWindow::updateWindowMenu()
-{
-    QMenu *windowMenu = ui->windowMenu;
-    windowMenu->clear();
-    windowMenu->addAction(m_minimizeWindowsAction);
-    windowMenu->addAction(m_maximizeWindowsAction);
-    windowMenu->addSeparator();
-    QActionGroup &actionGroup = DocumentManager::getInstance().getActionGroup();
-    foreach (QAction *action, actionGroup.actions()) {
-        windowMenu->addAction(action);
-    }
-
 }
 

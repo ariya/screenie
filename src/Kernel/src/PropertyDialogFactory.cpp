@@ -82,6 +82,8 @@ QDialog *PropertyDialogFactory::createDialog(ScreenieModelInterface &screenieMod
                 this, SLOT(handlePropertyDialogDestroyed()));
         result->setAttribute(Qt::WA_DeleteOnClose);
         result->setWindowIcon(QIcon(":/img/application-icon.png"));
+        /*!\todo Bad design! The factory should not delete the previous dialog! That "logic" belongs
+                 e.g. into the QGraphicsScene/View instance */
         if (PropertyDialogFactoryPrivate::lastDialog != 0) {
             delete PropertyDialogFactoryPrivate::lastDialog;
         }

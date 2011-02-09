@@ -50,10 +50,12 @@ public:
     QSignalMapper windowMapper;
     static DocumentManager *instance;
     static int nextWindowId;
+    static DocumentManager::CloseRequest closeRequest;
 };
 
 DocumentManager *DocumentManagerPrivate::instance = 0;
 int DocumentManagerPrivate::nextWindowId = 0;
+DocumentManager::CloseRequest DocumentManagerPrivate::closeRequest = DocumentManager::CloseCurrent;
 
 // public
 
@@ -82,6 +84,7 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     // update object name ("window ID")
     mainWindow->setObjectName(mainWindow->objectName() + QString::number(d->nextWindowId));
     mainWindow->installEventFilter(this);
+    /*!\todo This gets messy: make DocumentInfo a proper class. */
     documentInfo->id = d->nextWindowId;
     ++d->nextWindowId;
     documentInfo->windowTitle = tr("New %1", "New document title + ID").arg(d->nextWindowId);
@@ -95,6 +98,16 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     emit changed();
 }
 
+QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
+{
+    QString result;
+    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        result = documentInfo->windowTitle;
+    }
+    return result;
+}
+
 void DocumentManager::setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow)
 {
     DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
@@ -105,16 +118,6 @@ void DocumentManager::setWindowTitle(const QString &windowTitle, const QMainWind
             action->setText(windowTitle);
         }
     }
-}
-
-QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
-{
-    QString result;
-    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
-    if (documentInfo != 0) {
-        result = documentInfo->windowTitle;
-    }
-    return result;
 }
 
 QActionGroup &DocumentManager::getActionGroup() const
@@ -136,6 +139,43 @@ int DocumentManager::getModifiedCount() const
         }
     }
     return result;
+}
+
+DocumentInfo::SaveStrategy DocumentManager::getSaveStrategy(const QMainWindow &mainWindow) const
+{
+    DocumentInfo::SaveStrategy result;
+    const DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        result = documentInfo->saveStrategy;
+    } else {
+        result = DocumentInfo::Discard;
+    }
+    return result;
+}
+
+void DocumentManager::setSaveStrategy(const QMainWindow &mainWindow, DocumentInfo::SaveStrategy saveStrategy)
+{
+    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    if (documentInfo != 0) {
+        documentInfo->saveStrategy = saveStrategy;
+    }
+}
+
+void DocumentManager::setSaveStrategyForAll(DocumentInfo::SaveStrategy saveStrategy)
+{
+    foreach (DocumentInfo *documentInfo, d->documentInfos) {
+       documentInfo->saveStrategy = saveStrategy;
+    }
+}
+
+DocumentManager::CloseRequest DocumentManager::getCloseRequest()
+{
+    return DocumentManagerPrivate::closeRequest;
+}
+
+void DocumentManager::setCloseRequest(CloseRequest closeRequest)
+{
+    DocumentManagerPrivate::closeRequest = closeRequest;
 }
 
 bool DocumentManager::eventFilter(QObject *object, QEvent *event)

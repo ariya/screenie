@@ -514,22 +514,5 @@
  <resources>
   <include location="../../Resources/Resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>closeAction</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>223</x>
-     <y>226</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

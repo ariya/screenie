@@ -28,10 +28,21 @@ class ScreenieScene;
 
 struct DocumentInfo
 {
+    /*!
+     * Defines how to deal with unsaved documents before closing the window.
+     */
+    enum SaveStrategy
+    {
+        Discard, /*!< Discard the modifications, close the document immediatelly */
+        Save, /*!< Save the modifications before closing the document */
+        Ask /*!< Ask the user whether to discard or save the modifications before closing the document */
+    };
+
+    int id;
     QMainWindow *mainWindow;
     ScreenieScene *screenieScene;
     QString windowTitle;
-    int id;
+    SaveStrategy saveStrategy;
 };
 
 #endif // DOCUMENTINFO_H

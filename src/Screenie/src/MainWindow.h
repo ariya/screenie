@@ -93,8 +93,11 @@ private:
     void createScene();
     void updateScene(ScreenieScene &screenieScene);
 
-    bool proceedWithModifiedScene();
-    void proceedWithModifiedScene(const char *slot);
+    void askBeforeClose();
+    void handleMultipleModifiedBeforeQuit();
+    void saveBeforeClose();
+    void saveAsBeforeClose();
+    void askBeforeClose(const char *slot);
     void restoreWindowGeometry();
 
     void updateDocumentManager(MainWindow &mainWindow);
@@ -110,6 +113,7 @@ private slots:
     void on_saveAsAction_triggered();
     void on_saveAsTemplateAction_triggered();
     void on_exportAction_triggered();
+    void on_closeAction_triggered();
     void on_quitAction_triggered();
 
     // Edit
@@ -150,7 +154,9 @@ private slots:
 
     void handleFileSaveAsSelected(const QString &filePath);
     void handleFileSaveAsTemplateSelected(const QString &filePath);
+    void handleFileSaveAsBeforeCloseSelected(const QString &filePath);
     void handleConfirm(int result);
+    void handleAskBeforeClose(int answer);
 };
 
 #endif // MAINWINDOW_H
