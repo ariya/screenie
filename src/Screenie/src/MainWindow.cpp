@@ -194,6 +194,12 @@ void MainWindow::frenchConnection()
     // recent files
     connect(&m_recentFiles, SIGNAL(openRecentFile(const QString &)),
             this, SLOT(handleRecentFile(const QString &)));
+
+    // Window menu
+    connect(m_minimizeWindowsAction, SIGNAL(triggered()),
+            this, SLOT(showMinimized()));
+    connect(m_maximizeWindowsAction, SIGNAL(triggered()),
+            this, SLOT(showMaximized()));
 }
 
 void MainWindow::newScene(ScreenieScene &screenieScene)
@@ -333,6 +339,10 @@ void MainWindow::updateTitle()
 
 void MainWindow::initializeUi()
 {
+    m_minimizeWindowsAction = new QAction(tr("Minimize", "Window menu"), this);
+    m_minimizeWindowsAction->setShortcut(QKeySequence(Qt::Key_M + Qt::CTRL));
+    m_maximizeWindowsAction = new QAction(tr("Maximize", "Window menu"), this);
+
     setWindowIcon(QIcon(":/img/application-icon.png"));
     updateTitle();
     updateWindowMenu();
@@ -831,10 +841,15 @@ void MainWindow::handleRecentFile(const QString &filePath)
 
 void MainWindow::updateWindowMenu()
 {
-    ui->windowMenu->clear();
+    QMenu *windowMenu = ui->windowMenu;
+    windowMenu->clear();
+    windowMenu->addAction(m_minimizeWindowsAction);
+    windowMenu->addAction(m_maximizeWindowsAction);
+    windowMenu->addSeparator();
     QActionGroup &actionGroup = DocumentManager::getInstance().getActionGroup();
     foreach (QAction *action, actionGroup.actions()) {
-        ui->windowMenu->addAction(action);
+        windowMenu->addAction(action);
     }
+
 }
 
