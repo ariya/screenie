@@ -247,10 +247,8 @@ bool SizeFitter::fitIt(QSize size, QSize &fittedSize, QRect *clippedRect) const
     bool  result;
     QSize orientedTargetSize = getOrientedTargetSize(size);
 
-    orientedTargetSize = getOrientedTargetSize(size);
-
     // enlarge?
-    if (isFitOptionEnabled(Enlarge) == false &&
+    if (!isFitOptionEnabled(Enlarge) &&
         size.width() <= orientedTargetSize.width() &&
         size.height() <= orientedTargetSize.height()) {
         fittedSize = size;
@@ -399,12 +397,12 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) con
 {
     bool result;
 
-    fittedSize = d->targetSize;
-    
+    QSize orientedTargetSize = getOrientedTargetSize(size);
+
     // enlarge?
     if (!isFitOptionEnabled(Enlarge) &&
-        size.width() <= d->targetSize.width() &&
-        size.height() <= d->targetSize.height()) {
+        size.width() <= orientedTargetSize.width() &&
+        size.height() <= orientedTargetSize.height()) {
         fittedSize = size;
         if (clippedRect != 0) {
             clippedRect->setTopLeft(QPoint(0, 0));
@@ -413,14 +411,15 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) con
         return false;
     }
     
-    if (size != d->targetSize) {
+    fittedSize = orientedTargetSize;
+    if (size != fittedSize) {
         result = true;
     } else {
         result = false;
     }
 
     if (clippedRect != 0) {
-        clip(size, d->targetSize, clippedRect);
+        clip(size, orientedTargetSize, clippedRect);
     }
     return result;
 }
@@ -428,7 +427,7 @@ bool SizeFitter::exactFit(QSize size, QSize &fittedSize, QRect *clippedRect) con
 void SizeFitter::clip(const QSize &size, const QSize &targetSize, QRect *clippedRect) const
 {
     float aspectRatio, targetAspectRatio;
-    int   newWidth, newHeight;
+    int newWidth, newHeight;
     QSize newSize;
 
     // center the visible area

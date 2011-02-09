@@ -236,6 +236,7 @@ void DocumentManager::activate(int id) const
     foreach(DocumentInfo *documentInfo, d->documentInfos) {
         if (documentInfo->id == id) {
             documentInfo->mainWindow->activateWindow();
+            documentInfo->mainWindow->raise();
             break;
         }
     }
