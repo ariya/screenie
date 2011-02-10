@@ -129,6 +129,10 @@ private slots:
     // View
     void on_toggleFullScreenAction_triggered();
 
+    // About
+    void on_aboutAction_triggered();
+    void on_aboutQtAction_triggered();
+
     void on_rotationSlider_valueChanged(int value);
     void on_distanceSlider_valueChanged(int value);
     void on_reflectionGroupBox_toggled(bool enable);
@@ -144,7 +148,7 @@ private slots:
     void on_blueSpinBox_valueChanged(int value);
     void on_htmlBGColorLineEdit_editingFinished();
 
-    void on_aboutQtAction_triggered();
+
 
     void updateUi();
     void updateDefaultValues();

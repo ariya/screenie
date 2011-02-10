@@ -310,8 +310,9 @@
    </widget>
    <widget class="QMenu" name="menu_About">
     <property name="title">
-     <string>&amp;About</string>
+     <string>&amp;Help</string>
     </property>
+    <addaction name="aboutAction"/>
     <addaction name="aboutQtAction"/>
    </widget>
    <widget class="QMenu" name="menu_Insert">
@@ -508,6 +509,11 @@
   <action name="saveAsTemplateAction">
    <property name="text">
     <string>Save As &amp;Template</string>
+   </property>
+  </action>
+  <action name="aboutAction">
+   <property name="text">
+    <string>&amp;About</string>
    </property>
   </action>
  </widget>

@@ -393,7 +393,7 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
 
 void MainWindow::handleMultipleModifiedBeforeQuit()
 {
-    QMessageBox *messageBox = new QMessageBox(tr("Documents Modified"),
+    QMessageBox *messageBox = new QMessageBox(Version::getApplicationName(),
                                               tr("Multiple documents are modified."),
                                               QMessageBox::Warning,
                                               QMessageBox::Save | QMessageBox::Default,
@@ -420,7 +420,7 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 
 void MainWindow::askBeforeClose()
 {
-    QMessageBox *messageBox = new QMessageBox(tr("Document Modified"),
+    QMessageBox *messageBox = new QMessageBox(Version::getApplicationName(),
                                               tr("The document %1 is modified.").arg(DocumentManager::getInstance().getWindowTitle(*this)),
                                               QMessageBox::Warning,
                                               QMessageBox::Save | QMessageBox::Default,
@@ -687,6 +687,11 @@ void MainWindow::on_addImageAction_triggered()
     }
 }
 
+void MainWindow::on_addTemplateAction_triggered()
+{
+    m_screenieControl->addTemplate(QPointF(0.0, 0.0));
+}
+
 void MainWindow::on_toggleFullScreenAction_triggered()
 {
     if (!isFullScreen()) {
@@ -696,9 +701,25 @@ void MainWindow::on_toggleFullScreenAction_triggered()
     }
 }
 
-void MainWindow::on_addTemplateAction_triggered()
+void MainWindow::on_aboutAction_triggered()
 {
-    m_screenieControl->addTemplate(QPointF(0.0, 0.0));
+    Version version;
+    QString description = tr("A fancy screenshot composer");
+    QString authors1 = tr("Developed by Till Oliver Knoll");
+    QString authors2 = tr("Idea by Ariya Hidayat");
+    QString versionNumber = tr("Version %1").arg(version.toString());
+    QString aboutText = QString("<b>") + Version::getApplicationName() + "</b><br />" +
+                        description + "<br /><br />" +
+                        authors1 + "<br />" +
+                        authors2 + "<br /><br />" +
+                        Version::getApplicationName() + "\"" + Version::getCodeName() + "\"<br />" +
+                        versionNumber;
+    QMessageBox::about(this, tr("About %1").arg(Version::getApplicationName()), aboutText);
+}
+
+void MainWindow::on_aboutQtAction_triggered()
+{
+    QMessageBox::aboutQt(this);
 }
 
 void MainWindow::on_rotationSlider_valueChanged(int value)
@@ -806,10 +827,6 @@ void MainWindow::on_htmlBGColorLineEdit_editingFinished()
         palette.setColor(ui->htmlBGColorLineEdit->foregroundRole(), Qt::red);
     }
     ui->htmlBGColorLineEdit->setPalette(palette);
-}
-
-void MainWindow::on_aboutQtAction_triggered() {
-    QMessageBox::aboutQt(this);
 }
 
 void MainWindow::updateUi()
