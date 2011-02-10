@@ -100,7 +100,7 @@ private:
     void askBeforeClose(const char *slot);
     void restoreWindowGeometry();
 
-    void updateDocumentManager(MainWindow &mainWindow);
+    void updateDocumentManager();
     MainWindow *createMainWindow();
 
 private slots:

@@ -61,6 +61,7 @@ public:
      * \sa #changed()
      */
     KERNEL_API void add(DocumentInfo *documentInfo);
+    KERNEL_API DocumentInfo *getDocumentInfo(const QMainWindow &mainWindow) const;
     KERNEL_API QString getWindowTitle(const QMainWindow &mainWindow) const;
     KERNEL_API void setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow);
     KERNEL_API QActionGroup &getActionGroup() const;
@@ -81,7 +82,6 @@ signals:
 protected:
     virtual ~DocumentManager();
 
-
 private:
     Q_DISABLE_COPY(DocumentManager)
     DocumentManagerPrivate *d;
@@ -91,7 +91,7 @@ private:
     void frenchConnection();
     void updateActionGroup(const QMainWindow &mainWindow);
     QAction *getWindowAction(int id) const;
-    DocumentInfo *getDocumentInfo(const QObject &object) const;
+    DocumentInfo *getDocumentInfoFromObject(const QObject &object) const;
 
 private slots:
     void remove(QObject *mainWindow);

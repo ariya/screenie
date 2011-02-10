@@ -98,10 +98,15 @@ void DocumentManager::add(DocumentInfo *documentInfo)
     emit changed();
 }
 
+DocumentInfo *DocumentManager::getDocumentInfo(const QMainWindow &mainWindow) const
+{
+    this->getDocumentInfoFromObject(mainWindow);
+}
+
 QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
 {
     QString result;
-    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);
     if (documentInfo != 0) {
         result = documentInfo->windowTitle;
     }
@@ -110,7 +115,7 @@ QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
 
 void DocumentManager::setWindowTitle(const QString &windowTitle, const QMainWindow &mainWindow)
 {
-    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);
     if (documentInfo != 0) {
         documentInfo->windowTitle = windowTitle;
         QAction *action = getWindowAction(documentInfo->id);
@@ -144,7 +149,7 @@ int DocumentManager::getModifiedCount() const
 DocumentInfo::SaveStrategy DocumentManager::getSaveStrategy(const QMainWindow &mainWindow) const
 {
     DocumentInfo::SaveStrategy result;
-    const DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    const DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);
     if (documentInfo != 0) {
         result = documentInfo->saveStrategy;
     } else {
@@ -155,7 +160,7 @@ DocumentInfo::SaveStrategy DocumentManager::getSaveStrategy(const QMainWindow &m
 
 void DocumentManager::setSaveStrategy(const QMainWindow &mainWindow, DocumentInfo::SaveStrategy saveStrategy)
 {
-    DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);
     if (documentInfo != 0) {
         documentInfo->saveStrategy = saveStrategy;
     }
@@ -221,7 +226,7 @@ void DocumentManager::frenchConnection()
 
 void DocumentManager::updateActionGroup(const QMainWindow &mainWindow)
 {
-    const DocumentInfo *documentInfo = getDocumentInfo(mainWindow);
+    const DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);
     if (documentInfo != 0) {
         QAction *action = getWindowAction(documentInfo->id);
         if (action != 0) {
@@ -242,7 +247,7 @@ QAction *DocumentManager::getWindowAction(int id) const
     return result;
 }
 
-DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object) const
+DocumentInfo *DocumentManager::getDocumentInfoFromObject(const QObject &object) const
 {
     DocumentInfo *result = 0;
     foreach (DocumentInfo *documentInfo, d->documentInfos) {
@@ -258,7 +263,7 @@ DocumentInfo *DocumentManager::getDocumentInfo(const QObject &object) const
 
 void DocumentManager::remove(QObject *object)
 {
-    DocumentInfo *documentInfo = getDocumentInfo(*object);
+    DocumentInfo *documentInfo = getDocumentInfoFromObject(*object);
     if (documentInfo != 0) {
         foreach (QAction *action, d->windowActionGroup->actions()) {
             if (action->data().toInt() == documentInfo->id) {

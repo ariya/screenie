@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     createScene();
-    updateDocumentManager(*this);
+    updateDocumentManager();
     initializeUi();
     m_platformManager = PlatformManagerFactory::getInstance().create();
     m_platformManager->initialize(*this, *ui);
@@ -399,6 +399,7 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
     m_clipboard = new Clipboard(*m_screenieControl, this);
     m_screenieControl->updateScene();
     updateUi();
+    updateDocumentManager();
     connect(m_screenieScene, SIGNAL(changed()),
             this, SLOT(updateUi()));
 }
@@ -501,13 +502,23 @@ void MainWindow::restoreWindowGeometry()
     }
 }
 
-void MainWindow::updateDocumentManager(MainWindow &mainWindow)
+void MainWindow::updateDocumentManager()
 {
-    DocumentInfo *documentInfo = new DocumentInfo();
-    documentInfo->mainWindow = &mainWindow;
-    documentInfo->screenieScene = mainWindow.m_screenieScene;
+    bool created;
+    DocumentManager &documentManager = DocumentManager::getInstance();
+    DocumentInfo *documentInfo = documentManager.getDocumentInfo(*this);
+    if (documentInfo == 0) {
+        documentInfo = new DocumentInfo();
+        created = true;
+    } else {
+        created = false;
+    }
+    documentInfo->mainWindow = this;
+    documentInfo->screenieScene = m_screenieScene;
     documentInfo->saveStrategy = DocumentInfo::Ask;
-    DocumentManager::getInstance().add(documentInfo);
+    if (created) {
+        documentManager.add(documentInfo);
+    }
 }
 
 MainWindow *MainWindow::createMainWindow()
