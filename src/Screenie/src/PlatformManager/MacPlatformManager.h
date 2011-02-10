@@ -36,9 +36,7 @@ namespace Ui {
 
 class MacPlatformManager : public QObject, public AbstractPlatformManager
 {
-    // Implementation note: Q_OBJECT macro intentionally left away, because
-    // qmake "mocs" this file regardless of qmake scopes -> linker errors on
-    // non-Mac platforms
+    Q_OBJECT
 public:
     MacPlatformManager();
     virtual ~MacPlatformManager();

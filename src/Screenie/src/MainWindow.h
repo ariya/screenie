@@ -103,6 +103,7 @@ private:
     MainWindow *createMainWindow();
 
     inline bool isFilePathRequired() const;
+    void showError(const QString &message);
 
 private slots:
     // File
@@ -147,8 +148,6 @@ private slots:
     void on_greenSpinBox_valueChanged(int value);
     void on_blueSpinBox_valueChanged(int value);
     void on_htmlBGColorLineEdit_editingFinished();
-
-
 
     void updateUi();
     void updateDefaultValues();

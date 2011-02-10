@@ -103,7 +103,7 @@ DocumentInfo *DocumentManager::getDocumentInfo(const QMainWindow &mainWindow) co
     return getDocumentInfoFromObject(mainWindow);
 }
 
-QString DocumentManager::getWindowTitle(const QMainWindow &mainWindow) const
+QString DocumentManager::getDocumentName(const QMainWindow &mainWindow) const
 {
     QString result;
     DocumentInfo *documentInfo = getDocumentInfoFromObject(mainWindow);

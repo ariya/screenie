@@ -43,6 +43,7 @@ public:
     static const qreal DefaultRotationGestureSensitivity;
     static const qreal DefaultDistanceGestureSensitivity;
     static const int DefaultMaxRecentFiles;
+    static const Settings::EditRenderQuality DefaultEditRenderQuality;
     static const bool DefaultFullScreen;
     static const QPoint DefaultMainWindowPosition;
     static const QSize DefaultMainWindowSize;
@@ -56,6 +57,7 @@ public:
     qreal rotationGestureSensitivity;
     qreal distanceGestureSensitivity;
     int maxRecentFiles;
+    Settings::EditRenderQuality editRenderQuality;
     QStringList recentFiles;
 
     QSettings *settings;
@@ -86,6 +88,7 @@ const QString SettingsPrivate::DefaultLastDocumentDirectoryPath = QDir::fromNati
 const qreal SettingsPrivate::DefaultRotationGestureSensitivity = 2.0; // these values work well on a MacBook Pro ;)
 const qreal SettingsPrivate::DefaultDistanceGestureSensitivity = 10.0;
 const int SettingsPrivate::DefaultMaxRecentFiles = 8;
+const Settings::EditRenderQuality SettingsPrivate::DefaultEditRenderQuality = Settings::LowQuality;
 const bool SettingsPrivate::DefaultFullScreen = false;
 const QPoint SettingsPrivate::DefaultMainWindowPosition = QPoint();
 const QSize SettingsPrivate::DefaultMainWindowSize = QSize(800, 600);
@@ -199,23 +202,6 @@ void Settings::setDistanceGestureSensitivity(qreal distanceGestureSensitivity)
     }
 }
 
-int Settings::getMaxRecentFiles() const {
-    return d->maxRecentFiles;
-}
-
-void Settings::setMaxRecentFiles(int maxRecentFiles)
-{
-    if (d->maxRecentFiles != maxRecentFiles) {
-        if (d->maxRecentFiles > maxRecentFiles) {
-            while (d->recentFiles.count() > maxRecentFiles) {
-                d->recentFiles.removeLast();
-            }
-        }
-        d->maxRecentFiles = maxRecentFiles;
-        emit changed();
-    }
-}
-
 void Settings::setRecentFiles(const QStringList &recentFiles) {
     if (d->recentFiles != recentFiles) {
         d->recentFiles = recentFiles;
@@ -246,6 +232,36 @@ void Settings::removeRecentFile(const QString &filePath)
 QStringList Settings::getRecentFiles() const
 {
     return d->recentFiles;
+}
+
+int Settings::getMaxRecentFiles() const {
+    return d->maxRecentFiles;
+}
+
+void Settings::setMaxRecentFiles(int maxRecentFiles)
+{
+    if (d->maxRecentFiles != maxRecentFiles) {
+        if (d->maxRecentFiles > maxRecentFiles) {
+            while (d->recentFiles.count() > maxRecentFiles) {
+                d->recentFiles.removeLast();
+            }
+        }
+        d->maxRecentFiles = maxRecentFiles;
+        emit changed();
+    }
+}
+
+Settings::EditRenderQuality Settings::getEditRenderQuality() const
+{
+    return d->editRenderQuality;
+}
+
+void Settings::setEditRenderQuality(EditRenderQuality editRenderQuality)
+{
+    if (d->editRenderQuality != editRenderQuality) {
+        d->editRenderQuality = editRenderQuality;
+        emit changed();
+    }
 }
 
 Settings::WindowGeometry Settings::getWindowGeometry() const
@@ -289,12 +305,18 @@ void Settings::store()
             d->settings->setValue("MaxRecentFiles", d->maxRecentFiles);
             d->settings->setValue("RecentFiles", d->recentFiles);
         }
+        d->settings->endGroup();
     }
     d->settings->endGroup();
-    d->settings->beginGroup("UI/Gestures");
+    d->settings->beginGroup("UI");
     {
-        d->settings->setValue("RotationSensitivity", d->rotationGestureSensitivity);
-        d->settings->setValue("DistanceSensitivity", d->distanceGestureSensitivity);
+        d->settings->setValue("EditRenderQuality", d->editRenderQuality);
+        d->settings->beginGroup("Gestures");
+        {
+            d->settings->setValue("RotationSensitivity", d->rotationGestureSensitivity);
+            d->settings->setValue("DistanceSensitivity", d->distanceGestureSensitivity);
+        }
+        d->settings->endGroup();
     }
     d->settings->endGroup();
 }
@@ -327,10 +349,15 @@ void Settings::restore()
         d->settings->endGroup();
     }
     d->settings->endGroup();
-    d->settings->beginGroup("UI/Gestures");
+    d->settings->beginGroup("UI");
     {
-        d->rotationGestureSensitivity = d->settings->value("RotationSensitivity", SettingsPrivate::DefaultRotationGestureSensitivity).toReal();
-        d->distanceGestureSensitivity = d->settings->value("DistanceSensitivity", SettingsPrivate::DefaultDistanceGestureSensitivity).toReal();
+        d->editRenderQuality = static_cast<EditRenderQuality>(d->settings->value("EditRenderQuality", SettingsPrivate::DefaultEditRenderQuality).toInt());
+        d->settings->beginGroup("Gestures");
+        {
+            d->rotationGestureSensitivity = d->settings->value("RotationSensitivity", SettingsPrivate::DefaultRotationGestureSensitivity).toReal();
+            d->distanceGestureSensitivity = d->settings->value("DistanceSensitivity", SettingsPrivate::DefaultDistanceGestureSensitivity).toReal();
+        }
+        d->settings->endGroup();
     }
     d->settings->endGroup();
 }

@@ -51,6 +51,16 @@ public:
     };
 
     /*!
+     * The render quality during edit operations.
+     */
+    enum EditRenderQuality {
+        LowQuality = 0, /*!< Low quality: no anti-aliasing for pixmaps and fonts */
+        MediumQuality = 1, /*!< Not implemented yet. */
+        HighQuality = 2, /*!< Not implemented yet. */
+        MaximumQuality = 3 /*!< Maximum quality: anti-aliasing for pixmaps and fonts */
+    };
+
+    /*!
      * \sa #changed()
      */
     UTILS_API static Settings &getInstance();
@@ -117,6 +127,13 @@ public:
      */
     UTILS_API void setMaxRecentFiles(int maxRecentFiles);
 
+    /*!
+     * \sa #changed()
+     */
+    UTILS_API void setEditRenderQuality(EditRenderQuality editRenderQuality);
+
+    UTILS_API EditRenderQuality getEditRenderQuality() const;
+
     UTILS_API WindowGeometry getWindowGeometry() const;
 
     /*!
@@ -128,8 +145,6 @@ public:
      *        the WindowGeometry containing the values of the last MainWindow geometry
      */
     UTILS_API void setWindowGeometry(const WindowGeometry windowGeometry);
-
-
 
 public slots:
     /*!

@@ -61,8 +61,8 @@ public:
      */
     enum RenderQuality
     {
-        Low, /*!< Antialiasing disabled, fast pixmap transformation */
-        High /*!< Antialiasing enabled, smooth pixmap transformation */
+        LowQuality, /*!< Antialiasing disabled, fast pixmap transformation */
+        MaximumQuality /*!< Antialiasing enabled, smooth pixmap transformation */
     };
 
     KERNEL_API ScreenieControl(ScreenieScene &screenieScene, ScreenieGraphicsScene &screenieGraphicsScene);
@@ -129,6 +129,7 @@ private:
     void frenchConnection();
 
     QList<ScreeniePixmapItem *> getScreeniePixmapItems() const;
+    void updateEditRenderQuality();
     void setRenderQuality(RenderQuality renderQuality);
     void applyDefaultValues(ScreenieModelInterface &screenieModelInterface);
     /*!\todo Put these methods in some Kernel "Geometry" class or somewhere */

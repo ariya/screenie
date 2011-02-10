@@ -21,6 +21,7 @@
 #include <QtCore/QString>
 #include <QtCore/QPointF>
 #include <QtCore/QFile>
+#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 #include <QtCore/QSignalMapper>
@@ -360,7 +361,7 @@ void MainWindow::updateTitle()
         title = QFileInfo(m_documentFilePath).fileName();
         documentManager.setWindowTitle(title, *this);
     } else {
-        title = documentManager.getWindowTitle(*this);
+        title = documentManager.getDocumentName(*this);
     }
     title.append("[*] - ");
     title.append(Version::getApplicationName());
@@ -393,13 +394,13 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
 
 void MainWindow::handleMultipleModifiedBeforeQuit()
 {
-    QMessageBox *messageBox = new QMessageBox(Version::getApplicationName(),
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
+                                              Version::getApplicationName(),
                                               tr("Multiple documents are modified."),
-                                              QMessageBox::Warning,
                                               QMessageBox::Save | QMessageBox::Default,
-                                              QMessageBox::Discard,
-                                              QMessageBox::Cancel | QMessageBox::Escape,
                                               this);
+    messageBox->addButton(QMessageBox::Discard);
+    messageBox->addButton(QMessageBox::Cancel);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     int answer = messageBox->exec();
     switch (answer) {
@@ -420,13 +421,13 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 
 void MainWindow::askBeforeClose()
 {
-    QMessageBox *messageBox = new QMessageBox(Version::getApplicationName(),
-                                              tr("The document %1 is modified.").arg(DocumentManager::getInstance().getWindowTitle(*this)),
-                                              QMessageBox::Warning,
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
+                                              Version::getApplicationName(),
+                                              tr("The document %1 is modified.").arg(DocumentManager::getInstance().getDocumentName(*this)),
                                               QMessageBox::Save | QMessageBox::Default,
-                                              QMessageBox::Discard,
-                                              QMessageBox::Cancel | QMessageBox::Escape,
                                               this);
+    messageBox->addButton(QMessageBox::Discard);
+    messageBox->addButton(QMessageBox::Cancel);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     messageBox->open(this, SLOT(handleAskBeforeClose(int)));
 }
@@ -438,9 +439,11 @@ void MainWindow::saveBeforeClose()
         bool ok = writeScene(m_documentFilePath);
         if (ok) {
             close();
+        } else {
+            showError(tr("Could not save scene %1 to path %2!")
+                      .arg(DocumentManager::getInstance().getDocumentName(*this))
+                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
         }
-        /*!\todo Error handling in case document could bot be saved (user tried
-                 to save on a CD-ROM, for instance *grin*) */
 #ifdef DEBUG
         qDebug("MainWindow::saveBeforeClose: ok: %d", ok);
 #endif
@@ -515,6 +518,17 @@ bool MainWindow::isFilePathRequired() const
     return m_documentFilePath.isNull() || (m_screenieScene->isTemplate() && !m_screenieScene->hasTemplatesExclusively());
 }
 
+void MainWindow::showError(const QString &message)
+{
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical,
+                                              Version::getApplicationName(),
+                                              message,
+                                              QMessageBox::Ok | QMessageBox::Default,
+                                              this);
+    messageBox->setAttribute(Qt::WA_DeleteOnClose);
+    messageBox->open();
+}
+
 // private slots
 
 void MainWindow::on_newAction_triggered()
@@ -555,7 +569,8 @@ void MainWindow::on_openAction_triggered()
             QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
         } else {
-             /*!\todo Error handling, show a nice error message to the user ;) */
+            showError(tr("Could not open scene from path %1!")
+                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
         }
     }
 }
@@ -564,11 +579,16 @@ void MainWindow::on_saveAction_triggered()
 {
     // save with given 'm_documentFilePath', if scene is not a template or if so, has only template items
     if (!isFilePathRequired()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = writeScene(m_documentFilePath);
 #ifdef DEBUG
         qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
 #endif
+        if (!ok) {
+            showError(tr("Could not save document %1 to path %2!")
+                      .arg(DocumentManager::getInstance().getDocumentName(*this))
+                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
+
+        }
     } else {
         on_saveAsAction_triggered();
     }
@@ -885,7 +905,6 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
 {
     bool ok = false;
     if (!filePath.isNull()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
         m_screenieScene->setTemplate(false);
         ok = writeScene(filePath);
         if (ok) {
@@ -893,6 +912,10 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
             Settings &settings = Settings::getInstance();
             settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
             settings.addRecentFile(filePath);
+        } else {
+            showError(tr("Could not save scene %1 to path %2!")
+                      .arg(DocumentManager::getInstance().getDocumentName(*this))
+                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
         }
     }
 }

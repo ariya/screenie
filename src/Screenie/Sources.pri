@@ -16,7 +16,6 @@ HEADERS += $$PWD/src/Main.h \
            $$PWD/src/RecentFiles.h \
            $$PWD/src/PlatformManager/PlatformManager.h \
            $$PWD/src/PlatformManager/PlatformManagerFactory.h \
-           $$PWD/src/PlatformManager/MacPlatformManager.h \
            $$PWD/src/PlatformManager/AbstractPlatformManager.h
 
 SOURCES += $$PWD/src/Main.cpp \
