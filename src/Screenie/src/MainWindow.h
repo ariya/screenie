@@ -102,6 +102,8 @@ private:
     void updateDocumentManager();
     MainWindow *createMainWindow();
 
+    inline bool isFilePathRequired() const;
+
 private slots:
     // File
     void on_newAction_triggered();

@@ -393,34 +393,25 @@ void MainWindow::updateScene(ScreenieScene &screenieScene)
 
 void MainWindow::handleMultipleModifiedBeforeQuit()
 {
-    QMessageBox *messageBox = new QMessageBox(tr("Multiple Documents Modified"),
-                                  "Multiple documents are modified.",
-                                  QMessageBox::Question,
-                                  QMessageBox::Save | QMessageBox::Default,
-                                  QMessageBox::Discard,
-                                  QMessageBox::Cancel | QMessageBox::Escape,
-                                  this);
+    QMessageBox *messageBox = new QMessageBox(tr("Documents Modified"),
+                                              tr("Multiple documents are modified."),
+                                              QMessageBox::Warning,
+                                              QMessageBox::Save | QMessageBox::Default,
+                                              QMessageBox::Discard,
+                                              QMessageBox::Cancel | QMessageBox::Escape,
+                                              this);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     int answer = messageBox->exec();
     switch (answer) {
     case QMessageBox::Save:
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Ask);
         QApplication::closeAllWindows();
-#ifdef DEBUG
-        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Save option.");
-#endif
         break;
     case QMessageBox::Discard:
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Discard);
         QApplication::closeAllWindows();
-#ifdef DEBUG
-        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Discard option.");
-#endif
         break;
     case QMessageBox::Cancel:
-#ifdef DEBUG
-        qDebug("MainWindow::handleMultipleModifiedBeforeQuit: Cancel option.");
-#endif
         break;
     default:
         break;
@@ -430,19 +421,19 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 void MainWindow::askBeforeClose()
 {
     QMessageBox *messageBox = new QMessageBox(tr("Document Modified"),
-                                  "The document is modified.",
-                                  QMessageBox::Question,
-                                  QMessageBox::Save | QMessageBox::Default,
-                                  QMessageBox::Discard,
-                                  QMessageBox::Cancel | QMessageBox::Escape,
-                                  this);
+                                              tr("The document %1 is modified.").arg(DocumentManager::getInstance().getWindowTitle(*this)),
+                                              QMessageBox::Warning,
+                                              QMessageBox::Save | QMessageBox::Default,
+                                              QMessageBox::Discard,
+                                              QMessageBox::Cancel | QMessageBox::Escape,
+                                              this);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     messageBox->open(this, SLOT(handleAskBeforeClose(int)));
 }
 
 void MainWindow::saveBeforeClose()
 {
-    if (!m_documentFilePath.isNull()) {
+    if (!isFilePathRequired()) {
         /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = writeScene(m_documentFilePath);
         if (ok) {
@@ -463,7 +454,6 @@ void MainWindow::saveAsBeforeClose()
     QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
     QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
                           .arg(FileUtils::SceneExtension);
-
 
     QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
     fileDialog->setNameFilter(sceneFilter);
@@ -520,30 +510,12 @@ MainWindow *MainWindow::createMainWindow()
     return result;
 }
 
-// private slots
+bool MainWindow::isFilePathRequired() const
+{
+    return m_documentFilePath.isNull() || (m_screenieScene->isTemplate() && !m_screenieScene->hasTemplatesExclusively());
+}
 
-//bool MainWindow::proceed(int answer, const char *followUpAction) {
-//    bool result;
-//    switch (answer) {
-//    case QMessageBox::Save:
-//        //saveBefore(followUpAction);
-//        result = true;
-//        break;
-//    case QMessageBox::Cancel:
-//        result = false;
-//        break;
-//    case QMessageBox::Discard:
-//        if (followUpAction != 0) {
-//            QMetaObject::invokeMethod(this, followUpAction);
-//        }
-//        result = true;
-//        break;
-//    default:
-//        result = false;
-//        break;
-//    }
-//    return result;
-//}
+// private slots
 
 void MainWindow::on_newAction_triggered()
 {
@@ -591,7 +563,7 @@ void MainWindow::on_openAction_triggered()
 void MainWindow::on_saveAction_triggered()
 {
     // save with given 'm_documentFilePath', if scene is not a template or if so, has only template items
-    if (!m_documentFilePath.isNull() && (!m_screenieScene->isTemplate() || m_screenieScene->hasTemplatesExclusively())) {
+    if (!isFilePathRequired()) {
         /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = writeScene(m_documentFilePath);
 #ifdef DEBUG
@@ -606,8 +578,7 @@ void MainWindow::on_saveAsAction_triggered()
 {
     QString lastDocumentDirectoryPath = Settings::getInstance().getLastDocumentDirectoryPath();
     QString sceneFilter = tr("Screenie Scene (*.%1)", "Save As dialog filter")
-                          .arg(FileUtils::SceneExtension);
-
+                             .arg(FileUtils::SceneExtension);
 
     QFileDialog *fileDialog = new QFileDialog(this, Qt::Sheet);
     fileDialog->setNameFilter(sceneFilter);
@@ -891,7 +862,6 @@ void MainWindow::updateWindowMenu()
     foreach (QAction *action, actionGroup.actions()) {
         windowMenu->addAction(action);
     }
-
 }
 
 void MainWindow::handleFileSaveAsSelected(const QString &filePath)

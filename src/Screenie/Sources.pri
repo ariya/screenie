@@ -26,7 +26,6 @@ SOURCES += $$PWD/src/Main.cpp \
            $$PWD/src/PlatformManager/PlatformManagerFactory.cpp \
            $$PWD/src/PlatformManager/AbstractPlatformManager.cpp
 
-
 FORMS += $$PWD/ui/MainWindow.ui
 
 if (macx) {
