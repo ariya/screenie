@@ -21,7 +21,10 @@
 #ifndef MACPLATFORMMANAGER_H
 #define MACPLATFORMMANAGER_H
 
+#include <QtCore/QObject>
+
 class QMainWindow;
+class QEvent;
 
 #include "AbstractPlatformManager.h"
 
@@ -31,17 +34,23 @@ namespace Ui {
     class MainWindow;
 }
 
-class MacPlatformManager : public AbstractPlatformManager
+class MacPlatformManager : public QObject, public AbstractPlatformManager
 {
+    // Implementation note: Q_OBJECT macro intentionally left away, because
+    // qmake "mocs" this file regardless of qmake scopes -> linker errors on
+    // non-Mac platforms
 public:
     MacPlatformManager();
     virtual ~MacPlatformManager();
 
     virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
-    virtual void handleWindowActivation(bool active);
+
+    virtual bool eventFilter(QObject *object, QEvent *event);
 
 private:
     MacPlatformManagerPrivate *d;
+
+    void handleWindowActivation(bool active);
 };
 
 #endif // MACPLATFORMMANAGER_H

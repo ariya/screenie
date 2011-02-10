@@ -38,7 +38,6 @@ public:
     virtual ~LinuxPlatformManager();
 
     virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi);
-    virtual void handleWindowActivation(bool active);
 
 private:
     LinuxPlatformManagerPrivate *d;

@@ -60,7 +60,6 @@ public slots:
 
 protected:
     virtual void closeEvent(QCloseEvent *event);
-    virtual void changeEvent(QEvent *event);
 
 private:
     Q_DISABLE_COPY(MainWindow)
@@ -83,12 +82,12 @@ private:
     bool writeScene(const QString &filePath);
     bool writeTemplate(const QString &filePath);
 
+    void initializeUi();
     void updateTransformationUi();
     void updateReflectionUi();
     void updateColorUi();
     void updateEditActions();
     void updateTitle();
-    void initializeUi();
 
     void createScene();
     void updateScene(ScreenieScene &screenieScene);
@@ -97,15 +96,13 @@ private:
     void handleMultipleModifiedBeforeQuit();
     void saveBeforeClose();
     void saveAsBeforeClose();
-    void askBeforeClose(const char *slot);
+
     void restoreWindowGeometry();
 
     void updateDocumentManager();
     MainWindow *createMainWindow();
 
 private slots:
-    bool proceed(int answer, const char *followUpAction);
-
     // File
     void on_newAction_triggered();
     void on_openAction_triggered();
@@ -155,7 +152,7 @@ private slots:
     void handleFileSaveAsSelected(const QString &filePath);
     void handleFileSaveAsTemplateSelected(const QString &filePath);
     void handleFileSaveAsBeforeCloseSelected(const QString &filePath);
-    void handleConfirm(int result);
+
     void handleAskBeforeClose(int answer);
 };
 

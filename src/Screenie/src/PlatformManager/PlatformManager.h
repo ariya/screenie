@@ -37,7 +37,6 @@ public:
     virtual ~PlatformManager() {}
 
     virtual void initialize(QMainWindow &mainWindow, Ui::MainWindow &mainWindowUi) = 0;
-    virtual void handleWindowActivation(bool active) = 0;
 };
 
 #endif // PLATFORMMANAGER_H

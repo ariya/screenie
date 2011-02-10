@@ -183,19 +183,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void MainWindow::changeEvent(QEvent *event)
-{
-    /*!\todo Move this into the platform manager, use an event filter there */
-    QMainWindow::changeEvent(event);
-    switch (event->type()) {
-    case QEvent::ActivationChange:
-        m_platformManager->handleWindowActivation(isActiveWindow());
-        break;
-     default:
-        break;
-    }
-}
-
 // private
 
 void MainWindow::frenchConnection()
@@ -245,6 +232,31 @@ bool MainWindow::writeTemplate(const QString &filePath)
 {
     m_screenieControl->convertItemsToTemplate(*m_screenieScene);
     return writeScene(filePath);
+}
+
+void MainWindow::initializeUi()
+{
+    m_minimizeWindowsAction = new QAction(tr("Minimize", "Window menu"), this);
+    m_minimizeWindowsAction->setShortcut(QKeySequence(Qt::Key_M + Qt::CTRL));
+    m_maximizeWindowsAction = new QAction(tr("Maximize", "Window menu"), this);
+
+    setWindowIcon(QIcon(":/img/application-icon.png"));
+    updateTitle();
+    updateWindowMenu();
+
+    // recent files menu
+    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
+        ui->recentFilesMenu->addAction(recentFileAction);
+    }
+
+    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+
+    DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
+    ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
+    ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
+    ui->reflectionGroupBox->setChecked(defaultScreenieModel.isReflectionEnabled());
+    ui->reflectionOffsetSlider->setValue(defaultScreenieModel.getReflectionOffset());
+    ui->reflectionOpacitySlider->setValue(defaultScreenieModel.getReflectionOpacity());
 }
 
 void MainWindow::updateTransformationUi()
@@ -353,31 +365,6 @@ void MainWindow::updateTitle()
     title.append("[*] - ");
     title.append(Version::getApplicationName());
     setWindowTitle(title);
-}
-
-void MainWindow::initializeUi()
-{
-    m_minimizeWindowsAction = new QAction(tr("Minimize", "Window menu"), this);
-    m_minimizeWindowsAction->setShortcut(QKeySequence(Qt::Key_M + Qt::CTRL));
-    m_maximizeWindowsAction = new QAction(tr("Maximize", "Window menu"), this);
-
-    setWindowIcon(QIcon(":/img/application-icon.png"));
-    updateTitle();
-    updateWindowMenu();
-
-    // recent files menu
-    foreach (QAction *recentFileAction, m_recentFiles.getRecentFilesActionGroup().actions()) {
-        ui->recentFilesMenu->addAction(recentFileAction);
-    }
-
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
-
-    DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
-    ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
-    ui->rotationSlider->setValue(defaultScreenieModel.getRotation());
-    ui->reflectionGroupBox->setChecked(defaultScreenieModel.isReflectionEnabled());
-    ui->reflectionOffsetSlider->setValue(defaultScreenieModel.getReflectionOffset());
-    ui->reflectionOpacitySlider->setValue(defaultScreenieModel.getReflectionOpacity());
 }
 
 void MainWindow::createScene()
@@ -535,28 +522,28 @@ MainWindow *MainWindow::createMainWindow()
 
 // private slots
 
-bool MainWindow::proceed(int answer, const char *followUpAction) {
-    bool result;
-    switch (answer) {
-    case QMessageBox::Save:
-        //saveBefore(followUpAction);
-        result = true;
-        break;
-    case QMessageBox::Cancel:
-        result = false;
-        break;
-    case QMessageBox::Discard:
-        if (followUpAction != 0) {
-            QMetaObject::invokeMethod(this, followUpAction);
-        }
-        result = true;
-        break;
-    default:
-        result = false;
-        break;
-    }
-    return result;
-}
+//bool MainWindow::proceed(int answer, const char *followUpAction) {
+//    bool result;
+//    switch (answer) {
+//    case QMessageBox::Save:
+//        //saveBefore(followUpAction);
+//        result = true;
+//        break;
+//    case QMessageBox::Cancel:
+//        result = false;
+//        break;
+//    case QMessageBox::Discard:
+//        if (followUpAction != 0) {
+//            QMetaObject::invokeMethod(this, followUpAction);
+//        }
+//        result = true;
+//        break;
+//    default:
+//        result = false;
+//        break;
+//    }
+//    return result;
+//}
 
 void MainWindow::on_newAction_triggered()
 {
@@ -958,11 +945,6 @@ void MainWindow::handleFileSaveAsBeforeCloseSelected(const QString &filePath)
             }
         }
     }
-}
-
-void MainWindow::handleConfirm(int result)
-{
-
 }
 
 void MainWindow::handleAskBeforeClose(int answer)

@@ -51,8 +51,31 @@ void MacPlatformManager::initialize(QMainWindow &mainWindow, Ui::MainWindow &mai
 {
     d = new MacPlatformManagerPrivate(mainWindowUi);
     AbstractPlatformManager::initialize(mainWindow, mainWindowUi);
+    mainWindow.installEventFilter(this);
     mainWindowUi.toggleFullScreenAction->setShortcut(QKeySequence(Qt::Key_F + Qt::CTRL));
 }
+
+bool MacPlatformManager::eventFilter(QObject *object, QEvent *event)
+{
+    bool result;
+    const QMainWindow *mainWindow = qobject_cast<const QMainWindow *>(object);
+    if (mainWindow != 0) {
+        switch (event->type()) {
+        case QEvent::ActivationChange:
+            handleWindowActivation(mainWindow->isActiveWindow());
+            result = false;
+            break;
+        default:
+            result = QObject::eventFilter(object, event);
+            break;
+        }
+    } else {
+        result = QObject::eventFilter(object, event);
+    }
+    return result;
+}
+
+// private
 
 void MacPlatformManager::handleWindowActivation(bool active)
 {
