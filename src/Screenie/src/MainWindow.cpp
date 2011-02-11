@@ -44,6 +44,8 @@
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
 #include <QtGui/QCloseEvent>
+#include <QtGui/QAbstractButton>
+#include <QtGui/QPushButton>
 //#include <QtOpenGL/QGLWidget>
 //#include <QtOpenGL/QGLFormat>
 
@@ -396,35 +398,37 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("Multiple documents are modified."),
-                                              QMessageBox::Save | QMessageBox::Default,
+                                              tr("There are %1 scenes with unsaved modifications. Would you like to verify these modifications before quitting the application?")
+                                              .arg(DocumentManager::getInstance().getModifiedCount()) +
+                                              QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
+                                              tr("If you do not check these documents all modifications will be lost.") + QString("</font>"),
+                                              QMessageBox::NoButton,
                                               this);
-    messageBox->addButton(QMessageBox::Discard);
+    QAbstractButton *verifyButton = messageBox->addButton(tr("Verify changes..."), QMessageBox::AcceptRole);
+    QAbstractButton *discardButton = messageBox->addButton(tr("Discard changes"), QMessageBox::DestructiveRole);
     messageBox->addButton(QMessageBox::Cancel);
-    messageBox->setAttribute(Qt::WA_DeleteOnClose);
-    int answer = messageBox->exec();
-    switch (answer) {
-    case QMessageBox::Save:
+    messageBox->setSizeGripEnabled(false);
+    messageBox->exec();
+    QAbstractButton *clickedButton = messageBox->clickedButton();
+    if (verifyButton == clickedButton) {
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Ask);
         QApplication::closeAllWindows();
-        break;
-    case QMessageBox::Discard:
+    } else if (discardButton == clickedButton) {
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Discard);
         QApplication::closeAllWindows();
-        break;
-    case QMessageBox::Cancel:
-        break;
-    default:
-        break;
     }
+    delete messageBox;
 }
 
 void MainWindow::askBeforeClose()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("The document %1 is modified.").arg(DocumentManager::getInstance().getDocumentName(*this)),
-                                              QMessageBox::Save | QMessageBox::Default,
+                                              tr("Would you like to save your modifications in scene \"%1\"?")
+                                              .arg(DocumentManager::getInstance().getDocumentName(*this)) +
+                                              QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
+                                              tr("Your modifications will be lost if you do not save.") + QString("</font>"),
+                                              QMessageBox::Save,
                                               this);
     messageBox->addButton(QMessageBox::Discard);
     messageBox->addButton(QMessageBox::Cancel);
@@ -523,7 +527,7 @@ void MainWindow::showError(const QString &message)
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical,
                                               Version::getApplicationName(),
                                               message,
-                                              QMessageBox::Ok | QMessageBox::Default,
+                                              QMessageBox::Ok,
                                               this);
     messageBox->setAttribute(Qt::WA_DeleteOnClose);
     messageBox->open();
