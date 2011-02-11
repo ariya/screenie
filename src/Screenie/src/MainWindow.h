@@ -103,6 +103,8 @@ private:
     MainWindow *createMainWindow();
 
     inline bool isFilePathRequired() const;
+    void showReadError(const QString &filePath);
+    void showWriteError(const QString &documentName, const QString &filePath);
     void showError(const QString &message);
 
 private slots:

@@ -102,6 +102,15 @@ ScreenieScene *XmlScreenieSceneDao::read() const
                     result = 0;
                 }
             }
+            if (d->streamReader->error() != QXmlStreamReader::NoError) {
+                // Note: we do not deal yet with QXmlStreamReader::PrematureEndOfDocumentError: disk files
+                // should always be complete XML
+#ifdef DEBUG
+                qDebug("XmlScreenieSceneDao::read: error: %d", d->streamReader->error());
+#endif
+                result = 0;
+                break;
+            }
         }
         d->device.close();
     } else {
@@ -307,6 +316,7 @@ ScreenieScene *XmlScreenieSceneDao::readScreenieScene() const
     if (ok) {
         result->setModified(false);
     } else {
+        // Note: we do not yet support QXmlStreamReader::PrematureEndOfDocumentError (no streaming support)
         delete result;
         result = 0;
     }
