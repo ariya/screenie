@@ -18,6 +18,42 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieModelInterface.h"
+#include <QtGui/QPalette>
+#include <QtGui/QWidget>
 
+#include "PropertyValidatorWidget.h"
 
+class PropertyValidatorWidgetPrivate
+{
+public:
+    PropertyValidatorWidgetPrivate()
+    {
+        validPalette.setColor(QPalette::Text, Qt::black);
+        invalidPalette.setColor(QPalette::Text, Qt::red);
+    }
+
+    QPalette validPalette;
+    QPalette invalidPalette;
+};
+
+// public
+
+PropertyValidatorWidget::PropertyValidatorWidget(QWidget *parent) :
+    QWidget(parent),
+    d(new PropertyValidatorWidgetPrivate())
+{
+}
+
+PropertyValidatorWidget::~PropertyValidatorWidget()
+{
+    delete d;
+}
+
+void PropertyValidatorWidget::validate(QWidget &widget, bool valid)
+{
+    if (valid) {
+        widget.setPalette(d->validPalette);
+    } else {
+        widget.setPalette(d->invalidPalette);
+    }
+}

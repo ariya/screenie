@@ -18,12 +18,13 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <cstdlib>
+#include <cmath>
 
 #include <QtCore/QPointF>
 #include <QtGui/QImage>
 
 #include "../../Utils/src/Settings.h"
+#include "SceneLimits.h"
 #include "DefaultScreenieModel.h"
 
 #include "AbstractScreenieModel.h"
@@ -127,7 +128,7 @@ qreal AbstractScreenieModel::getDistance() const
 
 void AbstractScreenieModel::setDistance(qreal distance)
 {
-    if (::abs(d->distance - distance) > AbstractScreenieModelPrivate::Epsilon && 0 <= distance && distance <= MaxDistance) {
+    if (::fabs(d->distance - distance) > AbstractScreenieModelPrivate::Epsilon && SceneLimits::MinDistance <= distance && distance <= SceneLimits::MaxDistance) {
         d->distance = distance;
         emit distanceChanged();
     }
@@ -140,8 +141,8 @@ void AbstractScreenieModel::addDistance(qreal distance)
         d->distance += distance;
         if (d->distance < 0.0) {
             d->distance = 0.0;
-        } else if (d->distance > MaxDistance) {
-            d->distance = MaxDistance;
+        } else if (d->distance > SceneLimits::MaxDistance) {
+            d->distance = SceneLimits::MaxDistance;
         }
         if (::abs(d->distance - oldDistance) > AbstractScreenieModelPrivate::Epsilon) {
             emit distanceChanged();

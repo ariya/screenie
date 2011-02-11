@@ -18,6 +18,26 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieModelInterface.h"
+#ifndef SCENELIMITS_H
+#define SCENELIMITS_H
 
+#include <QtCore/QSize>
 
+#include "ModelLib.h"
+
+/*!
+ * Scene limits.
+ */
+class SceneLimits
+{
+public:
+    MODEL_API static const qreal MinDistance;
+    MODEL_API static const qreal MaxDistance;
+    MODEL_API static const QSize MaxTemplateSize;
+    MODEL_API static const int MinReflectionOffset;
+    MODEL_API static const int MaxReflectionOffset;
+    MODEL_API static const int MinReflectionOpacity;
+    MODEL_API static const int MaxReflectionOpacity;
+};
+
+#endif // SCENELIMITS_H

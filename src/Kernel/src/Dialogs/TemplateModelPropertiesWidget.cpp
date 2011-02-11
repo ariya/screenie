@@ -22,11 +22,14 @@
 #include <QtCore/QStringList>
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
+#include <QtGui/QIntValidator>
 
 #include "../../../Utils/src/SizeFitter.h"
 #include "../../../Model/src/ScreenieTemplateModel.h"
+#include "../../../Model/src/SceneLimits.h"
 #include "../ScreenieControl.h"
 #include "TemplateModelPropertiesWidget.h"
+#include "PropertyValidatorWidget.h"
 #include "ui_TemplateModelPropertiesWidget.h"
 
 class TemplateModelPropertiesWidgetPrivate
@@ -43,7 +46,7 @@ public:
 };
 
 TemplateModelPropertiesWidget::TemplateModelPropertiesWidget(ScreenieTemplateModel &templateModel, ScreenieControl &screenieControl, QWidget *parent) :
-    QWidget(parent),
+    PropertyValidatorWidget(parent),
     ui(new Ui::TemplateModelPropertiesWidget),
     d(new TemplateModelPropertiesWidgetPrivate(templateModel, screenieControl))
 {
@@ -69,6 +72,10 @@ void TemplateModelPropertiesWidget::initializeUi()
     QStringList items;
     items << tr("No Fit") << tr("Fit") << tr("Fit To Width") << tr("Fit To Height") << tr("Exact Fit");
     ui->fitModeComboBox->addItems(items);
+
+    QIntValidator *integerValidator = new QIntValidator(this);
+    ui->widthLineEdit->setValidator(integerValidator);
+    ui->heightLineEdit->setValidator(integerValidator);
 }
 
 void TemplateModelPropertiesWidget::frenchConnection()
@@ -85,7 +92,9 @@ void TemplateModelPropertiesWidget::updateUi()
     int width = d->screenieTemplateModel.getSize().width();
     int height = d->screenieTemplateModel.getSize().height();
     ui->widthLineEdit->setText(QString::number(width));
+    validate(*ui->widthLineEdit, true);
     ui->heightLineEdit->setText(QString::number(height));
+    validate(*ui->heightLineEdit, true);
     SizeFitter &sizeFitter = d->screenieTemplateModel.getSizeFitter();
     switch (sizeFitter.getFitMode()) {
     case SizeFitter::NoFit:
@@ -128,8 +137,11 @@ void TemplateModelPropertiesWidget::on_widthLineEdit_editingFinished()
 {
     bool ok;
     int width = ui->widthLineEdit->text().toInt(&ok);
-    if (ok) {
-         d->screenieControl.setTargetWidth(width, &d->screenieTemplateModel);
+    if (ok && width <= SceneLimits::MaxTemplateSize.width()) {
+        d->screenieControl.setTargetWidth(width, &d->screenieTemplateModel);
+        validate(*ui->widthLineEdit, true);
+    } else {
+        validate(*ui->widthLineEdit, false);
     }
 }
 
@@ -137,8 +149,11 @@ void TemplateModelPropertiesWidget::on_heightLineEdit_editingFinished()
 {
     bool ok;
     int height = ui->heightLineEdit->text().toInt(&ok);
-    if (ok) {
+    if (ok && height <= SceneLimits::MaxTemplateSize.height()) {
         d->screenieControl.setTargetHeight(height, &d->screenieTemplateModel);
+        validate(*ui->heightLineEdit, true);
+    } else {
+        validate(*ui->heightLineEdit, false);
     }
 }
 

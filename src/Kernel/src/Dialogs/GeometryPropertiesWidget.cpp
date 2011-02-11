@@ -19,12 +19,16 @@
  */
 
 #include <QtCore/QString>
+#include <QtGui/QDoubleValidator>
+#include <QtGui/QIntValidator>
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../../../Model/src/SceneLimits.h"
 #include "../ScreenieControl.h"
 #include "GeometryPropertiesWidget.h"
+#include "PropertyValidatorWidget.h"
 #include "ui_GeometryPropertiesWidget.h"
 
 class GeometryPropertiesWidgetPrivate
@@ -42,7 +46,7 @@ public:
 // public
 
 GeometryPropertiesWidget::GeometryPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent) :
-    QWidget(parent),
+    PropertyValidatorWidget(parent),
     ui(new Ui::GeometryPropertiesWidget),
     d(new GeometryPropertiesWidgetPrivate(screenieModel, screenieControl))
 {
@@ -65,7 +69,14 @@ GeometryPropertiesWidget::~GeometryPropertiesWidget()
 
 void GeometryPropertiesWidget::initializeUi()
 {
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+    ui->distanceSlider->setMaximum(SceneLimits::MinDistance);
+    ui->distanceSlider->setMaximum(SceneLimits::MaxDistance);
+    QDoubleValidator *doubleValidator = new QDoubleValidator(this);
+    QIntValidator *integerValidator = new QIntValidator(this);
+    ui->positionXLineEdit->setValidator(doubleValidator);
+    ui->positionYLineEdit->setValidator(doubleValidator);
+    ui->rotationLineEdit->setValidator(integerValidator);
+    ui->distanceLineEdit->setValidator(doubleValidator);
 }
 
 void GeometryPropertiesWidget::frenchConnection()
@@ -88,6 +99,7 @@ void GeometryPropertiesWidget::updateUi()
     ui->positionXLineEdit->setText(QString::number(x));
     ui->positionYLineEdit->setText(QString::number(y));
     ui->distanceLineEdit->setText(QString::number(z));
+    validate(*ui->distanceLineEdit, true);
     ui->distanceSlider->setValue(z);
     int rotation = d->screenieModel.getRotation();
     ui->rotationLineEdit->setText(QString::number(rotation));
@@ -131,8 +143,11 @@ void GeometryPropertiesWidget::on_distanceLineEdit_editingFinished()
 {
     bool ok;
     qreal distance = ui->distanceLineEdit->text().toFloat(&ok);
-    if (ok) {
+    if (ok && distance >= 0.0 && distance <= SceneLimits::MaxDistance) {
         d->screenieControl.setDistance(distance, &d->screenieModel);
+        validate(*ui->distanceLineEdit, true);
+    } else {
+        validate(*ui->distanceLineEdit, false);
     }
 }
 

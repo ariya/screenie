@@ -22,8 +22,10 @@
 #include <QtGui/QWidget>
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
+#include <QtGui/QIntValidator>
 
 #include "../../../Model/src/ScreenieModelInterface.h"
+#include "../../../Model/src/SceneLimits.h"
 #include "../ScreenieControl.h"
 #include "ReflectionPropertiesWidget.h"
 #include "ui_ReflectionPropertiesWidget.h"
@@ -43,11 +45,12 @@ public:
 // public
 
 ReflectionPropertiesWidget::ReflectionPropertiesWidget(ScreenieModelInterface &screenieModel, ScreenieControl &screenieControl, QWidget *parent) :
-    QWidget(parent),
+    PropertyValidatorWidget(parent),
     ui(new Ui::ReflectionPropertiesWidget),
     d(new ReflectionPropertiesWidgetPrivate(screenieModel, screenieControl))
 {
     ui->setupUi(this);
+    initializeUi();
     updateUi();
     frenchConnection();
 }
@@ -62,6 +65,17 @@ ReflectionPropertiesWidget::~ReflectionPropertiesWidget()
 }
 
 // private
+
+void ReflectionPropertiesWidget::initializeUi()
+{
+    QIntValidator *integerValidator = new QIntValidator(this);
+    ui->offsetSlider->setMinimum(SceneLimits::MinReflectionOffset);
+    ui->offsetSlider->setMaximum(SceneLimits::MaxReflectionOffset);
+    ui->opacitySlider->setMinimum(SceneLimits::MinReflectionOpacity);
+    ui->opacitySlider->setMaximum(SceneLimits::MaxReflectionOpacity);
+    ui->offsetLineEdit->setValidator(integerValidator);
+    ui->opacityLineEdit->setValidator(integerValidator);
+}
 
 void ReflectionPropertiesWidget::frenchConnection()
 {
@@ -78,11 +92,13 @@ void ReflectionPropertiesWidget::updateUi()
     int reflectionOffset = d->screenieModel.getReflectionOffset();
     ui->offsetLineEdit->setText(QString::number(reflectionOffset));
     ui->offsetLineEdit->setEnabled(enableReflection);
+    validate(*ui->offsetLineEdit, true);
     ui->offsetSlider->setValue(reflectionOffset);
     ui->offsetSlider->setEnabled(enableReflection);
     int reflectionOpacity = d->screenieModel.getReflectionOpacity();
     ui->opacityLineEdit->setText(QString::number(reflectionOpacity));
     ui->opacityLineEdit->setEnabled(enableReflection);
+    validate(*ui->opacityLineEdit, true);
     ui->opacitySlider->setValue(reflectionOpacity);
     ui->opacitySlider->setEnabled(enableReflection);
 }
@@ -102,8 +118,11 @@ void ReflectionPropertiesWidget::on_offsetLineEdit_editingFinished()
 {
     bool ok;
     int offset = ui->offsetLineEdit->text().toInt(&ok);
-    if (ok) {
+    if (ok && offset >= SceneLimits::MinReflectionOffset && offset <= SceneLimits::MaxReflectionOffset) {
         d->screenieControl.setReflectionOffset(offset, &d->screenieModel);
+        validate(*ui->offsetLineEdit, true);
+    } else {
+        validate(*ui->offsetLineEdit, false);
     }
 }
 
@@ -116,8 +135,11 @@ void ReflectionPropertiesWidget::on_opacityLineEdit_editingFinished()
 {
     bool ok;
     int opacity = ui->opacityLineEdit->text().toInt(&ok);
-    if (ok) {
+    if (ok && opacity >= SceneLimits::MinReflectionOpacity && opacity <= SceneLimits::MaxReflectionOpacity) {
         d->screenieControl.setReflectionOpacity(opacity, &d->screenieModel);
+        validate(*ui->opacityLineEdit, true);
+    } else {
+        validate(*ui->opacityLineEdit, false);
     }
 }
 

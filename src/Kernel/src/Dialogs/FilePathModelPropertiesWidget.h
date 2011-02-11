@@ -24,6 +24,8 @@
 #include <QtCore/QString>
 #include <QtGui/QWidget>
 
+#include "PropertyValidatorWidget.h"
+
 class ScreenieFilePathModel;
 class ScreenieControl;
 class FilePathModelPropertiesWidgetPrivate;
@@ -32,13 +34,12 @@ namespace Ui {
     class FilePathModelPropertiesWidget;
 }
 
-class FilePathModelPropertiesWidget : public QWidget
+class FilePathModelPropertiesWidget : public PropertyValidatorWidget
 {
     Q_OBJECT
-
 public:
     FilePathModelPropertiesWidget(ScreenieFilePathModel &filePathModel, ScreenieControl &screenieControl, QWidget *parent = 0);
-    ~FilePathModelPropertiesWidget();
+    virtual ~FilePathModelPropertiesWidget();
 
 private:
     Ui::FilePathModelPropertiesWidget *ui;

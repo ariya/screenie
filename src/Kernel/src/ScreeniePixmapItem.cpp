@@ -40,6 +40,7 @@
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Model/src/ScreenieModelInterface.h"
+#include "../../Model/src/SceneLimits.h"
 #include "Clipboard/MimeHelper.h"
 #include "Reflection.h"
 #include "ScreenieControl.h"
@@ -455,7 +456,7 @@ void ScreeniePixmapItem::updateItemGeometry()
     QTransform scale;
     QTransform translateBack;
 
-    qreal centerScale = 1.0 - 0.9 * d->screenieModel.getDistance() / ScreenieModelInterface::MaxDistance;
+    qreal centerScale = 1.0 - 0.9 * d->screenieModel.getDistance() / SceneLimits::MaxDistance;
     scale = QTransform().scale(centerScale, centerScale);
 
     QPixmap pixmap = this->pixmap();

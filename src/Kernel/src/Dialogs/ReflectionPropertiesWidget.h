@@ -23,6 +23,8 @@
 
 #include <QtGui/QWidget>
 
+#include "PropertyValidatorWidget.h"
+
 class ScreenieModelInterface;
 class ScreenieControl;
 class ReflectionPropertiesWidgetPrivate;
@@ -31,7 +33,7 @@ namespace Ui {
     class ReflectionPropertiesWidget;
 }
 
-class ReflectionPropertiesWidget : public QWidget
+class ReflectionPropertiesWidget : public PropertyValidatorWidget
 {
     Q_OBJECT
 public:

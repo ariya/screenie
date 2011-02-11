@@ -51,6 +51,7 @@
 #include "../../Utils/src/Version.h"
 #include "../../Utils/src/FileUtils.h"
 #include "../../Model/src/ScreenieScene.h"
+#include "../../Model/src/SceneLimits.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
 #include "../../Model/src/Dao/ScreenieSceneDao.h"
@@ -250,7 +251,8 @@ void MainWindow::initializeUi()
         ui->recentFilesMenu->addAction(recentFileAction);
     }
 
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+    ui->distanceSlider->setMinimum(SceneLimits::MinDistance);
+    ui->distanceSlider->setMaximum(SceneLimits::MaxDistance);
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
