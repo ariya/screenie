@@ -21,10 +21,12 @@
 #ifndef SCREENIEPIXMAPITEM_H
 #define SCREENIEPIXMAPITEM_H
 
+#include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QVariant>
 #include <QtGui/QGraphicsPixmapItem>
 
+class QSize;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QGraphicsSceneDragDropEvent;
@@ -79,6 +81,7 @@ private:
     void changeReflection(QGraphicsSceneMouseEvent *event);
     void addReflectionOpacity(int reflectionOpacity);
     void selectExclusive();
+    QPoint calculateDialogPosition(const QPoint &mousePosition);
 
 private slots:
     void updateReflection();
