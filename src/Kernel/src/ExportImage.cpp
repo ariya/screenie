@@ -92,7 +92,7 @@ QImage ExportImage::exportImage(Selection selection) const
     QImage result(qRound(sourceRect.width()), qRound(sourceRect.height()), QImage::Format_ARGB32);
     result.fill(0);
     QPainter painter(&result);
-    painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing, true);
+    painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing | QPainter::TextAntialiasing, true);
     if (d->screenieScene.isBackgroundEnabled()) {
         painter.fillRect(0, 0, result.width(), result.height(), d->screenieScene.getBackgroundColor());
     } else {

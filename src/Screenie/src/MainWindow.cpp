@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
-    ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    ui->graphicsView->setRenderHints(QPainter::Antialiasing|QPainter::SmoothPixmapTransform|QPainter::TextAntialiasing);
     ui->graphicsView->setAcceptDrops(true);
 
     // Gesture support
@@ -890,6 +890,7 @@ void MainWindow::updateDefaultValues()
 
 void MainWindow::handleRecentFile(const QString &filePath)
 {
+    // xxx
     bool ok;
     if (m_screenieScene->isDefault()) {
         ok = read(filePath);
