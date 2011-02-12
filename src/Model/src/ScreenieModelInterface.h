@@ -29,14 +29,16 @@
 
 class QString;
 
+/*!
+ * The ScreenieScene contains items which implement this model interface.
+ *
+ * \sa SceneLimits
+ */
 class ScreenieModelInterface : public QObject
 {
     Q_OBJECT
 
 public:
-
-    MODEL_API static const qreal MaxDistance;
-
     virtual ~ScreenieModelInterface() {}
 
     /*!

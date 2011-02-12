@@ -18,6 +18,8 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <cmath>
+
 #include <QtCore/QPoint>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
@@ -33,9 +35,12 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
 #include <QtGui/QDialog>
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 
 #include "../../Utils/src/PaintTools.h"
 #include "../../Model/src/ScreenieModelInterface.h"
+#include "../../Model/src/SceneLimits.h"
 #include "Clipboard/MimeHelper.h"
 #include "Reflection.h"
 #include "ScreenieControl.h"
@@ -70,8 +75,16 @@ public:
     bool ignoreUpdates;
     bool itemTransformed;
     PropertyDialogFactory *propertyDialogFactory;
+    QPoint initialPoint;
     QDialog *propertyDialog;
+
+    static const int ContextActionThreshold;
 };
+
+// This threshold is supposed to be small enough as not to delay normal
+// rotation actions, and large enough to handle normal "random mouse jitter" when clicking
+// the right mouse button for context menu
+const int ScreeniePixmapItemPrivate::ContextActionThreshold = 2;
 
 // public
 
@@ -112,20 +125,41 @@ int ScreeniePixmapItem::type() const
 
 void ScreeniePixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-   d->transformPixmap = isInsidePixmap(event->pos());
-   d->itemTransformed = false;
-   event->accept();
+    d->transformPixmap = isInsidePixmap(event->pos());
+    d->itemTransformed = false;
+    d->initialPoint = event->lastScreenPos();
+#ifdef DEBUG
+    qDebug("ScreeniePixmapItem::mousePressEvent: initial point: %d, %d",
+           d->initialPoint.x(),
+           d->initialPoint.y());
+#endif
+    event->accept();
 }
 
 void ScreeniePixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isInsidePixmap(event->pos()) && d->transformPixmap) {
-        transformPixmap(event);
-    } else if (!d->transformPixmap) {
-        changeReflection(event);
+    if (!d->itemTransformed && event->buttons() & Qt::RightButton) {
+        if (::fabs(d->initialPoint.x() - event->screenPos().x()) > ScreeniePixmapItemPrivate::ContextActionThreshold ||
+            ::fabs(d->initialPoint.y() - event->screenPos().y()) > ScreeniePixmapItemPrivate::ContextActionThreshold) {
+            d->itemTransformed = true;
+        }
+#ifdef DEBUG
+        else {
+            qDebug("ScreeniePixmapItem::mouseMoveEvent: within threshold point: %d, %d",
+                   event->screenPos().x(),
+                   event->screenPos().y());
+        }
+#endif
+    } else {
+        d->itemTransformed = true;
     }
-    /*!\todo Maybe define some pixel threshold before we consider this item to be transformed? */
-    d->itemTransformed = true;
+    if (d->itemTransformed) {
+        if (isInsidePixmap(event->pos()) && d->transformPixmap) {
+            transformPixmap(event);
+        } else if (!d->transformPixmap) {
+            changeReflection(event);
+        }
+    }
 }
 
 void ScreeniePixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -147,6 +181,8 @@ void ScreeniePixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 if (d->propertyDialog != 0) {
                     connect(d->propertyDialog, SIGNAL(destroyed()),
                             this, SLOT(handlePropertyDialogDestroyed()));
+                    QPoint position = this->calculateDialogPosition(event->screenPos());
+                    d->propertyDialog->move(position);
                     d->propertyDialog->show();
                 }
             }
@@ -355,6 +391,31 @@ void ScreeniePixmapItem::selectExclusive()
     }
 }
 
+QPoint ScreeniePixmapItem::calculateDialogPosition(const QPoint &mousePosition)
+{
+    QPoint result;
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    QRect availableGeometry = desktopWidget->availableGeometry(d->propertyDialog);
+    d->propertyDialog->adjustSize();
+    QSize dialogSize = d->propertyDialog->size();
+#ifdef DEBUG
+    qDebug("ScreeniePixmapItem::calculateDialogPosition: dialog size w: %d, h: %d",
+           dialogSize.width(), dialogSize.height());
+#endif
+    if (mousePosition.x() + dialogSize.width() < availableGeometry.right()) {
+        result.setX(mousePosition.x());
+    } else {
+        result.setX(availableGeometry.right() - dialogSize.width());
+    }
+    if (mousePosition.y() + dialogSize.height() < availableGeometry.bottom()) {
+        result.setY(mousePosition.y());
+    } else {
+        result.setY(availableGeometry.bottom() - dialogSize.height());
+    }
+    return result;
+}
+
+
 // private slots
 
 void ScreeniePixmapItem::updateReflection()
@@ -395,7 +456,7 @@ void ScreeniePixmapItem::updateItemGeometry()
     QTransform scale;
     QTransform translateBack;
 
-    qreal centerScale = 1.0 - 0.9 * d->screenieModel.getDistance() / ScreenieModelInterface::MaxDistance;
+    qreal centerScale = 1.0 - 0.9 * d->screenieModel.getDistance() / SceneLimits::MaxDistance;
     scale = QTransform().scale(centerScale, centerScale);
 
     QPixmap pixmap = this->pixmap();

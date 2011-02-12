@@ -9,6 +9,7 @@ HEADERS += $$PWD/src/ModelLib.h \
            $$PWD/src/DefaultScreenieModel.h \
            $$PWD/src/ScreenieFilePathModel.h \
            $$PWD/src/ScreenieModelInterface.h \
+           $$PWD/src/SceneLimits.h \
            $$PWD/src/ScreenieImageModel.h \
            $$PWD/src/ScreenieTemplateModel.h \
            $$PWD/src/ScreenieScene.h \
@@ -28,7 +29,7 @@ HEADERS += $$PWD/src/ModelLib.h \
 SOURCES += $$PWD/src/AbstractScreenieModel.cpp \
            $$PWD/src/DefaultScreenieModel.cpp \
            $$PWD/src/ScreenieFilePathModel.cpp \
-           $$PWD/src/ScreenieModelInterface.cpp \
+           $$PWD/src/SceneLimits.cpp \
            $$PWD/src/ScreenieImageModel.cpp \
            $$PWD/src/ScreenieTemplateModel.cpp \
            $$PWD/src/ScreenieScene.cpp \

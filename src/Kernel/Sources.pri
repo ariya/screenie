@@ -25,7 +25,8 @@ HEADERS += $$PWD/src/KernelLib.h \
            $$PWD/src/Dialogs/ReflectionPropertiesWidget.h \
            $$PWD/src/Dialogs/FilePathModelPropertiesDialog.h \
            $$PWD/src/Dialogs/FilePathModelPropertiesWidget.h \
-           $$PWD/src/Dialogs/ImageModelPropertiesDialog.h
+           $$PWD/src/Dialogs/ImageModelPropertiesDialog.h \
+    src/Dialogs/PropertyValidatorWidget.h
 
 SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Reflection.cpp \
@@ -45,7 +46,8 @@ SOURCES += $$PWD/src/ExportImage.cpp \
            $$PWD/src/Dialogs/ReflectionPropertiesWidget.cpp \
            $$PWD/src/Dialogs/FilePathModelPropertiesDialog.cpp \
            $$PWD/src/Dialogs/FilePathModelPropertiesWidget.cpp \
-           $$PWD/src/Dialogs/ImageModelPropertiesDialog.cpp
+           $$PWD/src/Dialogs/ImageModelPropertiesDialog.cpp \
+    src/Dialogs/PropertyValidatorWidget.cpp
 
 FORMS += $$PWD/ui/ScreenieModelPropertiesDialog.ui \
          $$PWD/ui/GeometryPropertiesWidget.ui \

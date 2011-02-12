@@ -18,6 +18,29 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieModelInterface.h"
+#ifndef PROPERTYVALIDATORWIDGET_H
+#define PROPERTYVALIDATORWIDGET_H
 
+#include <QtGui/QWidget>
 
+class PropertyValidatorWidgetPrivate;
+
+/*!
+ * Base class for property editor widgets. Colours the edit widgets
+ * according to their validation state.
+ */
+class PropertyValidatorWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit PropertyValidatorWidget(QWidget *parent = 0);
+    virtual ~PropertyValidatorWidget();
+
+protected:
+    void validate(QWidget &widget, bool valid);
+
+private:
+    PropertyValidatorWidgetPrivate *d;
+};
+
+#endif // PROPERTYVALIDATORWIDGET_H

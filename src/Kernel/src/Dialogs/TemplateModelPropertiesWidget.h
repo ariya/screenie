@@ -23,6 +23,8 @@
 
 #include <QtGui/QWidget>
 
+#include "PropertyValidatorWidget.h"
+
 class ScreenieTemplateModel;
 class ScreenieControl;
 class TemplateModelPropertiesWidgetPrivate;
@@ -31,7 +33,7 @@ namespace Ui {
     class TemplateModelPropertiesWidget;
 }
 
-class TemplateModelPropertiesWidget : public QWidget
+class TemplateModelPropertiesWidget : public PropertyValidatorWidget
 {
     Q_OBJECT
 public:

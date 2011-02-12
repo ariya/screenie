@@ -18,6 +18,16 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "ScreenieModelInterface.h"
+#include <QtCore/QSize>
 
+#include "SceneLimits.h"
 
+const qreal SceneLimits::MinDistance = 0.0;
+const qreal SceneLimits::MaxDistance = 200.0;
+// size chosen as big as possible such that a generated pixmap
+// does not blow up the RAM
+const QSize SceneLimits::MaxTemplateSize = QSize(4096, 4096);
+const int SceneLimits::MinReflectionOffset = 0;
+const int SceneLimits::MaxReflectionOffset = 100;
+const int SceneLimits::MinReflectionOpacity = 0;
+const int SceneLimits::MaxReflectionOpacity = 100;

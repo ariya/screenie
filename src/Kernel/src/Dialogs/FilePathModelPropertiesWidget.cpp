@@ -20,6 +20,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtGui/QWidget>
 #include <QtGui/QFileDialog>
 
@@ -27,6 +28,7 @@
 #include "../../../Model/src/ScreenieFilePathModel.h"
 #include "../ScreenieControl.h"
 #include "FilePathModelPropertiesWidget.h"
+#include "PropertyValidatorWidget.h"
 #include "ui_FilePathModelPropertiesWidget.h"
 
 class FilePathModelPropertiesWidgetPrivate
@@ -44,7 +46,7 @@ public:
 // public
 
 FilePathModelPropertiesWidget::FilePathModelPropertiesWidget(ScreenieFilePathModel &filePathModel, ScreenieControl &screenieControl, QWidget *parent) :
-    QWidget(parent),
+    PropertyValidatorWidget(parent),
     ui(new Ui::FilePathModelPropertiesWidget),
     d(new FilePathModelPropertiesWidgetPrivate(filePathModel, screenieControl))
 {
@@ -81,6 +83,12 @@ void FilePathModelPropertiesWidget::on_filePathLineEdit_editingFinished()
 {
     QString filePath = ui->filePathLineEdit->text();
     d->screenieControl.setFilePath(filePath, &d->screenieFilePathModel);
+    QFileInfo fileInfo(filePath);
+    if (fileInfo.exists() && fileInfo.isReadable()) {
+        validate(*ui->filePathLineEdit, true);
+    } else {
+        validate(*ui->filePathLineEdit, false);
+    }
 }
 
 void FilePathModelPropertiesWidget::on_filePathPushButton_clicked()

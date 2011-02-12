@@ -53,6 +53,7 @@
 #include "../../Utils/src/Version.h"
 #include "../../Utils/src/FileUtils.h"
 #include "../../Model/src/ScreenieScene.h"
+#include "../../Model/src/SceneLimits.h"
 #include "../../Model/src/ScreenieModelInterface.h"
 #include "../../Model/src/ScreenieTemplateModel.h"
 #include "../../Model/src/Dao/ScreenieSceneDao.h"
@@ -252,7 +253,8 @@ void MainWindow::initializeUi()
         ui->recentFilesMenu->addAction(recentFileAction);
     }
 
-    ui->distanceSlider->setMaximum(ScreenieModelInterface::MaxDistance);
+    ui->distanceSlider->setMinimum(SceneLimits::MinDistance);
+    ui->distanceSlider->setMaximum(SceneLimits::MaxDistance);
 
     DefaultScreenieModel &defaultScreenieModel = m_screenieControl->getDefaultScreenieModel();
     ui->distanceSlider->setValue(defaultScreenieModel.getDistance());
@@ -439,14 +441,12 @@ void MainWindow::askBeforeClose()
 void MainWindow::saveBeforeClose()
 {
     if (!isFilePathRequired()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = writeScene(m_documentFilePath);
         if (ok) {
             close();
         } else {
-            showError(tr("Could not save scene %1 to path %2!")
-                      .arg(DocumentManager::getInstance().getDocumentName(*this))
-                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
+            showWriteError(DocumentManager::getInstance().getDocumentName(*this),
+                           QDir::toNativeSeparators(m_documentFilePath));
         }
 #ifdef DEBUG
         qDebug("MainWindow::saveBeforeClose: ok: %d", ok);
@@ -522,9 +522,22 @@ bool MainWindow::isFilePathRequired() const
     return m_documentFilePath.isNull() || (m_screenieScene->isTemplate() && !m_screenieScene->hasTemplatesExclusively());
 }
 
+void MainWindow::showReadError(const QString &filePath)
+{
+    showError(tr("Could not open document from file %1!")
+              .arg(QDir::toNativeSeparators(filePath)));
+}
+
+void MainWindow::showWriteError(const QString &documentName, const QString &filePath)
+{
+    showError(tr("Could not save document %1 to file %2!")
+              .arg(documentName)
+              .arg(filePath));
+}
+
 void MainWindow::showError(const QString &message)
 {
-    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical,
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
                                               message,
                                               QMessageBox::Ok,
@@ -554,7 +567,7 @@ void MainWindow::on_openAction_triggered()
                              .arg(FileUtils::TemplateExtension);
     QString filter = allFilter + ";;" + sceneFilter + ";;" + templateFilter;
 
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open"), lastDocumentDirectoryPath, filter);
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open", "Open file dialog"), lastDocumentDirectoryPath, filter);
 
     if (!filePath.isNull()) {
         bool ok;
@@ -573,8 +586,7 @@ void MainWindow::on_openAction_triggered()
             QString lastDocumentFilePath = QFileInfo(filePath).absolutePath();
             Settings::getInstance().setLastDocumentDirectoryPath(lastDocumentFilePath);
         } else {
-            showError(tr("Could not open scene from path %1!")
-                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
+            showReadError(QDir::toNativeSeparators(filePath));
         }
     }
 }
@@ -588,9 +600,8 @@ void MainWindow::on_saveAction_triggered()
         qDebug("MainWindow::on_saveAction_triggered: ok: %d", ok);
 #endif
         if (!ok) {
-            showError(tr("Could not save document %1 to path %2!")
-                      .arg(DocumentManager::getInstance().getDocumentName(*this))
-                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
+            showWriteError(DocumentManager::getInstance().getDocumentName(*this),
+                           QDir::toNativeSeparators(m_documentFilePath));
 
         }
     } else {
@@ -639,11 +650,13 @@ void MainWindow::on_exportAction_triggered()
     QString filePath = QFileDialog::getSaveFileName(this, tr("Export Image"), lastExportDirectoryPath, filter);
     if (!filePath.isNull()) {
         ExportImage exportImage(*m_screenieScene, *m_screenieGraphicsScene);
-        /*!\todo Error handling, show a nice error message to the user ;) */
         bool ok = exportImage.exportImage(filePath);
         if (ok) {
             lastExportDirectoryPath = QFileInfo(filePath).absolutePath();
             settings.setLastExportDirectoryPath(lastExportDirectoryPath);
+        } else {
+            showError(tr("Could not export iamge to file %1!")
+                      .arg(filePath));
         }
     }
 }
@@ -889,7 +902,9 @@ void MainWindow::handleRecentFile(const QString &filePath)
             delete mainWindow;
         }
     }
-    /*!\todo Error handling, show a nice error message to the user ;) */
+    if (!ok) {
+        showReadError(filePath);
+    }
 }
 
 void MainWindow::updateWindowMenu()
@@ -917,9 +932,8 @@ void MainWindow::handleFileSaveAsSelected(const QString &filePath)
             settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
             settings.addRecentFile(filePath);
         } else {
-            showError(tr("Could not save scene %1 to path %2!")
-                      .arg(DocumentManager::getInstance().getDocumentName(*this))
-                      .arg(QDir::toNativeSeparators(m_documentFilePath)));
+            showWriteError(DocumentManager::getInstance().getDocumentName(*this),
+                           QDir::toNativeSeparators(filePath));
         }
     }
 }
@@ -928,7 +942,6 @@ void MainWindow::handleFileSaveAsTemplateSelected(const QString &filePath)
 {
     bool ok = false;
     if (!filePath.isNull()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
         m_screenieScene->setTemplate(true);
         ok = writeTemplate(filePath);
         if (ok) {
@@ -936,6 +949,9 @@ void MainWindow::handleFileSaveAsTemplateSelected(const QString &filePath)
             Settings &settings = Settings::getInstance();
             settings.setLastDocumentDirectoryPath(lastDocumentDirectoryPath);
             settings.addRecentFile(filePath);
+        } else {
+            showWriteError(DocumentManager::getInstance().getDocumentName(*this),
+                           filePath);
         }
     }
 }
@@ -944,7 +960,6 @@ void MainWindow::handleFileSaveAsBeforeCloseSelected(const QString &filePath)
 {
     bool ok = false;
     if (!filePath.isNull()) {
-        /*!\todo Error handling, show a nice error message to the user ;) */
         m_screenieScene->setTemplate(false);
         ok = writeScene(filePath);
         if (ok) {
@@ -957,6 +972,9 @@ void MainWindow::handleFileSaveAsBeforeCloseSelected(const QString &filePath)
             } else {
                 QApplication::closeAllWindows();
             }
+        } else {
+            showWriteError(DocumentManager::getInstance().getDocumentName(*this),
+                           QDir::toNativeSeparators(filePath));
         }
     }
 }
