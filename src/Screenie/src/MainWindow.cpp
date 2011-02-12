@@ -400,10 +400,10 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("There are %1 scenes with unsaved modifications. Would you like to verify these modifications before quitting the application?")
+                                              tr("You have %1 documents with unsaved changes. Do you want to review these changes before quitting?")
                                               .arg(DocumentManager::getInstance().getModifiedCount()) +
                                               QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
-                                              tr("If you do not check these documents all modifications will be lost.") + QString("</font>"),
+                                              tr("If you don't review your documents, all your changes will be lost.") + QString("</font>"),
                                               QMessageBox::NoButton,
                                               this);
     QAbstractButton *verifyButton = messageBox->addButton(tr("Verify changes..."), QMessageBox::AcceptRole);
@@ -426,10 +426,10 @@ void MainWindow::askBeforeClose()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("Would you like to save your modifications in scene \"%1\"?")
+                                              tr("Do you want to save the changes you made in the document \"%1\"?")
                                               .arg(DocumentManager::getInstance().getDocumentName(*this)) +
                                               QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
-                                              tr("Your modifications will be lost if you do not save.") + QString("</font>"),
+                                              tr("Your changes will be lost if you don't save them.") + QString("</font>"),
                                               QMessageBox::Save,
                                               this);
     messageBox->addButton(QMessageBox::Discard);
@@ -524,13 +524,13 @@ bool MainWindow::isFilePathRequired() const
 
 void MainWindow::showReadError(const QString &filePath)
 {
-    showError(tr("Could not open document from file %1!")
+    showError(tr("Could not open document from file \"%1\"!")
               .arg(QDir::toNativeSeparators(filePath)));
 }
 
 void MainWindow::showWriteError(const QString &documentName, const QString &filePath)
 {
-    showError(tr("Could not save document %1 to file %2!")
+    showError(tr("Could not save document \"%1\" to file \"%2\"!")
               .arg(documentName)
               .arg(filePath));
 }
