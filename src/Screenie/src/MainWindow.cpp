@@ -82,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_screenieGraphicsScene = new ScreenieGraphicsScene(this);
     ui->graphicsView->setScene(m_screenieGraphicsScene);
-    ui->graphicsView->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     ui->graphicsView->setAcceptDrops(true);
 
     // Gesture support
@@ -101,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreWindowGeometry();
     // call unified toolbar AFTER restoring window geometry!
     setUnifiedTitleAndToolBarOnMac(true);
+    m_screenieControl->setRenderQuality(ScreenieControl::MaximumQuality);
     frenchConnection();
 }
 
