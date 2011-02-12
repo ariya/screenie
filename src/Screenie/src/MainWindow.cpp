@@ -86,7 +86,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Gesture support
     ui->graphicsView->viewport()->grabGesture(Qt::PinchGesture);
-    ui->graphicsView->viewport()->grabGesture(Qt::PanGesture);
 
     // later: OpenGL support (configurable)
     // ui->graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));

@@ -42,14 +42,9 @@ class ScreenieGraphicsScenePrivate
 public:
     ScreenieGraphicsScenePrivate()
         : itemDragDrop(false)
-    {
-        cursorTimer.setSingleShot(true);
-        cursorTimer.setInterval(1000);
-    }
+    {}
 
     bool itemDragDrop;
-    // temporary workaround for http://bugreports.qt.nokia.com/browse/QTBUG-16281
-    QTimer cursorTimer;
 };
 
 // public
@@ -58,7 +53,6 @@ ScreenieGraphicsScene::ScreenieGraphicsScene(QObject *parent)
     : QGraphicsScene(parent),
       d(new ScreenieGraphicsScenePrivate())
 {
-    frenchConnection();
 }
 
 ScreenieGraphicsScene::~ScreenieGraphicsScene()
@@ -134,19 +128,10 @@ bool ScreenieGraphicsScene::event(QEvent *event)
 
 // private
 
-void ScreenieGraphicsScene::frenchConnection()
-{
-    connect(&d->cursorTimer, SIGNAL(timeout()),
-            this, SLOT(restoreCursor()));
-}
-
 bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
 {
     bool result = false;
     if (selectedItems().size() > 0) {
-        if (QGesture *pan = event->gesture(Qt::PanGesture)) {
-            result = panTriggered(static_cast<QPanGesture *>(pan));
-        }
         if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
             result = pinchTriggered(static_cast<QPinchGesture *>(pinch));
         }
@@ -154,17 +139,6 @@ bool ScreenieGraphicsScene::gestureEvent(const QGestureEvent *event)
         result = false;
     }
 
-    return result;
-}
-
-bool ScreenieGraphicsScene::panTriggered(const QPanGesture *gesture)
-{
-    bool result = true;
-    updateGestureCursor(gesture, Qt::SizeAllCursor);
-    QPointF delta = gesture->delta();
-    qreal x = delta.x();
-    qreal y = delta.y();
-    emit translate(x, y);
     return result;
 }
 
@@ -191,34 +165,4 @@ bool ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
     return result;
 }
 
-void ScreenieGraphicsScene::updateGestureCursor(const QGesture *gesture, const QCursor &gestureCursor)
-{
-    QCursor cursor;
-    switch (gesture->state()) {
-        case Qt::GestureStarted: // fall-thru intended
-        case Qt::GestureUpdated:
-            cursor = gestureCursor;
-            d->cursorTimer.start();
-            break;
-        default:
-            cursor = Qt::ArrowCursor;
-            d->cursorTimer.stop();
-            break;
-    }
-    updateCursor(cursor);
-}
-
-void ScreenieGraphicsScene::updateCursor(const QCursor &cursor)
-{
-    foreach (QGraphicsView *view, views()) {
-        view->setCursor(cursor);
-    }
-}
-
-// private slots
-
-void ScreenieGraphicsScene::restoreCursor()
-{
-    updateCursor(Qt::ArrowCursor);
-}
 

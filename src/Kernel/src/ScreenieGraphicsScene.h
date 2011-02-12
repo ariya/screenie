@@ -32,7 +32,6 @@ class QKeyEvent;
 class QGesture;
 class QGestureEvent;
 class QPinchGesture;
-class QPanGesture;
 class QGesture;
 class QObject;
 
@@ -66,17 +65,8 @@ protected:
 private:
     ScreenieGraphicsScenePrivate *d;
 
-    void frenchConnection();
-
     bool gestureEvent(const QGestureEvent *event);
-    bool panTriggered(const QPanGesture *gesture);
     bool pinchTriggered(const QPinchGesture *gesture);
-
-    void updateGestureCursor(const QGesture *gesture, const QCursor &gestureCursor);
-    void updateCursor(const QCursor &cursor);
-
-private slots:
-    void restoreCursor();
 };
 
 #endif // SCREENIEGRAPHICSSCENE_H
