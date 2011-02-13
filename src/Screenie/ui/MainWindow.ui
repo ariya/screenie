@@ -283,7 +283,7 @@
      <x>0</x>
      <y>0</y>
      <width>448</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -381,7 +381,7 @@
      <normaloff>:/img/insert-image.png</normaloff>:/img/insert-image.png</iconset>
    </property>
    <property name="text">
-    <string>Image</string>
+    <string>Image ...</string>
    </property>
    <property name="toolTip">
     <string>Add Image</string>
@@ -393,7 +393,7 @@
      <normaloff>:/img/document-open.png</normaloff>:/img/document-open.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Open</string>
+    <string>&amp;Open ...</string>
    </property>
   </action>
   <action name="saveAction">
@@ -411,7 +411,7 @@
      <normaloff>:/img/document-save-as.png</normaloff>:/img/document-save-as.png</iconset>
    </property>
    <property name="text">
-    <string>Save &amp;As</string>
+    <string>Save &amp;As ...</string>
    </property>
   </action>
   <action name="exportAction">
@@ -508,7 +508,7 @@
   </action>
   <action name="saveAsTemplateAction">
    <property name="text">
-    <string>Save As &amp;Template</string>
+    <string>Save As &amp;Template ...</string>
    </property>
   </action>
   <action name="aboutAction">
