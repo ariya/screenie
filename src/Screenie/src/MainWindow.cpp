@@ -44,6 +44,8 @@
 #include <QtGui/QShortcut>
 #include <QtGui/QKeySequence>
 #include <QtGui/QCloseEvent>
+#include <QtGui/QAbstractButton>
+#include <QtGui/QPushButton>
 //#include <QtOpenGL/QGLWidget>
 //#include <QtOpenGL/QGLFormat>
 
@@ -397,35 +399,37 @@ void MainWindow::handleMultipleModifiedBeforeQuit()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("Multiple documents are modified."),
-                                              QMessageBox::Save | QMessageBox::Default,
+                                              tr("You have %1 documents with unsaved changes. Do you want to review these changes before quitting?")
+                                              .arg(DocumentManager::getInstance().getModifiedCount()) +
+                                              QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
+                                              tr("If you don't review your documents, all your changes will be lost.") + QString("</font>"),
+                                              QMessageBox::NoButton,
                                               this);
-    messageBox->addButton(QMessageBox::Discard);
+    QAbstractButton *verifyButton = messageBox->addButton(tr("Verify changes..."), QMessageBox::AcceptRole);
+    QAbstractButton *discardButton = messageBox->addButton(tr("Discard changes"), QMessageBox::DestructiveRole);
     messageBox->addButton(QMessageBox::Cancel);
-    messageBox->setAttribute(Qt::WA_DeleteOnClose);
-    int answer = messageBox->exec();
-    switch (answer) {
-    case QMessageBox::Save:
+    messageBox->setSizeGripEnabled(false);
+    messageBox->exec();
+    QAbstractButton *clickedButton = messageBox->clickedButton();
+    if (verifyButton == clickedButton) {
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Ask);
         QApplication::closeAllWindows();
-        break;
-    case QMessageBox::Discard:
+    } else if (discardButton == clickedButton) {
         DocumentManager::getInstance().setSaveStrategyForAll(DocumentInfo::Discard);
         QApplication::closeAllWindows();
-        break;
-    case QMessageBox::Cancel:
-        break;
-    default:
-        break;
     }
+    delete messageBox;
 }
 
 void MainWindow::askBeforeClose()
 {
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Warning,
                                               Version::getApplicationName(),
-                                              tr("The document %1 is modified.").arg(DocumentManager::getInstance().getDocumentName(*this)),
-                                              QMessageBox::Save | QMessageBox::Default,
+                                              tr("Do you want to save the changes you made in the document \"%1\"?")
+                                              .arg(DocumentManager::getInstance().getDocumentName(*this)) +
+                                              QString("<br /><br /><font size=\"-1\" style=\"font-weight:normal;\">") +
+                                              tr("Your changes will be lost if you don't save them.") + QString("</font>"),
+                                              QMessageBox::Save,
                                               this);
     messageBox->addButton(QMessageBox::Discard);
     messageBox->addButton(QMessageBox::Cancel);
@@ -519,13 +523,13 @@ bool MainWindow::isFilePathRequired() const
 
 void MainWindow::showReadError(const QString &filePath)
 {
-    showError(tr("Could not open document from file %1!")
+    showError(tr("Could not open document from file \"%1\"!")
               .arg(QDir::toNativeSeparators(filePath)));
 }
 
 void MainWindow::showWriteError(const QString &documentName, const QString &filePath)
 {
-    showError(tr("Could not save document %1 to file %2!")
+    showError(tr("Could not save document \"%1\" to file \"%2\"!")
               .arg(documentName)
               .arg(filePath));
 }
@@ -885,6 +889,7 @@ void MainWindow::updateDefaultValues()
 
 void MainWindow::handleRecentFile(const QString &filePath)
 {
+    // xxx
     bool ok;
     if (m_screenieScene->isDefault()) {
         ok = read(filePath);

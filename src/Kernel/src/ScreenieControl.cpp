@@ -305,22 +305,20 @@ void ScreenieControl::rotate(int angle, ScreenieModelInterface *screenieModel)
 
 void ScreenieControl::setDistance(int distance, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setDistance(distance);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::addDistance(int distance, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addDistance(distance);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::setReflectionEnabled(bool enable, ScreenieModelInterface *screenieModel)
@@ -333,42 +331,38 @@ void ScreenieControl::setReflectionEnabled(bool enable, ScreenieModelInterface *
 
 void ScreenieControl::setReflectionOffset(int reflectionOffset, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOffset(reflectionOffset);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::addReflectionOffset(int reflectionOffset, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOffset(reflectionOffset);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::setReflectionOpacity(int reflectionOpacity, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->setReflectionOpacity(reflectionOpacity);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::addReflectionOpacity(int reflectionOpacity, ScreenieModelInterface *screenieModel)
 {
-    setRenderQuality(LowQuality);
+    updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
     foreach (ScreenieModelInterface *screenieModel, screenieModels) {
         screenieModel->addReflectionOpacity(reflectionOpacity);
     }
-    d->qualityTimer.start();
 }
 
 void ScreenieControl::setBackgroundEnabled(bool enable)
