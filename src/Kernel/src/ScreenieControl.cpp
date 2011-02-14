@@ -535,6 +535,7 @@ void ScreenieControl::updateEditRenderQuality()
 #ifdef DEBUG
        qCritical("ScreenieControl::updateRenderQuality: UNSUPPORTED render quality: %d", Settings::getInstance().getEditRenderQuality());
 #endif
+       break;
     }
 }
 
