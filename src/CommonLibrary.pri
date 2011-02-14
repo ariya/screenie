@@ -21,3 +21,4 @@ macx {
         message(Building $$TARGET in release mode)
     }
 }
+

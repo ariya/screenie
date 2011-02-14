@@ -743,13 +743,15 @@ void MainWindow::on_aboutAction_triggered()
     QString description = tr("A fancy screenshot composer");
     QString authors1 = tr("Developed by Till Oliver Knoll");
     QString authors2 = tr("Idea by Ariya Hidayat");
-    QString versionNumber = tr("Version %1").arg(version.toString());
+    QString versionString = tr("Version %1").arg(Version::getUserVersion());
     QString aboutText = QString("<b>") + Version::getApplicationName() + "</b><br />" +
                         description + "<br /><br />" +
-                        authors1 + "<br />" +
+                        "<font style=\"font-weight:normal;\">" + authors1 + "<br />" +
                         authors2 + "<br /><br />" +
-                        Version::getApplicationName() + "\"" + Version::getCodeName() + "\"<br />" +
-                        versionNumber;
+                        Version::getApplicationName() + "<br />" +
+                        versionString + "<br />" +
+                        "\"" + Version::getCodeName() + "\"</font><br />" +
+                        "<font style=\"font-weight:normal;color:#aaa;\">" + version.toString() + "</font>";
     QMessageBox::about(this, tr("About %1").arg(Version::getApplicationName()), aboutText);
 }
 

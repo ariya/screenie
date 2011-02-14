@@ -34,6 +34,9 @@ CONFIG(debug, debug|release) {
     INCLUDEPATH   += GeneratedFiles/release
 }
 
+target.path = $$PWD/../dist
+INSTALLS += target
+
 unix:linux* {
     QMAKE_CXXFLAGS += -Wall -Woverloaded-virtual -Wno-deprecated -Wuninitialized -O
     QMAKE_CFLAGS += -Wstrict-prototypes -Wmissing-prototypes

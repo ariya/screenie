@@ -41,6 +41,7 @@ public:
     static const int Minor;
     static const int Subminor;
     static const QString CodeName;
+    static const QString UserVersion;
     static const QString ApplicationTitle;
 };
 
@@ -49,7 +50,8 @@ const int VersionPrivate::Major = 1;
 const int VersionPrivate::Minor = 0;
 const int VersionPrivate::Subminor = 0;
 const QString VersionPrivate::CodeName = QString("Anarchic Amoeba");
-const QString VersionPrivate::ApplicationTitle = "Screenie"; // note: no translation here (i18n)
+const QString VersionPrivate::UserVersion = QString("11.02");
+const QString VersionPrivate::ApplicationTitle = QString("Screenie"); // note: no translation here (i18n)
 
 // public
 
@@ -139,6 +141,11 @@ bool Version::operator<(const Version &other)
 QString Version::getCodeName()
 {
     return VersionPrivate::CodeName;
+}
+
+QString Version::getUserVersion()
+{
+    return VersionPrivate::UserVersion;
 }
 
 QString Version::getApplicationName()

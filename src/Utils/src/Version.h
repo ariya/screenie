@@ -111,6 +111,15 @@ public:
     UTILS_API static QString getCodeName();
 
     /*!
+     * A "fancy user readable version" which follows the pattern yy.mm.
+     *
+     * Example: 11.02 (= "released February 2011")
+     *
+     * \return a QString containing the "user readable version"
+     */
+    UTILS_API static QString getUserVersion();
+
+    /*!
      * Returns the application name which can be displayed in dialog captions.
      *
      * \return a QString containing the application name

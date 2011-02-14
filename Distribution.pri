@@ -6,7 +6,7 @@ win32 {
   include(Distribution_Windows.pri)
 }
 
-distribution.depends = all
+distribution.depends = install
 
 installer.depends = distribution
 
