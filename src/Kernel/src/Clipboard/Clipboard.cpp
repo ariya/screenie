@@ -170,7 +170,6 @@ void Clipboard::storeMimeData()
         QByteArray data = screenieSceneSerializer->serialize(d->screenieControl.getScreenieScene(), ScreenieSceneSerializer::SelectedItems);
         screenieMimeData->setData(MimeHelper::ScreenieMimeType, data);
         screenieMimeData->setData(MimeHelper::XmlMimeType, data);
-        screenieMimeData->setData(MimeHelper::TextMimeType, data);
         clipboard->setMimeData(screenieMimeData);
     }
 }
