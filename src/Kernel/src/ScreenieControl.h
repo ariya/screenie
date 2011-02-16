@@ -99,8 +99,8 @@ public slots:
     KERNEL_API void translate(qreal dx, qreal dy, ScreenieModelInterface *screenieModel = 0);
     KERNEL_API void setRotation(int angle, ScreenieModelInterface *screenieModel = 0);
     KERNEL_API void rotate(int angle, ScreenieModelInterface *screenieModel = 0);
-    KERNEL_API void setDistance(int distance, ScreenieModelInterface *screenieModel = 0);
-    KERNEL_API void addDistance(int distance, ScreenieModelInterface *screenieModel = 0);
+    KERNEL_API void setDistance(qreal distance, ScreenieModelInterface *screenieModel = 0);
+    KERNEL_API void addDistance(qreal distance, ScreenieModelInterface *screenieModel = 0);
 
     KERNEL_API void setReflectionEnabled(bool enable, ScreenieModelInterface *screenieModel = 0);
     KERNEL_API void setReflectionOffset(int reflectionOffset, ScreenieModelInterface *screenieModel = 0);

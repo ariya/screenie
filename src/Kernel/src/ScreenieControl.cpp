@@ -303,7 +303,7 @@ void ScreenieControl::rotate(int angle, ScreenieModelInterface *screenieModel)
     }
 }
 
-void ScreenieControl::setDistance(int distance, ScreenieModelInterface *screenieModel)
+void ScreenieControl::setDistance(qreal distance, ScreenieModelInterface *screenieModel)
 {
     updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
@@ -312,7 +312,7 @@ void ScreenieControl::setDistance(int distance, ScreenieModelInterface *screenie
     }
 }
 
-void ScreenieControl::addDistance(int distance, ScreenieModelInterface *screenieModel)
+void ScreenieControl::addDistance(qreal distance, ScreenieModelInterface *screenieModel)
 {
     updateEditRenderQuality();
     QList<ScreenieModelInterface *> screenieModels = getEditableModels(screenieModel);
@@ -499,8 +499,8 @@ void ScreenieControl::frenchConnection()
             this, SLOT(handleFilePathsDrop(QStringList, QPointF)));
     connect(&d->screenieGraphicsScene, SIGNAL(rotate(int)),
             this, SLOT(rotate(int)));
-    connect(&d->screenieGraphicsScene, SIGNAL(addDistance(int)),
-            this, SLOT(addDistance(int)));
+    connect(&d->screenieGraphicsScene, SIGNAL(addDistance(qreal)),
+            this, SLOT(addDistance(qreal)));
     connect(&d->screenieGraphicsScene, SIGNAL(translate(qreal, qreal)),
             this, SLOT(translate(qreal, qreal)));
     connect(&d->qualityTimer, SIGNAL(timeout()),

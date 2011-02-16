@@ -159,7 +159,7 @@ bool ScreenieGraphicsScene::pinchTriggered(const QPinchGesture *gesture)
     if (changeFlags & QPinchGesture::ScaleFactorChanged) {
         qreal distance = 1.0 - gesture->scaleFactor();
         qreal distanceSensitivity = Settings::getInstance().getDistanceGestureSensitivity();
-        emit addDistance(qRound(distance * distanceSensitivity));
+        emit addDistance(distance * distanceSensitivity);
         result = true;
     }
     return result;

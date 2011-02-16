@@ -53,7 +53,7 @@ signals:
     void imagesDropped(QList<QImage> images, QPointF position);
     void filePathsDropped(QStringList filePaths, QPointF position);
     void rotate(int angle);
-    void addDistance(int distance);
+    void addDistance(qreal distance);
     void translate(qreal x, qreal y);
 
 protected:
