@@ -196,7 +196,14 @@ void ScreeniePixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void ScreeniePixmapItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    int value = event->delta() / 12;
+    int value;
+    // On Windows 7 pinch gestures are mapped to wheel events with CTRL pressed,
+    // also refer to: http://msdn.microsoft.com/en-us/library/dd940543%28v=vs.85%29.aspx
+    if (Qt::ControlModifier & event->modifiers()) {
+        value = -event->delta() / 12;
+    } else {
+        value = event->delta() / 12;
+    }
     if (isInsidePixmap(event->pos())) {
         addDistance(value);
     } else {
