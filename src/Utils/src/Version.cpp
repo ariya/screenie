@@ -22,6 +22,14 @@
 #include <QtCore/QRegExp>
 #include "Version.h"
 
+#ifdef minor
+#undef minor
+#endif
+
+#ifdef major
+#undef major
+#endif
+
 class VersionPrivate
 {
 public:
